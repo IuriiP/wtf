@@ -1,0 +1,19 @@
+{
+    "name": "vendor/wt-f",
+    "description": "Wrapper To Framing",
+    "version": "0.1.0-dev",
+    "type": "project",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "IuriiP",
+            "email": "hardwork.mouse@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "v2.2.0"
+    },
+    "autoload": {
+        "classmap": ["core/", "private/" ,"vendor/"]
+    }
+}

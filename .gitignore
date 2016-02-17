@@ -1,1 +1,8 @@
+#netbeans project folder
 /nbproject/
+
+#work environment
+.env
+
+#vendors
+vendor/
