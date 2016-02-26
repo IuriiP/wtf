@@ -1,6 +1,6 @@
 {
-    "name": "vendor/wt-f",
-    "description": "Wrapper To Framing",
+    "name": "iuriip/wtf",
+    "description": "Wrapper 'The-Fastest'",
     "version": "0.1.0-dev",
     "type": "project",
     "license": "GPL-3.0",
@@ -11,9 +11,20 @@
         }
     ],
     "require": {
+        "php": ">=5.4",
         "vlucas/phpdotenv": "v2.2.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8|^5.0"
+    },
+    "require": {
+    },
     "autoload": {
-        "classmap": ["core/", "private/" ,"vendor/"]
+        "psr-4": {
+            "Core\\": "core/"
+        },
+        "classmap": [
+            "private/"
+        ]
     }
 }

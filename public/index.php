@@ -1,21 +1,30 @@
 <?php
+/*
+ * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+$start_time = microtime(true);
+session_start();
 /**
  * Use Composer's autoloader
  * 
  * @var \Composer\Autoload\ClassLoader Autoloader
  */
-$loader = require_once '../vendor/autoload.php';
+$loader = require_once('../vendor/autoload.php');
 
 /**
- * Use Dotenv environment
- * 
- * @var \Dotenv\Dotenv Environtment
+ * Run application
  */
-$dotenv = new Dotenv\Dotenv(__DIR__.DIRECTORY_SEPARATOR.'..');
-// $dotenv->load(); // for append .env to environment
-$dotenv->overload(); // for override environment by .env
-
-print_r($loader);
-print_r($dotenv);
-
-phpinfo();
+App::run($start_time);
