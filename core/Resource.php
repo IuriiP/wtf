@@ -25,7 +25,7 @@ namespace Wtf\Core;
  * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Bootstrap {
+abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Factory {
 
     use \Wtf\Traits\Builder,
         \Wtf\Traits\Factory;
@@ -144,7 +144,7 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
             }
 
             return [
-                'scheme' => ['Wtf\\Resources', $parts[2] ? : 'file'],
+                'scheme' => ['', $parts[2] ? : 'file'],
                 'path' => $parts[6]? : '/',
                 'options' => $opt,
                 'data' => count($parts > 7) ? $parts[8] : ''
@@ -152,7 +152,7 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
         }
 
         return [
-            'scheme' => ['Wtf\\Resources', 'none'],
+            'scheme' => ['', 'none'],
             'path' => '',
             'options' => [],
             'data' => ''

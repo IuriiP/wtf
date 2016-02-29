@@ -15,26 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core;
+namespace Wtf\Interfaces;
 
 /**
- * Description of Session
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
-
-    use \Wtf\Traits\Container,
-        \Wtf\Traits\Singleton;
-
-    private function __construct() {
-        if (PHP_SESSION_ACTIVE !== session_status()) {
-            session_start();
-        }
-    }
-
-//    public function __destruct() {
-//        session_commit();
-//    }
-//    
+interface Factory {
+    public static function factory($param);
 }

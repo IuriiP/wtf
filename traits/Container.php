@@ -33,14 +33,14 @@ trait Container {
 
     protected $_container = [];
 
-    private static function _parseComplex($offset) {
+    protected static function _parseComplex($offset) {
         if (is_string($offset) && (FALSE !== strpos($offset, '.'))) {
             return explode('.', $offset);
         }
         return null;
     }
 
-    private static function _complexCheck($container, $param) {
+    protected static function _complexCheck($container, $param) {
         $offset = array_shift($param);
         if (isset($container[$offset])) {
             if ($param) {
@@ -51,7 +51,7 @@ trait Container {
         return false;
     }
 
-    private static function _complexGet($container, $param) {
+    protected static function _complexGet($container, $param) {
         $offset = array_shift($param);
         if (isset($container[$offset])) {
             if ($param) {
@@ -62,7 +62,7 @@ trait Container {
         return null;
     }
 
-    private static function _complexSet(&$container, $param, $value) {
+    protected static function _complexSet(&$container, $param, $value) {
         $offset = array_shift($param);
         if ($param) {
             if (!isset($container[$offset])) {
@@ -73,7 +73,7 @@ trait Container {
         return $container[$offset] = $value;
     }
 
-    private static function _complexUnset(&$container, $param) {
+    protected static function _complexUnset(&$container, $param) {
         $offset = array_shift($param);
         if ($param) {
             if (isset($container[$offset])) {
@@ -85,28 +85,30 @@ trait Container {
     }
 
     public function offsetExists($offset) {
-        if ($complex = self::_parseOffset($offset)) {
-            $container = $this->_container;
-            foreach ($complex as $step) {
-                if (!isset($container[$step])) {
-                    return FALSE;
-                }
-                $container = $container[$step];
-            }
-            return TRUE;
+        if ($complex = self::_parseComplex($offset)) {
+            return self::_complexCheck($this->_container, $complex);
         }
         return isset($this->_container[strtolower($offset)]);
     }
 
     public function offsetGet($offset) {
+        if ($complex = self::_parseComplex($offset)) {
+            return self::_complexGet($this->_container, $complex);
+        }
         return $this->_container[strtolower($offset)];
     }
 
     public function offsetSet($offset, $value) {
+        if ($complex = self::_parseComplex($offset)) {
+            return self::_complexSet($this->_container, $complex, $value);
+        }
         return $this->_container[strtolower($offset)] = $value;
     }
 
     public function offsetUnset($offset) {
+        if ($complex = self::_parseComplex($offset)) {
+            return self::_complexUnset($this->_container, $complex);
+        }
         unset($this->_container[strtolower($offset)]);
     }
 
@@ -114,22 +116,27 @@ trait Container {
         return $this->_container;
     }
 
+    public function eliminate($offset, $def = null) {
+        $elem = $this->get($offset, $def);
+        $this->offsetUnset($offset);
+        return $elem;
+    }
+
     public function get($name, $def = null) {
+        if ($complex = self::_parseComplex($offset)) {
+            return self::_complexExists($this->_container, $complex) ?
+                    self::_complexGet($this->_container, $complex) :
+                    $def;
+        }
         return $this->offsetExists($name) ? $this->offsetGet($name) : $def;
     }
 
-    public function getOnly($only = []) {
-        if ($only) {
-            return array_intersect_key($this->_container, array_change_key_case(array_fill_keys($only, 0)));
-        }
-    }
-
-    public function getExcept($except = []) {
-        return array_diff_key($this->_container, array_change_key_case(array_fill_keys($except, 0)));
-    }
-
     public function set(array $array) {
-        return $this->_container = array_replace_recursive($this->_container, array_change_key_case($array));
+        $this->_container = [];
+        foreach ($array as $key => $value) {
+            $this->offsetSet($key, $value);
+        }
+        return $this->_container;
     }
 
     public function __get($offset) {
@@ -171,7 +178,8 @@ trait Container {
         if (is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
             return call_user_func_array([static::singleton(), $offset], $args);
         }
-        trigger_error(__CLASS__ . '::Container: static call to not the Singleton.');
+        trigger_error(__CLASS__ . '::Container: static calling accepted by Singleton only.');
+        return null;
     }
 
 }

@@ -34,13 +34,13 @@ trait Factory {
      */
     final static public function factory($named, $args = []) {
         if (is_array($named)) {
-            $class = (empty($named[0]) ? __NAMESPACE__ : $named[0]) . '\\' . ucfirst($named[1]);
+            $class = (empty($named[0]) ? __CLASS__.'s' : $named[0]) . '\\' . ucfirst($named[1]);
         } elseif(is_string($named)) {
             $class = \Wtf\Core\App::get($named) || $named;
         } elseif(is_object($named)) {
             $class = get_class($named);
         } else {
-            $class = $named;
+            return null;
         }
         if(is_object($class)) {
             // it's contract for singleton
@@ -50,7 +50,7 @@ trait Factory {
             $ref = new \ReflectionClass($class);
             return $ref->newInstanceArgs($args);
         } catch (Exception $exc) {
-            trigger_error(__CLASS__ . "::Factory: error istantiating '$class'");
+            trigger_error(__CLASS__ . "::Factory: error istantiating '{$class}'");
         }
         return null;
     }

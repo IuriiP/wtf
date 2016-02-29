@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Resources;
+namespace Wtf\Core\Resources;
 
 /**
  * Description of File
@@ -167,6 +167,13 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\
             return file_get_contents($this->_origin);
         }
         return FALSE;
+    }
+
+    public function getLength() {
+        if (!is_dir($this->_origin)) {
+            return filesize($this->_origin);
+        }
+        return 0;
     }
 
     /**

@@ -18,23 +18,13 @@
 namespace Wtf\Core;
 
 /**
- * Description of Session
+ * Description of Content
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
+abstract class Content implements \Wtf\Interfaces\Factory {
 
-    use \Wtf\Traits\Container,
-        \Wtf\Traits\Singleton;
+    use \Wtf\Traits\Factory;
 
-    private function __construct() {
-        if (PHP_SESSION_ACTIVE !== session_status()) {
-            session_start();
-        }
-    }
 
-//    public function __destruct() {
-//        session_commit();
-//    }
-//    
 }

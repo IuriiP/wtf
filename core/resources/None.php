@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Resources;
+namespace Wtf\Core\Resources;
 
 /**
  * Description of File
@@ -93,6 +93,10 @@ class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\
      */
     public function getMime() {
         return '';
+    }
+
+    public function getLength() {
+        
     }
 
     /**
