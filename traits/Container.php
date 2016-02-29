@@ -33,7 +33,68 @@ trait Container {
 
     protected $_container = [];
 
+    private static function _parseComplex($offset) {
+        if (is_string($offset) && (FALSE !== strpos($offset, '.'))) {
+            return explode('.', $offset);
+        }
+        return null;
+    }
+
+    private static function _complexCheck($container, $param) {
+        $offset = array_shift($param);
+        if (isset($container[$offset])) {
+            if ($param) {
+                return self::_complexCheck($container[$offset], $param);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private static function _complexGet($container, $param) {
+        $offset = array_shift($param);
+        if (isset($container[$offset])) {
+            if ($param) {
+                return self::_complexGet($container[$offset], $param);
+            }
+            return $container[$offset];
+        }
+        return null;
+    }
+
+    private static function _complexSet(&$container, $param, $value) {
+        $offset = array_shift($param);
+        if ($param) {
+            if (!isset($container[$offset])) {
+                $container[$offset] = array();
+            }
+            return self::_complexSet($container[$offset], $param, $value);
+        }
+        return $container[$offset] = $value;
+    }
+
+    private static function _complexUnset(&$container, $param) {
+        $offset = array_shift($param);
+        if ($param) {
+            if (isset($container[$offset])) {
+                self::_complexUnset($container[$offset], $param);
+            }
+            return;
+        }
+        unset($container[$offset]);
+    }
+
     public function offsetExists($offset) {
+        if ($complex = self::_parseOffset($offset)) {
+            $container = $this->_container;
+            foreach ($complex as $step) {
+                if (!isset($container[$step])) {
+                    return FALSE;
+                }
+                $container = $container[$step];
+            }
+            return TRUE;
+        }
         return isset($this->_container[strtolower($offset)]);
     }
 
@@ -66,7 +127,7 @@ trait Container {
     public function getExcept($except = []) {
         return array_diff_key($this->_container, array_change_key_case(array_fill_keys($except, 0)));
     }
-    
+
     public function set(array $array) {
         return $this->_container = array_replace_recursive($this->_container, array_change_key_case($array));
     }
@@ -104,13 +165,13 @@ trait Container {
         }
         return $elem;
     }
-    
+
     public function __callStatic($offset, $args = []) {
         $class = get_called_class();
-        if(is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
-            return call_user_func_array([static::singleton(),$offset], $args);
+        if (is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
+            return call_user_func_array([static::singleton(), $offset], $args);
         }
-        trigger_error(__CLASS__.'::Container: static call to not the Singleton.');
+        trigger_error(__CLASS__ . '::Container: static call to not the Singleton.');
     }
 
 }

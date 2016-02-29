@@ -22,8 +22,15 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Session implements \Wtf\Interfaces\Singleton {
+class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 
     use \Wtf\Traits\Singleton;
 
+    private function __construct() {
+        if(PHP_SESSION_ACTIVE!==session_status()) {
+            session_start();
+        }
+    }
+    
+    
 }
