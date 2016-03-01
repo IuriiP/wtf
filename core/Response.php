@@ -114,6 +114,11 @@ class Response implements \Wtf\Interfaces\Bootstrap {
     private $_content = null;
 
     /**
+     * @var \Wtf\Core\Content[]
+     */
+    private $_asserts = [];
+
+    /**
      * Contracted name
      */
     public static function bootstrap() {
@@ -165,6 +170,27 @@ class Response implements \Wtf\Interfaces\Bootstrap {
         return $this;
     }
 
+    public function assert($content, $name = null, $position = 0) {
+        $assertion = Content::make('assert', $content, $position);
+
+        if ((Content::ASSERT_HERE === $position) && !($name && isset($this->_asserts[$name]))) {
+            if ($this->_content) {
+                if (method_exists($this->_content, 'assert')) {
+                    $this->_content->assert($assertion, Content::ASSERT_END);
+                }
+            } else {
+                $this->_content = $assertion;
+            }
+            if ($name) {
+                $this->_asserts[$name] = null;
+            }
+        } elseif ($name) {
+            $this->_asserts[$name] = $assertion;
+        } else {
+            $this->_asserts[] = $assertion;
+        }
+    }
+
     /**
      * Magic setter for any type casting.
      * 
@@ -178,13 +204,13 @@ class Response implements \Wtf\Interfaces\Bootstrap {
             $this->_content = null;
         } elseif (!$this->_content) {
             // initial
-            $this->_content = Content::factory($type,$args[0]);
-        } elseif ($this->_content->getType() !== $type) {
+            $this->_content = Content::factory($type, $args);
+        } elseif ($this->_content->isType($type)) {
             // mixing not allowed
-            trigger_error(__CLASS__ . "::{$type}: content mixing not allowed to ".$this->_content->getType());
+            trigger_error(__CLASS__ . "::{$type}: content mixing not allowed to " . $this->_content->getType());
         } else {
             // expand if possible
-            if (!$this->_content->append($args[0])) {
+            if (!$this->_content->append($args)) {
                 trigger_error(__CLASS__ . "::{$type}: content expanding not allowed");
             }
         }
@@ -213,10 +239,22 @@ class Response implements \Wtf\Interfaces\Bootstrap {
         return ($code >= 200) && ($code < 300);
     }
 
-    public function send($code = null) {
-        if (!headers_sent() && $this->_sendHeader($code? : $this->_code) && $this->_content) {
-            header('Content-type: '. $this->_content->getMime(), true);
+    public function send($trash = null) {
+        if (!headers_sent() && $this->_sendHeader($this->_code) && $this->_content) {
+            header('Content-type: ' . $this->_content->getMime(), true);
 
+            if($trash) {
+                if ($this->_content->isType('html')) {
+                    $this->assert(Content::make('html_comment', $trash), '', Content::ASSERT_END);
+                } else {
+                    $this->assert(Content::make('http_header', $trash), '', Content::ASSERT_END);
+                }
+            }
+            if ($this->_asserts && method_exists($this->_content, 'assert')) {
+                foreach (array_filter($this->_asserts) as $assertion) {
+                    $this->_content->assert($assertion);
+                }
+            }
             $this->_content->send();
         }
     }

@@ -25,6 +25,14 @@ namespace Wtf\Traits;
  */
 trait Factory {
 
+    final static public function camelCase($string) {
+        
+    }
+
+    final static public function snakeCase($string) {
+        
+    }
+
     /**
      * Object Factory
      * 
@@ -53,6 +61,12 @@ trait Factory {
             trigger_error(__CLASS__ . "::Factory: error istantiating '{$class}'");
         }
         return null;
+    }
+    
+    final public static function make() {
+        $args = func_get_args();
+        $named = array_shift($args);
+        return self::factory($named,$args);
     }
 
 }

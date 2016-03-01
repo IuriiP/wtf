@@ -26,5 +26,57 @@ abstract class Content implements \Wtf\Interfaces\Factory {
 
     use \Wtf\Traits\Factory;
 
+    const
+            ASSERT_END = 0,
+            ASSERT_BEGIN = 1,
+            ASSERT_HERE = 2,
+            ASSERT_ONLOAD = 3;
 
+    /**
+     * @var string type of content
+     */
+    protected $type = null;
+
+    /**
+     * @var mixed content
+     */
+    protected $content = null;
+
+    /**
+     * Check type
+     * 
+     * @param string $type
+     * @return boolean
+     */
+    final public function isType($type) {
+        return strcasecmp($this->type, $type) === 0;
+    }
+
+    /**
+     * Get data mime-type for the 'Content-type' header
+     * 
+     * @return string 
+     */
+    abstract public function getMime();
+
+    /**
+     * Get data length in bytes for the 'Content-length' header
+     * 
+     * @return int
+     */
+    abstract public function getLength();
+
+    /**
+     * Append data to content
+     * 
+     * @return boolean is success
+     */
+    abstract public function append($args);
+
+    /**
+     * Send data to the output stream
+     * 
+     * @return boolean is success
+     */
+    abstract public function send();
 }
