@@ -17,14 +17,16 @@
  */
 namespace Wtf\Core;
 
-use Wtf\Core\Content;
+use Wtf\Core\Content,
+    Wtf\Core\Entity;
 
 /**
  * Chainable Response
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Response implements \Wtf\Interfaces\Bootstrap {
+class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
+{
 
     /**
      * @var array HTTP/1.1 response codes
@@ -80,7 +82,6 @@ class Response implements \Wtf\Interfaces\Bootstrap {
         429 => 'Too Many Requests',
         431 => 'Request Header Fields Too Large',
         434 => 'Requested host unavailable',
-        444 => '',
         449 => 'Retry With',
         451 => 'Unavailable For Legal Reasons',
         //5xx: Server Error:
@@ -107,34 +108,24 @@ class Response implements \Wtf\Interfaces\Bootstrap {
      * @var int response code
      */
     private $_code = 200;
-
-    /**
-     * @var \Wtf\Core\Content
-     */
-    private $_content = null;
-
-    /**
-     * @var \Wtf\Core\Content[]
-     */
-    private $_asserts = [];
+    public $sent = false;
 
     /**
      * Contracted name
      */
-    public static function bootstrap() {
+    public static function bootstrap()
+    {
         App::contract('response', __CLASS__);
     }
 
     /**
      * Set headers array.
      * 
-     * Clears headers when NULL or omitted.
-     * Expands headers from array.
-     * 
      * @param array $array
      * @return \Wtf\Core\Response
      */
-    public function headers($array = null) {
+    public function headers($array = null)
+    {
         if (!headers_sent()) {
             if (null === $array) {
                 $this->_headers = [];
@@ -146,13 +137,14 @@ class Response implements \Wtf\Interfaces\Bootstrap {
     }
 
     /**
-     * SEt/replace the header.
+     * Set/replace the header.
      * 
      * @param string $name
      * @param mixed $value
      * @return \Wtf\Core\Response
      */
-    public function header($name, $value = null) {
+    public function header($name, $value = null)
+    {
         if (!headers_sent()) {
             $this->_headers[$name] = $value;
         }
@@ -165,64 +157,111 @@ class Response implements \Wtf\Interfaces\Bootstrap {
      * @param int $code
      * @return \Wtf\Core\Response
      */
-    public function code($code) {
+    public function code($code)
+    {
         $this->_code = $code;
         return $this;
     }
 
-    public function assert($content, $name = null, $position = 0) {
-        $assertion = Content::make('assert', $content, $position);
-
-        if ((Content::ASSERT_HERE === $position) && !($name && isset($this->_asserts[$name]))) {
-            if ($this->_content) {
-                if (method_exists($this->_content, 'assert')) {
-                    $this->_content->assert($assertion, Content::ASSERT_END);
-                }
+    /**
+     * Define the required dependency
+     * 
+     * @param mixed $content \Wtf\Core\Content descendant
+     * @param string $name 
+     * @param int $position
+     */
+    public function approve($content, $name = null, $position = 0)
+    {
+        $asset = [
+            'position' => $position,
+            'content' => $content,
+        ];
+        if ((Content::USE_HERE === $position) && !$this->hasChild($name)) {
+            if (!$this->content) {
+                $this->content($content);
             } else {
-                $this->_content = $assertion;
+                $this->content->inject($asset);
             }
             if ($name) {
-                $this->_asserts[$name] = null;
+                $this->child[$name] = null;
             }
         } elseif ($name) {
-            $this->_asserts[$name] = $assertion;
+            $this->child[$name] = $asset;
         } else {
-            $this->_asserts[] = $assertion;
+            $this->child[] = $asset;
         }
+        return $this;
     }
 
     /**
-     * Magic setter for any type casting.
+     * Magic setter for any type injection.
+     * 
+     * EG: Code below
+     * ~~~
+     * $response->html()
+     *     ->style('.hidden {display:none;}')
+     *     ->script('$("#some").addClass("hidden");');
+     * ~~~
+     * will inject <style> and <script> tags into html.
      * 
      * @param type $type
      * @param type $args
      * @return \Wtf\Core\Response
      */
-    public function __call($type, $args) {
+    public function __call($type, $args)
+    {
         if ((count($args) < 1) || (null === $args[0])) {
-            // clear
-            $this->_content = null;
-        } elseif (!$this->_content) {
-            // initial
-            $this->_content = Content::factory($type, $args);
-        } elseif ($this->_content->isType($type)) {
-            // mixing not allowed
-            trigger_error(__CLASS__ . "::{$type}: content mixing not allowed to " . $this->_content->getType());
-        } else {
-            // expand if possible
-            if (!$this->_content->append($args)) {
-                trigger_error(__CLASS__ . "::{$type}: content expanding not allowed");
+            
+        } elseif (!$this->content) {
+            if (!$this->content(Content::factory($type, $args))) {
+                trigger_error(__CLASS__ . "::{$type}: unknown initial class");
             }
+        } elseif ($this->content->canInject($type)) {
+            switch (count($args)) {
+                case 2: $this->approve(Entity::make($type, $args[1]), $args[0]);
+                    break;
+                case 1: $this->approve(Entity::make($type, $args[0]));
+                    break;
+                default: $this->approve(Entity::make($type, $args[1]), $args[0], $args[2]);
+                    break;
+            }
+        } else {
+            trigger_error(__CLASS__ . "::{$type}: injecting not allowed to " . $this->content->getType());
         }
         return $this;
     }
 
-    public function redirect($url, $code) {
-        $this->clear()->header('Location', $url)->code($code? : 301);
-        $this->send();
+    /**
+     * Static initialize.
+     * 
+     * EG:
+     * Resource::html('hello, world!') = new Resource(Content::make('html','hello, world!')) = new Resource(new Contents\Html('hello, world!'))
+     * 
+     * @param type $name
+     * @param type $args
+     * @return \Wtf\Core\Response
+     */
+    public function __callStatic($name, $args)
+    {
+        return new Response(Content::factory($name, $args));
     }
 
-    private function _sendHeader($code) {
+    public function clear()
+    {
+        $this->content = null;
+        $this->children = [];
+        return $this;
+    }
+
+    public function redirect($url, $code)
+    {
+        $this->clear()->header('Location', $url)->code($code? : 301);
+        $this->sent = $this->send();
+        return $this;
+    }
+
+    private function _sendHeader($code)
+    {
         header("HTTP/1.1 {$code} " . self::$_http[$code], true);
 
         foreach ($this->_headers as $key => $value) {
@@ -239,24 +278,33 @@ class Response implements \Wtf\Interfaces\Bootstrap {
         return ($code >= 200) && ($code < 300);
     }
 
-    public function send($trash = null) {
-        if (!headers_sent() && $this->_sendHeader($this->_code) && $this->_content) {
-            header('Content-type: ' . $this->_content->getMime(), true);
-
-            if($trash) {
-                if ($this->_content->isType('html')) {
-                    $this->assert(Content::make('html_comment', $trash), '', Content::ASSERT_END);
+    public function send($trash = null)
+    {
+        if (!headers_sent() && $this->_sendHeader($this->_code) && $this->content) {
+            header('Content-type: ' . $this->content->getMime(), true);
+            if ($trash) {
+                if ($this->content->isType('html')) {
+                    $this->approve(Entity::make('html_comment', $trash), '', Content::INJECT_END);
                 } else {
-                    $this->assert(Content::make('http_header', $trash), '', Content::ASSERT_END);
+                    $this->approve(Entity::make('http_debug', $trash), '', Content::INJECT_HERE);
                 }
             }
-            if ($this->_asserts && method_exists($this->_content, 'assert')) {
-                foreach (array_filter($this->_asserts) as $assertion) {
-                    $this->_content->assert($assertion);
+            if ($this->children) {
+                foreach (array_filter($this->children) as $asset) {
+                    $this->content->inject($asset);
                 }
             }
-            $this->_content->send();
+            if ($length = $this->content->getLength()) {
+                header("Content-length: {$length}", true);
+            }
+            echo (string) $this->content;
         }
+        return $this->sent = true;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->content;
     }
 
 }

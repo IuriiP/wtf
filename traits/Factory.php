@@ -23,14 +23,53 @@ namespace Wtf\Traits;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-trait Factory {
+trait Factory
+{
 
-    final static public function camelCase($string) {
-        
+    /**
+     * Make name in CamelCase style
+     * 
+     * @param string $string
+     * @param boolean $ucfirst
+     * @return string
+     */
+    final public static function camelCase($string, $ucfirst = true)
+    {
+        $str = preg_replace_callback('~_([a-z])~i', function($matches) {
+            return ucfirst($matches[1]);
+        }, $string);
+        return $ucfirst ? ucfirst($str) : $str;
     }
 
-    final static public function snakeCase($string) {
-        
+    /**
+     * Make name in snake_case style
+     * 
+     * @param string $string
+     * @return string
+     */
+    final public static function snakeCase($string)
+    {
+        $str = preg_replace_callback('~[A-Z]~', function($matches) {
+            return '_' . strtolower($matches[0]);
+        }, lcfirst($string));
+        return $str;
+    }
+
+    /**
+     * Pluralise last element in string
+     * 
+     * @param string $string
+     * @return string
+     */
+    final public static function plural($string)
+    {
+        return preg_replace_callback('~[a-z]$~', function($matches) {
+            switch ($matches[0]) {
+                case 's': return 'ses';
+                case 'y': return 'ies';
+                default: return $matches[0] . 's';
+            }
+        }, $string);
     }
 
     /**
@@ -40,17 +79,18 @@ trait Factory {
      * @param array $args args list
      * @return mixed|null
      */
-    final static public function factory($named, $args = []) {
+    final public static function factory($named, $args = [])
+    {
         if (is_array($named)) {
-            $class = (empty($named[0]) ? __CLASS__.'s' : $named[0]) . '\\' . ucfirst($named[1]);
-        } elseif(is_string($named)) {
+            $class = (empty($named[0]) ? self::plural(get_called_class()) : $named[0]) . '\\' . self::camelCase($named[1]);
+        } elseif (is_string($named)) {
             $class = \Wtf\Core\App::get($named) || $named;
-        } elseif(is_object($named)) {
+        } elseif (is_object($named)) {
             $class = get_class($named);
         } else {
             return null;
         }
-        if(is_object($class)) {
+        if (is_object($class)) {
             // it's contract for singleton
             return $class;
         }
@@ -62,11 +102,29 @@ trait Factory {
         }
         return null;
     }
-    
-    final public static function make() {
+
+    /**
+     * Direct call to factory
+     * 
+     * @return mixed|null
+     */
+    final public static function make()
+    {
         $args = func_get_args();
         $named = array_shift($args);
-        return self::factory($named,$args);
+        return self::factory($named, $args);
+    }
+
+    /**
+     * Smart call to factory
+     * 
+     * @param string $name
+     * @param array $param
+     * @return mixed|null
+     */
+    final static function __callStatic($name, $param)
+    {
+        return static::factory($name, $param);
     }
 
 }

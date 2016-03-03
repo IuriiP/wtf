@@ -18,38 +18,44 @@
 namespace Wtf\Core;
 
 /**
- * Description of Content
+ * Universal Content prototype
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Content implements \Wtf\Interfaces\Factory {
-
-    use \Wtf\Traits\Factory;
-
+abstract class Content extends \Wtf\Core\Entity
+{
     const
-            ASSERT_END = 0,
-            ASSERT_BEGIN = 1,
-            ASSERT_HERE = 2,
-            ASSERT_ONLOAD = 3;
+            INJECT_HERE = 0,
+            INJECT_BEGIN = 1,
+            INJECT_END = 2;
+
 
     /**
-     * @var string type of content
-     */
-    protected $type = null;
-
-    /**
-     * @var mixed content
-     */
-    protected $content = null;
-
-    /**
-     * Check type
+     * Get the private method name for injecting
      * 
      * @param string $type
-     * @return boolean
+     * @return string|false
      */
-    final public function isType($type) {
-        return strcasecmp($this->type, $type) === 0;
+    final public function canInject($type)
+    {
+        $method = "inject_{$type}";
+        if (method_exists($this, $method)) {
+            return $method;
+        }
+        return false;
+    }
+
+    /**
+     * Common injection entry point 
+     * 
+     * @param array $asset
+     */
+    final public function inject($asset)
+    {
+        if ($method = $this->canInject($asset['content']->getType())) {
+            return $this->$method($asset['content'], $asset['position']);
+        }
+        return false;
     }
 
     /**
@@ -67,16 +73,17 @@ abstract class Content implements \Wtf\Interfaces\Factory {
     abstract public function getLength();
 
     /**
-     * Append data to content
+     * Shortcut for the fragment injecting to the end
      * 
-     * @return boolean is success
+     * @param type $content
+     * @return type
      */
-    abstract public function append($args);
+    final public function append($content)
+    {
+        return $this->inject([
+                    'content' => self::make($this->type, $content),
+                    'position' => self::INJECT_END,
+        ]);
+    }
 
-    /**
-     * Send data to the output stream
-     * 
-     * @return boolean is success
-     */
-    abstract public function send();
 }
