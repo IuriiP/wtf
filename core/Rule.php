@@ -22,7 +22,7 @@ namespace Wtf\Core;
  * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Rule implements \Wtf\Interfaces\Bootstrap {
+class Rule implements \Wtf\Interfaces\Bootstrap,  \Wtf\Interfaces\Builder {
 
     use \Wtf\Traits\Builder;
 

@@ -15,17 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core;
+namespace Wtf\Interfaces;
 
 /**
- * Application is a basic factory
- * for get up named descendants
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Application implements \Wtf\Interfaces\Factory
+interface Attributes
 {
 
-    use \Wtf\Traits\Factory;
-
+    public function attrsLines($array);
 }

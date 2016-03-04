@@ -90,4 +90,15 @@ abstract class Entity implements \Wtf\Interfaces\Factory
      * @return string 
      */
     abstract public function __toString();
+    
+    /**
+     * Apply processor to this object.
+     * 
+     * @param \Wtf\Core\Processor $processor
+     * @return $this
+     */
+    final public function apply(Processor $processor)
+    {
+        return $processor->process($this);
+    }
 }

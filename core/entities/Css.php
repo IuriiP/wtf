@@ -15,17 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core;
+namespace Wtf\Core\Entities;
 
 /**
- * Application is a basic factory
- * for get up named descendants
+ * Description of Css
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Application implements \Wtf\Interfaces\Factory
+class Css extends \Wtf\Core\Entity
 {
+    use \Wtf\Traits\Attributes;
+    
+    public function __construct($data=[])
+    {
+        parent::__construct((array) $data, 'css');
+    }
 
-    use \Wtf\Traits\Factory;
+    public function __toString()
+    {
+        return '<link rel="stylesheet" '. \implode(' ',$this->attrsLines($this->content)) .' />';
+    }
 
 }

@@ -93,6 +93,21 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
      * 
      * @param array $args
      */
+    final static protected function guess_object_array(array $args) {
+        $obj = $args[0];
+        if ($obj instanceof Resource) {
+            return self::factory($obj, [$obj->getPath(), $obj->getOptions(), ''])->options($args[1]);
+        }
+        return null;
+    }
+
+    /**
+     * Create Resource descendant
+     * from the child of Resource 
+     * with adding options
+     * 
+     * @param array $args
+     */
     final static protected function guess_object_string_array(array $args) {
         return self::guess_object_string_array($args, $args[2]);
     }

@@ -15,17 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core;
+namespace Wtf\Core\Entities;
 
 /**
- * Application is a basic factory
- * for get up named descendants
+ * Description of HttpDebug
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Application implements \Wtf\Interfaces\Factory
+class HttpDebug extends \Wtf\Core\Entity implements \IteratorAggregate
 {
 
-    use \Wtf\Traits\Factory;
+    public function __construct($data = null)
+    {
+        parent::__construct((array) $data, 'http_debug');
+    }
+
+    public function __toString()
+    {
+        return \implode(\PHP_EOL, $this->content);
+    }
+
+    public function getIterator()
+    {
+        return $this->content;
+    }
 
 }

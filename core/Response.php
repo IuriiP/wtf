@@ -176,7 +176,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
             'position' => $position,
             'content' => $content,
         ];
-        if ((Content::USE_HERE === $position) && !$this->hasChild($name)) {
+        if ((\Wtf\Interfaces\Content::INJECT_HERE === $position) && !$this->hasChild($name)) {
             if (!$this->content) {
                 $this->content($content);
             } else {
@@ -211,10 +211,13 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
     public function __call($type, $args)
     {
         if ((count($args) < 1) || (null === $args[0])) {
-            
+            $this->approve(Entity::make($type, null));
         } elseif (!$this->content) {
-            if (!$this->content(Content::factory($type, $args))) {
-                trigger_error(__CLASS__ . "::{$type}: unknown initial class");
+            $content = Entity::factory($type, $args);
+            if ($content && ($content instanceof \Wtf\Interfaces\Content)) {
+                $this->content($content);
+            }else {
+                trigger_error(__CLASS__ . "::{$type}: can't be content");
             }
         } elseif ($this->content->canInject($type)) {
             switch (count($args)) {
@@ -243,7 +246,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
      */
     public function __callStatic($name, $args)
     {
-        return new Response(Content::factory($name, $args));
+        return new Response(Entity::factory($name, $args));
     }
 
     public function clear()
@@ -284,9 +287,9 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
             header('Content-type: ' . $this->content->getMime(), true);
             if ($trash) {
                 if ($this->content->isType('html')) {
-                    $this->approve(Entity::make('html_comment', $trash), '', Content::INJECT_END);
+                    $this->approve(Entity::make('html_comment', $trash), '', \Wtf\Interfaces\Content::INJECT_END);
                 } else {
-                    $this->approve(Entity::make('http_debug', $trash), '', Content::INJECT_HERE);
+                    $this->approve(Entity::make('http_debug', $trash), '', \Wtf\Interfaces\Content::INJECT_HERE);
                 }
             }
             if ($this->children) {

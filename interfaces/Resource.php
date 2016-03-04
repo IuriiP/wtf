@@ -92,7 +92,7 @@ interface Resource {
     public function getMime();
 
     /**
-     * Get the object mime-type
+     * Get the object length
      * 
      * @return string
      */

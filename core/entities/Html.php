@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core\Contents;
+namespace Wtf\Core\Entities;
 
 /**
  * Html treat its content as
@@ -23,8 +23,10 @@ namespace Wtf\Core\Contents;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Html extends \Wtf\Core\Content
+class Html extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
 {
+
+    use \Wtf\Traits\Content;
 
     /**
      * Early prepared xPath
@@ -58,32 +60,37 @@ class Html extends \Wtf\Core\Content
      */
     public function __construct($content, $charset = null)
     {
-        parent::__construct(null,'html');
+        parent::__construct(null, 'html');
 
         if ($content instanceof \SimpleXMLElement) {
             $this->content = new DOMDocument('1.0', $charset? : 'utf-8');
             $this->content->importNode(dom_import_simplexml($content), true);
         } elseif ($content instanceof \DOMDocument) {
             $this->content = clone $content;
-        } elseif (is_string($content)) {
+        } elseif ($content) {
             $this->content = new DOMDocument('1.0', $charset? : 'utf-8');
-            $this->content->loadHTML($content, LIBXML_COMPACT | LIBXML_NONET);
+            $this->content->loadHTML((string) $content, LIBXML_COMPACT | LIBXML_NONET);
         }
         if ($this->content) {
             $this->xpath = new \DOMXPath($this->content);
-            $this->head = $this->xpath->query('//head')->item(0);
-            $this->body = $this->xpath->query('//body')->item(0);
+            $body = $this->xpath->query('//body');
+            if ($body->length) {
+                $this->body = $body->item(0);
+            } else {
+                $this->body = $this->content->documentElement->appendChild($this->content->createElement('body'));
+            }
+            $head = $this->xpath->query('//head');
+            if ($head->length) {
+                $this->head = $head->item(0);
+            } else {
+                $this->head = $this->content->documentElement->insertBefore($this->content->createElement('head'), $this->body);
+            }
         }
     }
 
     public function getMime()
     {
         return 'text/html; charset=' . $this->content->encoding;
-    }
-
-    public function getLength()
-    {
-        return null;
     }
 
     public function __toString()
@@ -102,11 +109,11 @@ class Html extends \Wtf\Core\Content
      * <head> always appended to existed
      * <body> injection depends to $position
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\Html $content
+     * @param \Wtf\Core\Entities\Html $content
      * @param int $position
      * @return boolean
      */
-    protected function inject_html(Wtf\Core\Contents\Html $content, $position)
+    protected function inject_html(Wtf\Core\Entities\Html $content, $position)
     {
         /**
          * @var \DOMDocument Description
@@ -118,7 +125,7 @@ class Html extends \Wtf\Core\Content
             $this->head->appendChild($dom->importNode($node, true));
         }
         // copy <body>
-        $anchor = self::INJECT_BEGIN === $position ? $this->body->firstChild : null;
+        $anchor = \Wtf\Interfaces\Content::INJECT_BEGIN === $position ? $this->body->firstChild : null;
         foreach ($content->content->getElementsByTagName('body')->item(0)->childNodes as $node) {
             $this->body->insertBefore($dom->importNode($node, true), $anchor);
         }
@@ -131,17 +138,17 @@ class Html extends \Wtf\Core\Content
      * INJECT_BEGIN append script to the <head>
      * INJECT_END append script to the <body>
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\Script $content
+     * @param \Wtf\Core\Entities\Script $content
      * @param int $position
      * @return boolean
      */
-    protected function inject_script(Wtf\Core\Contents\Script $content, $position)
+    protected function inject_script(Wtf\Core\Entities\Script $content, $position)
     {
         /**
          * @var \DOMDocument Description
          */
         $dom = $this->content;
-        $target = self::INJECT_BEGIN === $position ? $this->head : $this->body;
+        $target = \Wtf\Interfaces\Content::INJECT_BEGIN === $position ? $this->head : $this->body;
         $target->appendChild($dom->createElement('script', (string) $content));
         return true;
     }
@@ -149,11 +156,11 @@ class Html extends \Wtf\Core\Content
     /**
      * Direct injection of the style.
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\Style $content
+     * @param \Wtf\Core\Entities\Style $content
      * @param int $position
      * @return boolean
      */
-    protected function inject_style(Wtf\Core\Contents\Style $content, $position)
+    protected function inject_style(Wtf\Core\Entities\Style $content, $position)
     {
         /**
          * @var \DOMDocument Description
@@ -166,17 +173,17 @@ class Html extends \Wtf\Core\Content
     /**
      * Inject link to script
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\Js $content
+     * @param \Wtf\Core\Entities\Js $content
      * @param int $position
      * @return boolean
      */
-    protected function inject_js(Wtf\Core\Contents\Js $content, $position)
+    protected function inject_js(Wtf\Core\Entities\Js $content, $position)
     {
         /**
          * @var \DOMDocument Description
          */
         $dom = $this->content;
-        if (self::INJECT_BEGIN === $position) {
+        if (\Wtf\Interfaces\Content::INJECT_BEGIN === $position) {
             $links = $this->xpath->query('script[@src]');
             if ($links && ($count = $links->length)) {
                 $anchor = $links->item(0);
@@ -190,8 +197,8 @@ class Html extends \Wtf\Core\Content
             $target = $this->body;
         }
         $node = $dom->createDocumentFragment();
-        if($node->appendXML((string) $content)) {
-            $target->insertBefore($node,$anchor);
+        if ($node->appendXML((string) $content)) {
+            $target->insertBefore($node, $anchor);
         }
         return true;
     }
@@ -199,11 +206,11 @@ class Html extends \Wtf\Core\Content
     /**
      * Inject link to css
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\Css $content
+     * @param \Wtf\Core\Entities\Css $content
      * @param int $position
      * @return boolean
      */
-    protected function inject_css(Wtf\Core\Contents\Css $content, $position)
+    protected function inject_css(Wtf\Core\Entities\Css $content, $position)
     {
         /**
          * @var \DOMDocument Description
@@ -211,13 +218,13 @@ class Html extends \Wtf\Core\Content
         $dom = $this->content;
         $links = $this->xpath->query('link[@rel = "stylesheet"]');
         if ($links && ($count = $links->length)) {
-            $anchor = self::INJECT_BEGIN === $position ? $links->item(0) : $links->item($count - 1)->nextSibling;
+            $anchor = \Wtf\Interfaces\Content::INJECT_BEGIN === $position ? $links->item(0) : $links->item($count - 1)->nextSibling;
         } else {
             $anchor = null;
         }
         $node = $dom->createDocumentFragment();
-        if($node->appendXML((string) $content)) {
-            $this->head->insertBefore($node,$anchor);
+        if ($node->appendXML((string) $content)) {
+            $this->head->insertBefore($node, $anchor);
         }
         return true;
     }
@@ -225,11 +232,11 @@ class Html extends \Wtf\Core\Content
     /**
      * 
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\Link $content
+     * @param \Wtf\Core\Entities\Link $content
      * @param int $position
      * @return boolean
      */
-    protected function inject_link(Wtf\Core\Contents\Link $content, $position)
+    protected function inject_link(Wtf\Core\Entities\Link $content, $position)
     {
         /**
          * @var \DOMDocument Description
@@ -237,13 +244,13 @@ class Html extends \Wtf\Core\Content
         $dom = $this->content;
         $links = $this->xpath->query('link');
         if ($links && ($count = $links->length)) {
-            $anchor = self::INJECT_BEGIN === $position ? $links->item(0) : $links->item($count - 1)->nextSibling;
+            $anchor = \Wtf\Interfaces\Content::INJECT_BEGIN === $position ? $links->item(0) : $links->item($count - 1)->nextSibling;
         } else {
             $anchor = null;
         }
         $node = $dom->createDocumentFragment();
-        if($node->appendXML((string) $content)) {
-            $this->head->insertBefore($node,$anchor);
+        if ($node->appendXML((string) $content)) {
+            $this->head->insertBefore($node, $anchor);
         }
         return true;
     }
@@ -251,11 +258,11 @@ class Html extends \Wtf\Core\Content
     /**
      * Append debug information to the HTTP header
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\HttpDebug $content
+     * @param \Wtf\Core\Entities\HttpDebug $content
      * @param int $position
      * @return boolean
      */
-    protected function inject_http_debug(Wtf\Core\Contents\HttpDebug $content, $position)
+    protected function inject_http_debug(Wtf\Core\Entities\HttpDebug $content, $position)
     {
         foreach ($content as $value) {
             header('X-Debug-String: ' . $value, false);
@@ -266,15 +273,15 @@ class Html extends \Wtf\Core\Content
     /**
      * Append final comment.
      * 
-     * @param \Wtf\Core\Contents\Wtf\Core\Contents\HtmlComment $content
+     * @param \Wtf\Core\Entities\HtmlComment $content
      * @param type $position
      * @return boolean
      */
-    protected function inject_html_comment(Wtf\Core\Contents\HtmlComment $content, $position)
+    protected function inject_html_comment(Wtf\Core\Entities\HtmlComment $content, $position)
     {
         $dom = $this->content;
         $comment = $dom->createComment((string) $content);
-        if (self::INJECT_END === $position) {
+        if (\Wtf\Interfaces\Content::INJECT_END === $position) {
             // after body!
             $this->body->parentNode->appendChild($comment);
         } else {

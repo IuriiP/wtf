@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core;
+namespace Wtf\Interfaces;
 
 /**
  * Universal Content prototype
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Content extends \Wtf\Core\Entity
+interface Content
 {
     const
             INJECT_HERE = 0,
@@ -36,41 +36,28 @@ abstract class Content extends \Wtf\Core\Entity
      * @param string $type
      * @return string|false
      */
-    final public function canInject($type)
-    {
-        $method = "inject_{$type}";
-        if (method_exists($this, $method)) {
-            return $method;
-        }
-        return false;
-    }
+    public function canInject($type);
 
     /**
      * Common injection entry point 
      * 
      * @param array $asset
      */
-    final public function inject($asset)
-    {
-        if ($method = $this->canInject($asset['content']->getType())) {
-            return $this->$method($asset['content'], $asset['position']);
-        }
-        return false;
-    }
+    public function inject($asset);
 
     /**
      * Get data mime-type for the 'Content-type' header
      * 
      * @return string 
      */
-    abstract public function getMime();
+    public function getMime();
 
     /**
      * Get data length in bytes for the 'Content-length' header
      * 
      * @return int
      */
-    abstract public function getLength();
+    public function getLength();
 
     /**
      * Shortcut for the fragment injecting to the end
@@ -78,12 +65,6 @@ abstract class Content extends \Wtf\Core\Entity
      * @param type $content
      * @return type
      */
-    final public function append($content)
-    {
-        return $this->inject([
-                    'content' => self::make($this->type, $content),
-                    'position' => self::INJECT_END,
-        ]);
-    }
+    public function append($content);
 
 }

@@ -82,7 +82,8 @@ trait Factory
     final public static function factory($named, $args = [])
     {
         if (is_array($named)) {
-            $class = (empty($named[0]) ? self::plural(get_called_class()) : $named[0]) . '\\' . self::camelCase($named[1]);
+            $ns = \Wtf\Core\App::config('applications', $named[1]);
+            $class = ($named[0] ? : ($ns? : self::plural(get_called_class()))) . '\\' . self::camelCase($named[1]);
         } elseif (is_string($named)) {
             $class = \Wtf\Core\App::get($named) || $named;
         } elseif (is_object($named)) {
@@ -124,7 +125,8 @@ trait Factory
      */
     final static function __callStatic($name, $param)
     {
-        return static::factory($name, $param);
+        return static::factory(['',
+                    $name], $param);
     }
 
 }

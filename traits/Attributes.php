@@ -18,10 +18,19 @@
 namespace Wtf\Traits;
 
 /**
- * Description of Contract
+ * Description of Attributes
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-trait Contract {
-    //put your code here
+trait Attributes
+{
+
+    public function attrsLines($array)
+    {
+        return array_map(function($val, $key) {
+            $str = addslashes($val); // slashing
+            return "{$key}=\"{$str}\"";
+        }, $array, array_keys($array));
+    }
+
 }

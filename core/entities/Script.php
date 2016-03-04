@@ -15,17 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core;
+namespace Wtf\Core\Entities;
 
 /**
- * Application is a basic factory
- * for get up named descendants
+ * Description of Script
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Application implements \Wtf\Interfaces\Factory
+class Script extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
 {
+    use \Wtf\Traits\Content;
+    
+    public function __construct($data=[])
+    {
+        parent::__construct((array) $data, 'script');
+    }
 
-    use \Wtf\Traits\Factory;
+    /**
+     * 
+     * @return type
+     * @todo Add the smart format for arrayed styles
+     */
+    public function __toString()
+    {
+        return implode(PHP_EOL,$this->content);
+    }
 
 }
