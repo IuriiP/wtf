@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>Trait Wtf\Traits\Container | WtF</title>
+
+	<link rel="stylesheet" href="resources/style.css?e99947befd7bf673c6b43ff75e9e0f170c88a60e">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+				<h3>Namespaces</h3>
+			<ul>
+				<li>
+					<a href="namespace-Composer.html">
+						Composer<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Composer.Autoload.html">
+						Autoload					</a>
+
+						</li>
+							</ul></li>
+				<li>
+					<a href="namespace-Dotenv.html">
+						Dotenv<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Dotenv.Exception.html">
+						Exception					</a>
+
+						</li>
+							</ul></li>
+				<li>
+					<a href="namespace-None.html">
+						None					</a>
+
+						</li>
+				<li>
+					<a href="namespace-PHP.html">
+						PHP					</a>
+
+						</li>
+				<li class="active">
+					<a href="namespace-Wtf.html">
+						Wtf<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Wtf.Core.html">
+						Core<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Wtf.Core.Entities.html">
+						Entities					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Wtf.Core.Resources.html">
+						Resources					</a>
+
+						</li>
+							</ul></li>
+				<li>
+					<a href="namespace-Wtf.Interfaces.html">
+						Interfaces					</a>
+
+						</li>
+				<li class="active">
+					<a href="namespace-Wtf.Traits.html">
+						Traits					</a>
+
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+
+
+			<h3>Traits</h3>
+			<ul>
+				<li><a href="class-Wtf.Traits.Attributes.html">Attributes</a></li>
+				<li><a href="class-Wtf.Traits.Builder.html">Builder</a></li>
+				<li class="active"><a href="class-Wtf.Traits.Container.html">Container</a></li>
+				<li><a href="class-Wtf.Traits.Content.html">Content</a></li>
+				<li><a href="class-Wtf.Traits.Factory.html">Factory</a></li>
+				<li><a href="class-Wtf.Traits.Singleton.html">Singleton</a></li>
+			</ul>
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text" placeholder="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Wtf.Traits.html" title="Summary of Wtf\Traits"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Trait Container</h1>
+
+
+	<div class="description">
+	<p>Container functionality for Wtf\Interfaces\Container</p>
+
+<p>Supports access:
+- Iterator
+- $container[$key] : \ArrayAccess
+- $container($key) : __invoke
+- $container->$key : __get, __set
+- $container->$key() : __call</p>
+	</div>
+
+
+
+
+
+
+
+	<div>
+		<h4>Direct Known Users</h4>
+			<a href="class-Wtf.Core.App.html">Wtf\Core\App</a>, 
+			<a href="class-Wtf.Core.ConfigBranch.html">Wtf\Core\ConfigBranch</a>, 
+			<a href="class-Wtf.Core.Path.html">Wtf\Core\Path</a>, 
+			<a href="class-Wtf.Core.Server.html">Wtf\Core\Server</a>, 
+			<a href="class-Wtf.Core.Session.html">Wtf\Core\Session</a>
+	</div>
+
+	<div>
+		<h4>Indirect Known Users</h4>
+			<a href="class-Wtf.Core.Config.html">Wtf\Core\Config</a>
+	</div>
+
+	<div class="info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Wtf.html">Wtf</a>\<a href="namespace-Wtf.Traits.html">Traits</a><br>
+		
+
+				<b>Author:</b>
+				Iurii Prudius <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#104;a&#x72;&#x64;&#119;&#111;&#x72;&#x6b;&#46;&#109;o&#x75;&#x73;&#101;&#64;&#x67;&#x6d;&#97;&#105;l&#x2e;&#x63;&#111;&#109;">&#104;a&#x72;&#x64;&#119;&#111;&#x72;&#x6b;&#46;&#109;o&#x75;&#x73;&#101;&#64;&#x67;&#x6d;&#97;&#105;l&#x2e;&#x63;&#111;&#109;</a><br>
+			<b>Located at</b> <a href="source-class-Wtf.Traits.Container.html#20-185" title="Go to source code">traits/Container.php</a>
+		<br>
+	</div>
+
+
+
+	<table class="summary methods" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="_parseComplex" id="__parseComplex">
+
+		<td class="attributes"><code>
+			 protected static
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#__parseComplex">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#36-41" title="Go to source code">_parseComplex</a>( <span> <var>$offset</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="_complexCheck" id="__complexCheck">
+
+		<td class="attributes"><code>
+			 protected static
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#__complexCheck">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#43-52" title="Go to source code">_complexCheck</a>( <span> <var>$container</var></span>, <span> <var>$param</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="_complexGet" id="__complexGet">
+
+		<td class="attributes"><code>
+			 protected static
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#__complexGet">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#54-63" title="Go to source code">_complexGet</a>( <span> <var>$container</var></span>, <span> <var>$param</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="_complexSet" id="__complexSet">
+
+		<td class="attributes"><code>
+			 protected static
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#__complexSet">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#65-74" title="Go to source code">_complexSet</a>( <span> <var>&amp; $container</var></span>, <span> <var>$param</var></span>, <span> <var>$value</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="_complexUnset" id="__complexUnset">
+
+		<td class="attributes"><code>
+			 protected static
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#__complexUnset">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#76-85" title="Go to source code">_complexUnset</a>( <span> <var>&amp; $container</var></span>, <span> <var>$param</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetExists" id="_offsetExists">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetExists">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#87-92" title="Go to source code">offsetExists</a>( <span> <var>$offset</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetGet" id="_offsetGet">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetGet">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#94-99" title="Go to source code">offsetGet</a>( <span> <var>$offset</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetSet" id="_offsetSet">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetSet">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#101-106" title="Go to source code">offsetSet</a>( <span> <var>$offset</var></span>, <span> <var>$value</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="offsetUnset" id="_offsetUnset">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_offsetUnset">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#108-113" title="Go to source code">offsetUnset</a>( <span> <var>$offset</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getIterator" id="_getIterator">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getIterator">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#115-117" title="Go to source code">getIterator</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="eliminate" id="_eliminate">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_eliminate">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#119-123" title="Go to source code">eliminate</a>( <span> <var>$offset</var></span>, <span> <var>$def</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get" id="_get">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#125-132" title="Go to source code">get</a>( <span> <var>$name</var></span>, <span> <var>$def</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="set" id="_set">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_set">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#134-140" title="Go to source code">set</a>( <span>array <var>$array</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__get" id="___get">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___get">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#142-144" title="Go to source code">__get</a>( <span> <var>$offset</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__set" id="___set">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___set">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#146-148" title="Go to source code">__set</a>( <span> <var>$offset</var></span>, <span> <var>$value</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__invoke" id="___invoke">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___invoke">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#150-157" title="Go to source code">__invoke</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__call" id="___call">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___call">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#159-174" title="Go to source code">__call</a>( <span> <var>$offset</var></span>, <span> <var>$args</var> = []</span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="__callStatic" id="___callStatic">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___callStatic">#</a>
+		<code><a href="source-class-Wtf.Traits.Container.html#176-183" title="Go to source code">__callStatic</a>( <span> <var>$offset</var></span>, <span> <var>$args</var> = []</span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary properties" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="_container" id="$_container">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Wtf.Traits.Container.html#34" title="Go to source code"><var>$_container</var></a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$_container" class="anchor">#</a>
+				<code>[]</code>
+			</div>
+		</td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		WtF API documentation generated by <a href="http://apigen.org">ApiGen</a>
+	</div>
+</div>
+</div>
+<script src="resources/combined.js"></script>
+<script src="elementlist.js"></script>
+</body>
+</html>
