@@ -122,7 +122,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
      * Set headers array.
      * 
      * @param array $array
-     * @return \Wtf\Core\Response
+     * @return \Wtf\Core\Response Chainable
      */
     public function headers($array = null)
     {
@@ -141,7 +141,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
      * 
      * @param string $name
      * @param mixed $value
-     * @return \Wtf\Core\Response
+     * @return \Wtf\Core\Response Chainable
      */
     public function header($name, $value = null)
     {
@@ -155,7 +155,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
      * Set response code.
      * 
      * @param int $code
-     * @return \Wtf\Core\Response
+     * @return \Wtf\Core\Response Chainable
      */
     public function code($code)
     {
@@ -166,9 +166,10 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
     /**
      * Define the required dependency
      * 
-     * @param mixed $content \Wtf\Core\Content descendant
+     * @param mixed $content
      * @param string $name 
      * @param int $position
+     * @return \Wtf\Core\Response Chainable
      */
     public function approve($content, $name = null, $position = 0)
     {
@@ -194,6 +195,17 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
     }
 
     /**
+     * Shortcut to immediatelly approval.
+     * 
+     * @param mixed $content
+     * @return \Wtf\Core\Response Chainable
+     */
+    public function apply($content)
+    {
+        return $this->approve($content);
+    }
+
+    /**
      * Magic setter for any type injection.
      * 
      * EG: Code below
@@ -206,7 +218,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
      * 
      * @param type $type
      * @param type $args
-     * @return \Wtf\Core\Response
+     * @return \Wtf\Core\Response Chainable
      */
     public function __call($type, $args)
     {
@@ -216,7 +228,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
             $content = Entity::factory($type, $args);
             if ($content && ($content instanceof \Wtf\Interfaces\Content)) {
                 $this->content($content);
-            }else {
+            } else {
                 trigger_error(__CLASS__ . "::{$type}: can't be content");
             }
         } elseif ($this->content->canInject($type)) {
@@ -242,13 +254,18 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
      * 
      * @param type $name
      * @param type $args
-     * @return \Wtf\Core\Response
+     * @return \Wtf\Core\Response new instance
      */
     public function __callStatic($name, $args)
     {
         return new Response(Entity::factory($name, $args));
     }
 
+    /**
+     * Clear content.
+     * 
+     * @return \Wtf\Core\Response Chainable
+     */
     public function clear()
     {
         $this->content = null;
@@ -256,6 +273,13 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
         return $this;
     }
 
+    /**
+     * Immediately redirect
+     * 
+     * @param type $url
+     * @param type $code
+     * @return \Wtf\Core\Response Chainable
+     */
     public function redirect($url, $code)
     {
         $this->clear()->header('Location', $url)->code($code? : 301);
@@ -263,6 +287,12 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
         return $this;
     }
 
+    /**
+     * Send prepared headers
+     * 
+     * @param int $code
+     * @return boolean Is code in 2xx
+     */
     private function _sendHeader($code)
     {
         header("HTTP/1.1 {$code} " . self::$_http[$code], true);
@@ -281,6 +311,12 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
         return ($code >= 200) && ($code < 300);
     }
 
+    /**
+     * Send headers and content
+     * 
+     * @param array $trash Some trash information for including in debug purposes
+     * @return true
+     */
     public function send($trash = null)
     {
         if (!headers_sent() && $this->_sendHeader($this->_code) && $this->content) {
@@ -305,6 +341,11 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
         return $this->sent = true;
     }
 
+    /**
+     * Magic cast to string.
+     * 
+     * @return type
+     */
     public function __toString()
     {
         return (string) $this->content;

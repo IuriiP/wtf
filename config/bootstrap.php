@@ -21,12 +21,13 @@
  * as set of the any callables.
  */
 return [
+    // predifined system contracts to singletons
     App::contract('session', Wtf\Core\Session::singleton()),
     App::contract('logger', Wtf\Core\Logger::singleton()),
     App::contract('profiler', Wtf\Core\Profiler::singleton()),
     App::contract('trashbin', Wtf\Core\Trashbin::singleton()),
     App::contract('database', Wtf\Core\Database::singleton()),
-    //
+    // self registered contracts to common builders
     'Wtf\Core\Request',
     'Wtf\Core\Response',
     'Wtf\Core\Rule',

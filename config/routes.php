@@ -16,13 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Wtf\Core\Rule;
 /**
  * Description of routes
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 return [
-    '/install' => 'Wtf\\Private\\Install::run',
-    '/config' => 'Wtf\\Private\\Config::run',
-//    '/{application}' => 'Private\\{application}::run',
+    Rule::group('/install','Private\\Install::run'),
+    Rule::group('/config','Private\\Config::run'),
+//  Rule::group('/{application}','Private\\{application}::run'),
 ];
