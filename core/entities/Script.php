@@ -24,9 +24,10 @@ namespace Wtf\Core\Entities;
  */
 class Script extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
 {
+
     use \Wtf\Traits\Content;
-    
-    public function __construct($data=[])
+
+    public function __construct($data = [])
     {
         parent::__construct((array) $data, 'script');
     }
@@ -38,7 +39,17 @@ class Script extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
      */
     public function __toString()
     {
-        return implode(PHP_EOL,$this->content);
+        return implode(PHP_EOL, $this->content);
+    }
+
+    public function getLength()
+    {
+        return 0;
+    }
+
+    public function getMime()
+    {
+        return 'application/javascript';
     }
 
 }

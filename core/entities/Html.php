@@ -88,6 +88,11 @@ class Html extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
         }
     }
 
+    public function getLength()
+    {
+        return 0;
+    }
+
     public function getMime()
     {
         return 'text/html; charset=' . $this->content->encoding;

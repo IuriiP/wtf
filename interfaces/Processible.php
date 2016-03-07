@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,41 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core\Entities;
-
+namespace Wtf\Interfaces;
 /**
- * Description of Style
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Style extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
-{
-
-    use \Wtf\Traits\Content;
-
-    public function __construct($data = [])
-    {
-        parent::__construct((array) $data, 'style');
-    }
-
-    /**
-     * 
-     * @return type
-     * @todo Add the smart format for arrayed styles
-     */
-    public function __toString()
-    {
-        return implode(PHP_EOL, $this->content);
-    }
-
-    public function getLength()
-    {
-        return 0;
-    }
-
-    public function getMime()
-    {
-        return 'text/css';
-    }
-
+interface Processible {
+     public function inject_process($process,$position);
+     public function apply($process);
 }
