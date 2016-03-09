@@ -67,7 +67,7 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
         if (!$self->offsetExists($name)) {
             $self->offsetSet($name, $instance);
         }
-        return $instance;
+        return $self[$name];
     }
 
     /**
@@ -103,7 +103,6 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
          * On the prepared response try add the last debug info 
          */
         if (!$self->response->sent) {
-            // send unexpected output to trashbin (debug purpose)
             $trashbin = [];
             while (FALSE !== ($str = ob_get_clean())) {
                 if ($str) {
@@ -111,7 +110,6 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
                 }
             }
             if ($trashbin) {
-                // try use trash from bin
                 $self->trashbin($trashbin);
             }
 

@@ -17,15 +17,14 @@
  */
 namespace Wtf\Core;
 
-use Wtf\Core\Content,
-    Wtf\Core\Entity;
+use Wtf\Core\Entity;
 
 /**
  * Chainable Response
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
+class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
 {
 
     /**
@@ -256,7 +255,7 @@ class Response extends \Wtf\Core\Aggregator implements \Wtf\Interfaces\Bootstrap
      * @param type $args
      * @return \Wtf\Core\Response new instance
      */
-    public function __callStatic($name, $args)
+    static public function __callStatic($name, $args)
     {
         return new Response(Entity::factory($name, $args));
     }
