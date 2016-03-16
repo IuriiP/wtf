@@ -100,8 +100,7 @@ class Html extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
 
     public function __toString()
     {
-        if ($this->content->documentElement->hasAttribute('xhtml')) {
-            $this->content->documentElement->removeAttribute('xhtml');
+        if ($this->options && isset($this->options['xhtml'])) {
             $xml = $this->content->saveXML($this->content->documentElement);
             return "<!DOCTYPE html>\n{$xml}";
         }

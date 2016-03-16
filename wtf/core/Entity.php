@@ -38,6 +38,11 @@ abstract class Entity implements \Wtf\Interfaces\Factory
     protected $content = null;
 
     /**
+     * @var array options for processors
+     */
+    protected $options = [];
+
+    /**
      * Check type
      * 
      * @param string $type

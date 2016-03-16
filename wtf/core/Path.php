@@ -48,6 +48,7 @@ class Path implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
         $this->offsetSet('config', Resource::build($root,'config'));
         $this->offsetSet('private', Resource::build($root,'private'));
         $this->offsetSet('public', Resource::build($root,'public'));
+        $this->offsetSet('cache', Resource::build($root,'cache'));
 
         $temp = Resource::build(sys_get_temp_dir());
         $this->offsetSet('temp', $temp);

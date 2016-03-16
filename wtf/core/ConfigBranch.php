@@ -38,7 +38,7 @@ class ConfigBranch implements \Wtf\Interfaces\Container {
     }
 
     protected function load(Resource $res) {
-        $ext = pathinfo($file = $res->getRealPath(), PATHINFO_EXTENSION);
+        $ext = pathinfo($file = $res->getPath(), PATHINFO_EXTENSION);
         switch ($ext) {
             case 'cfg':
             case 'php':
@@ -61,7 +61,7 @@ class ConfigBranch implements \Wtf\Interfaces\Container {
 
 }
 
-if (!function_exists('icludeFile')) {
+if (!function_exists('includeFile')) {
 
     /**
      * Isolated file including

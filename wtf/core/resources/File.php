@@ -80,13 +80,13 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\
     /**
      * Get the specified timestamp of file:
      * 'c' - create time
-     * 'm' - modify time
-     * 'a' - access time (default)
+     * 'm' - modify time  (default)
+     * 'a' - access time
      * 
      * @param string $type
      * @return int
      */
-    public function getTime($type = null) {
+    public function getTime($type = 'm') {
         switch (strtolower($type)) {
             case 'c':
                 return filectime($this->_origin);

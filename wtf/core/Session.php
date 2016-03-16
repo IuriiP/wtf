@@ -28,7 +28,7 @@ class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
         \Wtf\Traits\Singleton;
 
     private function __construct() {
-        if (PHP_SESSION_ACTIVE !== session_status()) {
+        if (\PHP_SESSION_ACTIVE !== session_status()) {
             session_start();
         }
     }

@@ -173,7 +173,7 @@ trait Container {
         return $elem;
     }
 
-    public function __callStatic($offset, $args = []) {
+    static public function __callStatic($offset, $args = []) {
         $class = get_called_class();
         if (is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
             return call_user_func_array([static::singleton(), $offset], $args);

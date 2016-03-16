@@ -19,8 +19,7 @@ namespace Wtf\Core;
 
 use Wtf\Core\Path,
     Wtf\Core\Config,
-    Wtf\Core\Request,
-    Wtf\Core\Response;
+    Wtf\Core\Request;
 
 /**
  * Main Application Class
