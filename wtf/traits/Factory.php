@@ -85,7 +85,7 @@ trait Factory
             $ns = \Wtf\Core\App::config('applications', $named[1]);
             $class = ($named[0] ? : ($ns? : self::plural(get_called_class()))) . '\\' . self::camelCase($named[1]);
         } elseif (is_string($named)) {
-            $class = \Wtf\Core\App::get($named) || $named;
+            $class = \Wtf\Core\App::get($named) or $named;
         } elseif (is_object($named)) {
             $class = get_class($named);
         } else {

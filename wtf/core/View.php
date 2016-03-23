@@ -15,23 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Wtf\Core\Entities;
+namespace Wtf\Core;
 
 use Wtf\Core\Compiler;
 
 /**
- * View is any templated or not file.
+ * View is wrapper for finding and compling templates.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class View extends Html
+class View
 {
 
+    static private $_caches = [];
+    
     /**
      * @param string $source
-     * @param array $vars applied variables
      */
-    public function __construct($source, $vars = [])
+    public function __construct($source)
     {
         if ($cached = self::find($source)) {
             parent::__construct($this->resolve($cached, $vars));

@@ -110,7 +110,7 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
     public $sent = false;
 
     /**
-     * Contracted name
+     * Contracted name.
      */
     public static function bootstrap()
     {
@@ -163,7 +163,7 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
     }
 
     /**
-     * Define the required dependency
+     * Define the required dependency.
      * 
      * @param mixed $content
      * @param string $name 
@@ -273,7 +273,7 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
     }
 
     /**
-     * Immediately redirect
+     * Immediately redirect.
      * 
      * @param type $url
      * @param type $code
@@ -287,7 +287,7 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
     }
 
     /**
-     * Send prepared headers
+     * Send prepared headers.
      * 
      * @param int $code
      * @return boolean Is code in 2xx
@@ -311,7 +311,7 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
     }
 
     /**
-     * Send headers and content
+     * Send headers and content.
      * 
      * @param array $trash Some trash information for including in debug purposes
      * @return true
