@@ -6,3 +6,5 @@
 
 #vendors
 vendor/
+/.project
+/docs/
