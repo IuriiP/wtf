@@ -22,16 +22,12 @@ class Database implements \Wtf\Interfaces\Pool {
 
     use \Wtf\Traits\Pool;
 
-    static private $_pool = [];
     protected $_id = null;
     protected $_engine = null;
 
     private function __construct($name) {
         $this->$_id = $name;
-        if (!isset(self::$_pool[$name])) {
-            $this->$_engine = self::factory(['', $name]);
-            self::$_pool[$name] = $this;
-        }
+        $this->$_engine = self::factory(['', $name]);
     }
 
 }
