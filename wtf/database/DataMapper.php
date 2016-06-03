@@ -1,5 +1,7 @@
-/* 
- * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
+<?php
+
+/*
+ * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace Wtf\Core;
 
-sort(function () {
-			return Math.random() *2 -0.8;
-		})
+/**
+ * DataMapper is interface to database
+ *
+ * @author IuriiP <hardwork.mouse@gmail.com>
+ */
+abstract class DataMapper implements \Wtf\Interfaces\Factory {
+
+    use \Wtf\Traits\Factory;
+    
+    protected $source = null;
+    protected $map = null;
+
+    public function create($name, $source) {
+        
+    }
+
+}

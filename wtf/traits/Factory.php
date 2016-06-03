@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Traits;
 
 /**
@@ -23,8 +25,7 @@ namespace Wtf\Traits;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-trait Factory
-{
+trait Factory {
 
     /**
      * Make name in CamelCase style
@@ -33,8 +34,7 @@ trait Factory
      * @param boolean $ucfirst
      * @return string
      */
-    final public static function camelCase($string, $ucfirst = true)
-    {
+    final public static function camelCase($string, $ucfirst = true) {
         $str = preg_replace_callback('~_([a-z])~i', function($matches) {
             return ucfirst($matches[1]);
         }, $string);
@@ -47,8 +47,7 @@ trait Factory
      * @param string $string
      * @return string
      */
-    final public static function snakeCase($string)
-    {
+    final public static function snakeCase($string) {
         $str = preg_replace_callback('~[A-Z]~', function($matches) {
             return '_' . strtolower($matches[0]);
         }, lcfirst($string));
@@ -61,8 +60,7 @@ trait Factory
      * @param string $string
      * @return string
      */
-    final public static function plural($string)
-    {
+    final public static function plural($string) {
         return preg_replace_callback('~[a-z]$~', function($matches) {
             switch ($matches[0]) {
                 case 's': return 'ses';
@@ -79,11 +77,10 @@ trait Factory
      * @param array $args args list
      * @return mixed|null
      */
-    final public static function factory($named, $args = [])
-    {
+    final public static function factory($named, $args = []) {
         if (is_array($named)) {
-            $ns = \Wtf\Core\App::config('applications', $named[1]);
-            $class = ($named[0] ? : ($ns? : self::plural(get_called_class()))) . '\\' . self::camelCase($named[1]);
+            $ns = $named[0] ? \Wtf\Core\App::config(self::plural($named[0]), $named[1]) : '';
+            $class = ($ns? : self::plural(get_called_class())) . '\\' . self::camelCase($named[1]);
         } elseif (is_string($named)) {
             $class = \Wtf\Core\App::get($named) or $named;
         } elseif (is_object($named)) {
@@ -109,8 +106,7 @@ trait Factory
      * 
      * @return mixed|null
      */
-    final public static function make()
-    {
+    final public static function make() {
         $args = func_get_args();
         $named = array_shift($args);
         return self::factory($named, $args);
@@ -120,13 +116,12 @@ trait Factory
      * Smart call to factory
      * 
      * @param string $name
-     * @param array $param
+     * @param array $params
      * @return mixed|null
      */
-    final static function __callStatic($name, $param)
-    {
+    final static function __callStatic($name, $params) {
         return static::factory(['',
-                    $name], $param);
+                    $name], $params);
     }
 
 }

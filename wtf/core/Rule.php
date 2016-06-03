@@ -22,9 +22,9 @@ namespace Wtf\Core;
  * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Rule implements \Wtf\Interfaces\Bootstrap,  \Wtf\Interfaces\Builder {
+class Rule implements \Wtf\Interfaces\Bootstrap,  \Wtf\Interfaces\AdaptiveFactory {
 
-    use \Wtf\Traits\Builder;
+    use \Wtf\Traits\AdaptiveFactory;
 
     /**
      * The smart rules builder
@@ -149,7 +149,7 @@ class Rule implements \Wtf\Interfaces\Bootstrap,  \Wtf\Interfaces\Builder {
      * @return array|null
      */
     static public function any($pattern, $closure) {
-        return self::build('', $pattern, $closure);
+        return self::produce('', $pattern, $closure);
     }
 
     /**
@@ -166,7 +166,7 @@ class Rule implements \Wtf\Interfaces\Bootstrap,  \Wtf\Interfaces\Builder {
      */
     static public function __callStatic($method, $args) {
         if (2 === count($args)) {
-            return self::build($method, $args[0], $args[1]);
+            return self::produce($method, $args[0], $args[1]);
         }
         return null;
     }

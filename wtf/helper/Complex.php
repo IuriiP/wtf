@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Helper;
 
 /**
@@ -23,8 +25,7 @@ namespace Wtf\Helper;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Complex
-{
+abstract class Complex {
 
     /**
      * Exclude the blacklisted keys
@@ -33,8 +34,7 @@ abstract class Complex
      * @param array $black Array of the blacklisted keys
      * @return array Cleared array
      */
-    static public function except($array, $black)
-    {
+    static public function except($array, $black) {
         return array_diff_key($array, array_flip($black));
     }
 
@@ -45,8 +45,7 @@ abstract class Complex
      * @param array $white Array of the whitelisted keys
      * @return array Cleared array
      */
-    static public function only($array, $white)
-    {
+    static public function only($array, $white) {
         return array_intersect_key($array, array_flip($white));
     }
 
@@ -57,8 +56,7 @@ abstract class Complex
      *  @param array|boolean $remove Remove the array specified keys or '@attributes' if true
      *  @return array
      */
-    static public function obj2arr($obj, $remove = null)
-    {
+    static public function obj2arr($obj, $remove = null) {
         if (is_object($obj)) {
             $elem = (array) $obj;
         } else {
@@ -79,8 +77,7 @@ abstract class Complex
      * @param array $arr  
      * @return object
      */
-    static public function arr2obj($arr)
-    {
+    static public function arr2obj($arr) {
         return json_decode(json_encode($arr));
     }
 
@@ -91,8 +88,7 @@ abstract class Complex
      * @parameter array $parent  
      * @return string
      */
-    static public function arr2ini(array $a, array $parent = array())
-    {
+    static public function arr2ini(array $a, array $parent = array()) {
         $out = array();
         foreach ($a as $k => $v) {
             if (is_array($v)) {
@@ -112,8 +108,7 @@ abstract class Complex
      * @param string $ini
      * @return array
      */
-    static public function ini2arr($ini)
-    {
+    static public function ini2arr($ini) {
         return parse_ini_string($ini, true);
     }
 
@@ -125,8 +120,7 @@ abstract class Complex
      * @param mixed $dflt Default value
      * @return mixed
      */
-    static public function get($from, $key, $dflt = null)
-    {
+    static public function get($from, $key, $dflt = null) {
         $afrom = (array) $from;
         if (isset($afrom[$key])) {
             return $afrom[$key];
@@ -142,8 +136,7 @@ abstract class Complex
      * @param mixed $dflt
      * @return mixed
      */
-    static public function eliminate(&$from, $key, $dflt = null)
-    {
+    static public function eliminate(&$from, $key, $dflt = null) {
         $afrom = (array) $from;
         if (isset($afrom[$key])) {
             $ret = $afrom[$key];
@@ -154,13 +147,27 @@ abstract class Complex
     }
 
     /**
+     * Array to `key`=`value` array
+     *
+     * @parameter array $a  
+     * @parameter array $only  
+     * @return array
+     */
+    static public function arr2attr(array $a, array $only = null) {
+        $arr = $only ? array_intersect_key($a, array_flip($only)) : $a;
+        array_walk($arr, function(&$v, $k) {
+            $v = "{$k}={$v}";
+        });
+        return $arr;
+    }
+
+    /**
      * Get attributes of XML node as array.
      * 
      * @param mixed $el DOMNode or SimpleXMLElement 
      * @return array|null
      */
-    static public function attr2arr($el)
-    {
+    static public function attr2arr($el) {
         if ($el instanceof DOMNode) {
             if (!$el->attributes) {
                 return null;

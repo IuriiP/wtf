@@ -249,7 +249,7 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
      * Static initialize.
      * 
      * EG:
-     * Resource::html('hello, world!') = new Resource(Content::make('html','hello, world!')) = new Resource(new Contents\Html('hello, world!'))
+     * Resource::html('hello, world!') = new Resource(Entity::factory('html','hello, world!')) = new Resource(new Entities\Html('hello, world!'))
      * 
      * @param type $name
      * @param type $args

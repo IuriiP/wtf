@@ -31,7 +31,7 @@ namespace Wtf\Traits;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-trait Builder {
+trait AdaptiveFactory {
 
     /**
      * Build the object of some class
@@ -39,7 +39,7 @@ trait Builder {
      * 
      * @return Object
      */
-    final static public function build() {
+    final static public function produce() {
         $args = func_get_args();
         $types = ['guess'];
         foreach ($args as $arg) {

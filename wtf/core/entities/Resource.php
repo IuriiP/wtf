@@ -29,7 +29,7 @@ class Resource extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
     
     public function __construct($data, $opts = [])
     {
-        $resource = \Wtf\Core\Resource::build($data, $opts);
+        $resource = \Wtf\Core\Resource::produce($data, $opts);
         parent::__construct($resource, 'resource');
     }
 

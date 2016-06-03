@@ -6,20 +6,22 @@
  * and open the template in the editor.
  */
 
-namespace Wtf\Core\Traits;
+namespace Wtf\Traits;
 
 /**
  * Description of Pool
  *
- * @author iprudius
+ * @author IuriiP
  */
 trait Pool {
+
     static private $_pool = [];
-    
-    public function instance($name) {
+
+    public static function instance($name='') {
         if (!isset(self::$_pool[$name])) {
-            self::$_pool[$name] = new static($name);
+            return self::$_pool[$name] = new static($name);
         }
         return self::$_pool[$name];
     }
+
 }

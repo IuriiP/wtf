@@ -41,16 +41,16 @@ class Path implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
      * 
      */
     private function __construct() {
-        $root = Resource::build(getenv('DOCUMENT_ROOT'));
+        $root = Resource::produce(getenv('DOCUMENT_ROOT'));
         $this->offsetSet('root', $root);
         $this->offsetSet('base', $root);
-        $this->offsetSet('vendor', Resource::build($root,'vendor'));
-        $this->offsetSet('config', Resource::build($root,'config'));
-        $this->offsetSet('private', Resource::build($root,'private'));
-        $this->offsetSet('public', Resource::build($root,'public'));
-        $this->offsetSet('cache', Resource::build($root,'cache'));
+        $this->offsetSet('vendor', Resource::produce($root,'vendor'));
+        $this->offsetSet('config', Resource::produce($root,'config'));
+        $this->offsetSet('private', Resource::produce($root,'private'));
+        $this->offsetSet('public', Resource::produce($root,'public'));
+        $this->offsetSet('cache', Resource::produce($root,'cache'));
 
-        $temp = Resource::build(sys_get_temp_dir());
+        $temp = Resource::produce(sys_get_temp_dir());
         $this->offsetSet('temp', $temp);
         $this->offsetSet('upload', $temp);
     }

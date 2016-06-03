@@ -1,6 +1,7 @@
 <?php
+
 /*
- * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
+ * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace Wtf\Core;
+
 /**
- * This file provide the bootstraping logic 
- * as set of the any callables.
+ * Description of Data
+ *
+ * @author IuriiP <hardwork.mouse@gmail.com>
  */
-return [
-    // predifined system contracts to singletons
-    App::contract('session', Wtf\Core\Session::singleton()),
-    App::contract('logger', Wtf\Core\Logger::singleton()),
-    App::contract('profiler', Wtf\Core\Profiler::singleton()),
-    App::contract('trashbin', Wtf\Core\Trashbin::singleton()),
-    App::contract('dataset', Wtf\Core\Dataset::singleton()),
-    // self registered contracts to common builders
-    'Wtf\Core\Request',
-    'Wtf\Core\Response',
-    'Wtf\Core\Rule',
-    'Wtf\Core\Resource',
-];
+class Data implements \Iterator {
+    
+    public function current() {
+        
+    }
+
+    public function key() {
+        
+    }
+
+    public function next() {
+        
+    }
+
+    public function rewind() {
+        
+    }
+
+    public function valid() {
+        
+    }
+
+}

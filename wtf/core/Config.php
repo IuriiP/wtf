@@ -39,7 +39,7 @@ class Config extends ConfigBranch implements \Wtf\Interfaces\Singleton {
 
         $list = $this->_cfgRoot->get();
         foreach ($list as $file) {
-            $this->offsetSet(pathinfo($file, PATHINFO_FILENAME), Resource::build($this->_cfgRoot, $file));
+            $this->offsetSet(pathinfo($file, PATHINFO_FILENAME), Resource::produce($this->_cfgRoot, $file));
         }
         
         if($bootstrap=$this['bootstrap']) {

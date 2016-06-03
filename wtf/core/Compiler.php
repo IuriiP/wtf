@@ -36,7 +36,7 @@ abstract class Compiler implements \Wtf\Interfaces\Factory
      */
     final static public function compile($compiler, Resource $source)
     {
-        $resource = Resource::build($source);
+        $resource = Resource::produce($source);
         if ($compiler && ($engine = self::factory(['',
                     $compiler]))) {
             return $engine->process($resource->getContent());

@@ -21,7 +21,7 @@ namespace Wtf\Interfaces;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-interface Builder
+interface AdaptiveFactory
 {
-    static public function build();
+    static public function produce();
 }

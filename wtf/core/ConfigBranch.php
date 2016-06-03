@@ -28,15 +28,27 @@ class ConfigBranch implements \Wtf\Interfaces\Container {
 
     use \Wtf\Traits\Container;
 
+    /**
+     * Override Container::offsetGet
+     * 
+     * @param string $offset
+     * @return array
+     */
     public function offsetGet($offset) {
         $cfg = $this->_container[strtolower($offset)];
         if ($cfg instanceof Resource) {
             // not loaded config
             $this->offsetSet($offset, $cfg = $this->load($cfg));
         }
-        return $cfg;
+        return (array) $cfg;
     }
 
+    /**
+     * Internal config loading.
+     * 
+     * @param Resource $res
+     * @return array
+     */
     protected function load(Resource $res) {
         $ext = pathinfo($file = $res->getPath(), PATHINFO_EXTENSION);
         switch ($ext) {
@@ -55,7 +67,7 @@ class ConfigBranch implements \Wtf\Interfaces\Container {
                 return json_decode(json_encode(simplexml_load_string($res->get_content())), true);
             default:
                 // unknown format
-                return null;
+                return [];
         }
     }
 

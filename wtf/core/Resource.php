@@ -27,7 +27,7 @@ namespace Wtf\Core;
  */
 abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Factory {
 
-    use \Wtf\Traits\Builder,
+    use \Wtf\Traits\AdaptiveFactory,
         \Wtf\Traits\Factory;
 
     /**
