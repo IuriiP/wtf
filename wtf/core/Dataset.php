@@ -20,6 +20,7 @@ use \Wtf\Dataset\Engine,
 class Dataset implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Observable {
 
     use \Wtf\Traits\Configurable,
+        \Wtf\Traits\Observable,
         \Wtf\Traits\Pool;
 
     /**
@@ -37,12 +38,12 @@ class Dataset implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable, \Wt
     final private function __construct($name) {
         $config = $this->configure('datasets', $name);
         if ($engine = $this->config('engine')) {
-            $this->_engine = Engine::make(['', $engine],$config);
+            $this->_engine = Engine::make(['', $engine], $config);
         }
         if ($observe = $this->config('observe')) {
             $this->observe($observe);
         }
-        
+
         $this->_id = $name;
     }
 

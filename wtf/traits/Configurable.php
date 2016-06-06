@@ -18,22 +18,16 @@ trait Configurable {
     static protected $s_config = null;
     protected $_config = null;
 
-    public function configure($name=null) {
-        if (!self::$s_config) {
-            self::$s_config = \Wtf\Core\App::config((new \ReflectionClass($this))->getShortName());
+    static public function configure($name = null) {
+        if (!static::$s_config) {
+            static::$s_config = \Wtf\Core\App::config($name? : (new \ReflectionClass(get_called_class()))->getShortName());
         }
-        if(self::$s_config) {
-            return $this->_config = $name? self::$s_config[$name] : null;
-        }
-        return null;
+        return static::$s_config;
     }
 
     public function config($path = null) {
-        if (!$this->_config) {
-            $this->configure();
-        }
-        if ($this->_config) {
-            return $path ? $this->_config[$path] : $this->_config;
+        if ($config = static::configure()) {
+            return $path ? $config[$path] : null;
         }
         return null;
     }

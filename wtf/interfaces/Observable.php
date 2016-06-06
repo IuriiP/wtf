@@ -25,5 +25,5 @@ namespace Wtf\Interfaces;
  */
 interface Observable {
 
-    
+    public function observe($list = null);
 }
