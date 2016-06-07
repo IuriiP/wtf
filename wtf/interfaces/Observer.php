@@ -40,6 +40,7 @@ interface Observer {
      * On event firing
      * 
      * @param Event $event
+     * @param string $regname Registered name from $this->observer()
      */
-    public function notify(Event $event);
+    public function notify(Event $event, $regname=null);
 }

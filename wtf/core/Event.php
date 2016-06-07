@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
  *
@@ -16,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace Wtf\Core;
 
 /**
@@ -86,7 +84,6 @@ class Event {
      * @param mixed $source
      */
     public function __construct($name, $source = null) {
-        $this->time = microtime(true);
         $this->name = $name;
         $this->source = $source;
     }
@@ -103,9 +100,11 @@ class Event {
         $this->message = $message;
         $this->type = $type;
         $this->data = $data;
-        if (isset(self::$_subscribers[$name])) {
-            foreach (self::$_subscribers[$name] as $observer) {
-                $observer->notify($this);
+        foreach (self::$_subscribers as $pattern => $observers) {
+            if (preg_match($pattern, $name)) {
+                foreach ($observers as $regname => $observer) {
+                    $observer->notify($this, $regname);
+                }
             }
         }
     }
@@ -113,30 +112,33 @@ class Event {
     /**
      * Add observer for event
      * 
-     * @param string $name
      * @param \Wtf\Interfaces\Observer $observer
+     * @param string $pattern
      */
-    static public function enable($name, \Wtf\Interfaces\Observer $observer) {
-        if (!isset(self::$_subscribers[$name]) || !isset(self::$_subscribers[$name][$observer->observer($name)])) {
-            self::$_subscribers[$name][$observer->observer($name)] = $observer;
+    static public function enable(\Wtf\Interfaces\Observer $observer, $pattern = '.*') {
+        $pattern = '/' . str_replace('/', '', $pattern) . '/';
+        $named = $observer->observer($name);
+        if (!isset(self::$_subscribers[$pattern]) || !isset(self::$_subscribers[$pattern][$named])) {
+            self::$_subscribers[$pattern][$named] = $observer;
         }
     }
 
     /**
      * Remove observer from event
      * 
-     * @param type $name
+     * @param type $pattern
      * @param type $observername
      */
-    static public function disable($name, $observername=null) {
-        if(!$observername) {
-            unset(self::$_subscribers[$name]);
-        } elseif(is_array($observername)) {
+    static public function disable($pattern, $observername = null) {
+        $pattern = '/' . str_replace('/', '', $pattern) . '/';
+        if (!$observername) {
+            unset(self::$_subscribers[$pattern]);
+        } elseif (is_array($observername)) {
             foreach ($observername as $value) {
-                self::disable($name, $value);
+                self::disable($pattern, $value);
             }
-        } elseif (isset(self::$_subscribers[$name]) && isset(self::$_subscribers[$name][$observername])) {
-            unset(self::$_subscribers[$name][$observername]);
+        } elseif (isset(self::$_subscribers[$pattern]) && isset(self::$_subscribers[$pattern][$observername])) {
+            unset(self::$_subscribers[$pattern][$observername]);
         }
     }
 
