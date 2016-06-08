@@ -17,7 +17,8 @@
  */
 namespace Wtf\Core;
 
-use Wtf\Core\Resource;
+use Wtf\Core\Resource,
+    Wtf\Helper\Common;
 
 /**
  * Description of ConfigBase
@@ -50,12 +51,11 @@ class ConfigBranch implements \Wtf\Interfaces\Container {
      * @return array
      */
     protected function load(Resource $res) {
-        $ext = pathinfo($file = $res->getPath(), PATHINFO_EXTENSION);
-        switch ($ext) {
+        switch (pathinfo($file = $res->getPath(), PATHINFO_EXTENSION)) {
             case 'cfg':
             case 'php':
                 // PHP as array
-                return (array) \Wtf\Core\includeFile($file);
+                return (array) \Wtf\Helper\includeFile($file);
             case 'json':
                 // JSON object as array
                 return json_decode($res->getContent(), true);
@@ -69,20 +69,6 @@ class ConfigBranch implements \Wtf\Interfaces\Container {
                 // unknown format
                 return [];
         }
-    }
-
-}
-
-if (!function_exists('includeFile')) {
-
-    /**
-     * Isolated file including
-     * 
-     * @param string $fname
-     * @return mixed
-     */
-    function includeFile($fname) {
-        return include($fname);
     }
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core\Resources;
 
 /**
@@ -25,6 +27,7 @@ namespace Wtf\Core\Resources;
 class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\Interfaces\Writable {
 
     private $_origin = null;
+    private $_content = null;
 
     /**
      * @param string $path path to file
@@ -86,16 +89,14 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\
      * @param string $type
      * @return int
      */
-    public function getTime($type = 'm') {
+    public function getTime($type = null) {
         switch (strtolower($type)) {
             case 'c':
                 return filectime($this->_origin);
-            case 'm':
-                return filemtime($this->_origin);
             case 'a':
                 return fileatime($this->_origin);
         }
-        return time();
+        return filemtime($this->_origin);
     }
 
     /**
@@ -152,7 +153,10 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\
                         return '.' !== $val[0];
                     });
         } else {
-            return file($this->_origin, FILE_IGNORE_NEW_LINES | ($keep ? 0 : FILE_SKIP_EMPTY_LINES));
+            if ($content = str_replace("\r", '', $this->getContent())) {
+                $array = explode("\n", $content);
+            }
+            return $keep ? $array : array_filter($array);
         }
         return FALSE;
     }
@@ -164,7 +168,7 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\
      */
     public function getContent() {
         if (!is_dir($this->_origin)) {
-            return file_get_contents($this->_origin);
+            return $this->_content? : $this->_content = file_get_contents($this->_origin);
         }
         return FALSE;
     }
