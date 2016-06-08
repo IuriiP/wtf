@@ -274,6 +274,8 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
         return $this;
     }
 
+    abstract public function __construct($path, $options = []);
+    
     public static function bootstrap() {
         App::contract('resource', __CLASS__);
     }

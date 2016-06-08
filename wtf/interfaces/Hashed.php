@@ -24,5 +24,13 @@ namespace Wtf\Interfaces\Hashed;
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
 interface Hashed {
-    public function byHash($hash);
+
+    /**
+     * Get data by hash.
+     * Use `divider` for nested hashing.
+     * 
+     * @param string $hash
+     * @param string $divider
+     */
+    public function byHash($hash, $divider = null);
 }
