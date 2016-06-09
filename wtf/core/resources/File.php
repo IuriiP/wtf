@@ -24,7 +24,7 @@ namespace Wtf\Core\Resources;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\Interfaces\Writable {
+class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 
     private $_origin = null;
     private $_content = null;

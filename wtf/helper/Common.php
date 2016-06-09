@@ -25,19 +25,12 @@ namespace Wtf\Helper;
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
 class Common {
-    //put your code here
-}
 
-if (!function_exists('includeFile')) {
-
-    /**
-     * Isolated file including
-     * 
-     * @param string $fname
-     * @return mixed
-     */
-    function includeFile($fname) {
-        return include($fname);
+    static public function parsePhp($string) {
+        ob_start();
+        $content = eval(preg_replace(['~\\<\\?php~', '~\\?\\>~'], '', $res->getContent()));
+        ob_end_clean();
+        return $content;
     }
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 /**
@@ -25,7 +27,7 @@ namespace Wtf\Core;
  * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Factory {
+abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory {
 
     use \Wtf\Traits\AdaptiveFactory,
         \Wtf\Traits\Factory;
@@ -133,7 +135,7 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
      * @param array $args
      */
     final static protected function guess_string_array(array $args) {
-        if ($obj = self::init_string($args)) {
+        if ($obj = self::guess_string($args)) {
             return $obj->options($args[1]);
         }
         return null;
@@ -147,7 +149,7 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
      */
     final static private function _parseURL($url) {
         $parts = [];
-        if (preg_match('~^(([\w]+)://)?((.+)@)?([/\\]?([^?]*))(\?(.*))?$~i', $init, $parts)) {
+        if (preg_match('~^(([\\w]+)://)?((.+)@)?([/\\\\]?([^?]*))(\\?(.*))?$~i', $url, $parts)) {
             /* @var array */
             $opt = [];
             $access = explode(':', $parts[4], 2);
@@ -162,7 +164,7 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
                 'scheme' => ['', $parts[2] ? : 'file'],
                 'path' => $parts[6]? : '/',
                 'options' => $opt,
-                'data' => count($parts > 7) ? $parts[8] : ''
+                'data' => count($parts) > 7 ? $parts[8] : ''
             ];
         }
 
@@ -274,8 +276,25 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
         return $this;
     }
 
+    /**
+     * Specific constructor
+     */
     abstract public function __construct($path, $options = []);
-    
+
+    /**
+     * Get data as array
+     * 
+     * @return array
+     */
+    abstract public function get($keep = false);
+
+    /**
+     * Get binary data
+     * 
+     * @return string
+     */
+    abstract function getContent();
+
     public static function bootstrap() {
         App::contract('resource', __CLASS__);
     }

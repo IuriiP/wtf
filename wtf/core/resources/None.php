@@ -22,7 +22,7 @@ namespace Wtf\Core\Resources;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\Interfaces\Writable {
+class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 
     private $_origin = null;
 

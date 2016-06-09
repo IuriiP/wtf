@@ -19,101 +19,91 @@
 
 namespace Wtf\Core\Resources;
 
-use Wtf\Helper\Common;
+use Wtf\Core\Resource,
+        Wtf\Helper\Common;
 
 /**
  * Hashed file (dictionary)
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Hash extends \Wtf\Core\Resource implements \Wtf\Interfaces\Readable, \Wtf\Interfaces\Hashed\Hashed {
+class Hash extends \Wtf\Core\Resource implements \Wtf\Interfaces\Container {
 
-    private $_json = [];
-
+    use \Wtf\Traits\Container;
+    
+    /**
+     * @var \Wtf\Core\Resource
+     */
+    private $_resource = null;
+    
     public function __construct($path, $options = array()) {
-// $data ignored!
-        $this->_origin = realpath($path);
+        $this->_resource = \Wtf\Core\Resource::produce($path,$options);
         $this->_opt = $options;
     }
 
+    public function isContainer() {
+        return true;
+    }
+
+    protected static function _parseComplex() {
+        return null;
+    }
+
+    public function child($name) {
+        $this->get();
+        return $this->offsetGet($name);
+    }
+
+    public function container() {
+        return $this->_resource;
+    }
+
     public function getPath() {
-        return $this->_origin;
+        return $this->_resource->getPath();
+    }
+
+    public function getLength() {
+        return $this->_resource->getLength();
+    }
+
+    public function getName() {
+        return $this->_resource->getName();
+    }
+
+    public function getTime($type = null) {
+        return $this->_resource->getTime($type);
     }
 
     public function getScheme() {
         return 'hash://';
     }
 
-    public function isContainer() {
-        return false;
-    }
-
-    public function child($name) {
-        return null;
-    }
-
-    public function container() {
-        $cont = dirname($this->_origin);
-        return new File($cont, []);
-    }
-
-    public function getLength() {
-        
-    }
-
     public function getMime() {
         return 'application/json';
     }
 
-    public function getName() {
-        return pathinfo($this->_origin, PATHINFO_FILENAME);
-    }
-
-    public function getTime($type = null) {
-        switch (strtolower($type)) {
-            case 'c':
-                return filectime($this->_origin);
-            case 'a':
-                return fileatime($this->_origin);
-        }
-        return filemtime($this->_origin);
-    }
-
     public function getType() {
-        return 'json';
+        return 'engine';
     }
 
-    public function byHash($hash, $divider = null) {
-        if($divider && is_string($hash)) {
-            $tree = explode($delimiter, $hash);
-        } else {
-            $tree = (array) $hash;
-        }
-        
-        $branch = $this->_json;
-        foreach ($tree as $key) {
-            if(!isset($branch[$key])) {
-                return null;
-            }
-            $branch = $branch[$key];
-        }
-        return $branch;
-    }
-
-    public function get($keep = false) {
-        if (!$this->_json) {
-            switch (pathinfo($this->_origin, PATHINFO_EXTENSION)) {
+    public function get() {
+        if (!$this->_container) {
+            switch ($this->_resource->getType()) {
                 case 'php':
-                    // PHP as array
-                    $this->_json = (array) \Wtf\Core\includeFile($this->_origin);
+                    // eval PHP file
+                    $this->_container = (array) Common::parsePhp($this->_resource->getContent());
                     break;
                 case 'json':
                     // JSON object as array
-                    $this->_json = json_decode(file_get_contents($this->_origin), true);
+                    $this->_container = json_decode($this->_resource->getContent(), true);
+                    break;
+                case 'engine':
+                    // try
+                    $this->_container = $this->_resource;
                     break;
             }
         }
-        return $this->_json;
+        return $this->_container;
     }
 
     public function getContent() {
