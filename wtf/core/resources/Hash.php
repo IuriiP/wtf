@@ -19,8 +19,7 @@
 
 namespace Wtf\Core\Resources;
 
-use Wtf\Core\Resource,
-        Wtf\Helper\Common;
+use Wtf\Helper\Common;
 
 /**
  * Hashed file (dictionary)

@@ -19,8 +19,6 @@
 
 namespace Wtf\Core;
 
-use Wtf\Core\I18n\Domain;
-
 /**
  * Description of I18n
  *
@@ -40,7 +38,7 @@ class I18n implements \Wtf\Interfaces\Configurable {
     /**
      * Default translator.
      *
-     * @var type 
+     * @var \Wtf\Core\I18n 
      */
     private static $_default = null;
 
@@ -120,7 +118,7 @@ class I18n implements \Wtf\Interfaces\Configurable {
      * @param string $unknown
      * @return string
      */
-    public function get($domain, $key, $params = [],$unknown='') {
+    public function get($domain, $key, $params = [], $unknown = '') {
         if (!($pattern = $this->find($domain, $key))) {
             return $key . ($params ? ': (' . implode(', ', \Wtf\Helper\Complex::arr2attr($params)) . ')' : '');
         }
@@ -144,8 +142,8 @@ class I18n implements \Wtf\Interfaces\Configurable {
     public function find($domain, $key) {
         foreach ($this->_fallback as $language => $link) {
             // 
-            if ($link && ($resource = $link->child($domain)) && ($resource instanceof \Wtf\Interfaces\Hashed)) {
-                if ($pattern = $resource->byHash($key)) {
+            if ($link && ($resource = $link->child($domain))) {
+                if ($pattern = $resource->children($key)) {
                     return $pattern;
                 }
             }
@@ -161,29 +159,29 @@ class I18n implements \Wtf\Interfaces\Configurable {
      * @return string
      */
     public function choose($patterns, $param = false) {
-        $patterns = (array) $patterns;
+        $patts = (array) $patterns;
         if ($param) {
-            foreach ($patterns as $key => $value) {
+            foreach ($patts as $key => $value) {
                 if (is_numeric($key)) {
                     if ($param === $key) {
-                        return $patterns[$key];
+                        return $patts[$key];
                     }
                 } elseif ($key{0} === '=') {
                     if ($param == substr($key, 1)) {
-                        return $patterns[$key];
+                        return $patts[$key];
                     }
                 } elseif ($key{0} === '<') {
                     if ($param < substr($key, 1)) {
-                        return $patterns[$key];
+                        return $patts[$key];
                     }
                 } elseif ($key{0} === '>') {
                     if ($param > substr($key, 1)) {
-                        return $patterns[$key];
+                        return $patts[$key];
                     }
                 }
             }
         }
-        return $patterns[0];
+        return $patts[0];
     }
 
     /**
@@ -194,11 +192,11 @@ class I18n implements \Wtf\Interfaces\Configurable {
      * @param string $unknown
      * @return string
      */
-    public function substitute($pattern, $params = [], $unknown='') {
+    public function substitute($pattern, $params = [], $unknown = '') {
         $list = [];
-        $format = mb_ereg_replace_callback('\{\:([a-z0-9])\}', function($matches) use($list, $params,$unknown) {
+        $format = mb_ereg_replace_callback('\{\:([a-z0-9])\}', function($matches) use($list, $params, $unknown) {
             $key = $matches[1];
-            if(isset($params[$key])) {
+            if (isset($params[$key])) {
                 $list[] = $params[$key];
                 return '%s';
             } else {
