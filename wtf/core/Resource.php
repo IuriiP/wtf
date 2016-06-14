@@ -294,6 +294,13 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
      * @return string
      */
     abstract function getContent();
+    
+    /**
+     * Check if resource exists.
+     * 
+     * @return bool
+     */
+    abstract function exists();
 
     public static function bootstrap() {
         App::contract('resource', __CLASS__);

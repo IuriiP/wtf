@@ -33,6 +33,15 @@ class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
     }
 
     /**
+     * Check if already exists.
+     * 
+     * @return bool
+     */
+    public function exists() {
+        return false;
+    }
+    
+    /**
      * @return FALSE
      */
     public function isContainer() {

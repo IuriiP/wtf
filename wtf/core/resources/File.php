@@ -40,6 +40,15 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
     }
 
     /**
+     * Check if already exists.
+     * 
+     * @return bool
+     */
+    public function exists() {
+        return file_exists($this->_origin);
+    }
+    
+    /**
      * Check if is directory
      * 
      * @return boolean
@@ -187,7 +196,7 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
      * @param int $mode 0|FILE_APPEND
      */
     private function _write($data, $mode) {
-        if ($data instanceof \Wtf\Interfaces\Readable) {
+        if ($data instanceof \Wtf\Interfaces\Resource) {
             $res = file_put_contents($this->_origin, $data->getContent(), $mode);
         } elseif (is_array($data)) {
             $res = file_put_contents($this->_origin, implode(PHP_EOL, $data), $mode);

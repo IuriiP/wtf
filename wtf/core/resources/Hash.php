@@ -29,15 +29,27 @@ use Wtf\Helper\Common;
 class Hash extends \Wtf\Core\Resource implements \Wtf\Interfaces\Container {
 
     use \Wtf\Traits\Container;
-    
+
     /**
      * @var \Wtf\Core\Resource
      */
     private $_resource = null;
-    
+
     public function __construct($path, $options = array()) {
-        $this->_resource = \Wtf\Core\Resource::produce($path,$options);
+        $this->_resource = \Wtf\Core\Resource::produce($path, $options);
         $this->_opt = $options;
+    }
+
+    /**
+     * Check if already exists.
+     * 
+     * @return bool
+     */
+    public function exists() {
+        if ($this->_resource) {
+            return $this->_resource->exists();
+        }
+        return false;
     }
 
     public function isContainer() {
