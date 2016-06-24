@@ -196,7 +196,7 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
      * @param int $mode 0|FILE_APPEND
      */
     private function _write($data, $mode) {
-        if ($data instanceof \Wtf\Interfaces\Resource) {
+        if ($data instanceof \Wtf\Core\Resource) {
             $res = file_put_contents($this->_origin, $data->getContent(), $mode);
         } elseif (is_array($data)) {
             $res = file_put_contents($this->_origin, implode(PHP_EOL, $data), $mode);

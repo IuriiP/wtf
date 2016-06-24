@@ -13,6 +13,8 @@ namespace Wtf\Interfaces;
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
 interface Configurable {
-    public function configure($name=null);
-    public function config($path=null);
+
+	static public function configure($name = null);
+
+	public function config($path = null);
 }

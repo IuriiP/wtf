@@ -20,8 +20,8 @@
 namespace Wtf\Core;
 
 use Wtf\Core\App,
-    Wtf\Core\Resource,
-    Wtf\Helper\Common;
+	Wtf\Core\Resource,
+	Wtf\Helper\Common;
 
 /**
  * General Config access Class
@@ -33,78 +33,79 @@ use Wtf\Core\App,
  */
 class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 
-    use \Wtf\Traits\Singleton,
-        \Wtf\Traits\Container;
+	use \Wtf\Traits\Singleton,
+	 \Wtf\Traits\Container;
 
-    /**
-     * @var \Wtf\Core\Resource
-     */
-    private $_cfgRoot = null;
+	/**
+	 * @var \Wtf\Core\Resource
+	 */
+	private $_cfgRoot = null;
 
-    private function __construct() {
-        $this->_cfgRoot = App::get('path')->config;
+	private function __construct() {
+		$this->_cfgRoot = App::singleton()->get('path')->config;
 
-        $list = $this->_cfgRoot->get();
-        if ($this->_cfgRoot->isContainer()) {
-            foreach ($list as $file) {
-                $this->offsetSet($file->getName(), Resource::produce($this->_cfgRoot, $file));
-            }
-        } else {
-            foreach ($list as $key => $line) {
-                $this->offsetSet($key, $line);
-            }
-        }
+		$list = $this->_cfgRoot->get();
+		if($this->_cfgRoot->isContainer()) {
+			foreach($list as $file) {
+				$res = Resource::produce($this->_cfgRoot, $file);
+				$this->offsetSet($res->getName(), $res);
+			}
+		} else {
+			foreach($list as $key => $line) {
+				$this->offsetSet($key, $line);
+			}
+		}
 
-        if ($bootstrap = $this['bootstrap']) {
-            foreach ($bootstrap as $action) {
-                if (is_callable([$action, 'bootstrap'])) {
-                    call_user_func([$action, 'bootstrap']);
-                }
-            }
-        }
-    }
+		if($bootstrap = $this['bootstrap']) {
+			foreach($bootstrap as $action) {
+				if(is_callable([$action, 'bootstrap'])) {
+					call_user_func([$action, 'bootstrap']);
+				}
+			}
+		}
+	}
 
-    /**
-     * Override Container::offsetGet
-     * 
-     * @param string $offset
-     * @return array
-     */
-    public function offsetGet($offset) {
-        $cfg = $this->_container[strtolower($offset)];
-        if ($cfg instanceof Resource) {
-            // not loaded config
-            $this->offsetSet($offset, $cfg = $this->load($cfg));
-        }
-        return $cfg;
-    }
+	/**
+	 * Override Container::offsetGet
+	 * 
+	 * @param string $offset
+	 * @return array
+	 */
+	public function offsetGet($offset) {
+		$cfg = $this->_container[strtolower($offset)];
+		if($cfg instanceof Resource) {
+			// not loaded config
+			$this->offsetSet($offset, $cfg = self::load($cfg));
+		}
+		return $cfg;
+	}
 
-    /**
-     * Internal config loading.
-     * 
-     * @param Resource $res
-     * @return array
-     */
-    protected function load(Resource $res) {
-        switch ($res->getType()) {
-            case 'cfg':
-            case 'php':
-                // eval PHP file
-                return Common::parsePhp($res->getContent());
-            case 'json':
-                // JSON object as array
-                return json_decode($res->getContent(), true);
-            case 'ini':
-                // INI array
-                return parse_ini_string($res->getContent(), true);
-            case 'xml':
-                // XML as array
-                return json_decode(json_encode(simplexml_load_string($res->getContent())), true);
-            case 'engine':
-                // 
-                return $res;
-        }
-        return [];
-    }
+	/**
+	 * Internal config loading.
+	 * 
+	 * @param Resource $res
+	 * @return array
+	 */
+	static protected function load(Resource $res) {
+		switch($res->getType()) {
+			case 'cfg':
+			case 'php':
+				// eval PHP file
+				return Common::parsePhp($res->getContent());
+			case 'json':
+				// JSON object as array
+				return json_decode($res->getContent(), true);
+			case 'ini':
+				// INI array
+				return parse_ini_string($res->getContent(), true);
+			case 'xml':
+				// XML as array
+				return json_decode(json_encode(simplexml_load_string($res->getContent())), true);
+			case 'engine':
+				// 
+				return $res;
+		}
+		return [];
+	}
 
 }

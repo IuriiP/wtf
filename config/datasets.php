@@ -10,7 +10,7 @@ return [
         'engine' => 'mysql',
         'host' => 'localhost',
         'name' => 'my_db',
-        'user' => 'user',
+        'user' => 'root',
         'password' => 'password',
         'persistent' => true,
     ],

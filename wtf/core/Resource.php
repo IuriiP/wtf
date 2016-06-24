@@ -270,9 +270,7 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
      * @return \Wtf\Core\Resource
      */
     final public function data($data = '') {
-        if ($this->_obj) {
-            $this->_obj->setData($data);
-        }
+        $this->_data = $data;
         return $this;
     }
 

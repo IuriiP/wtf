@@ -26,11 +26,12 @@ namespace Wtf\Helper;
  */
 class Common {
 
-    static public function parsePhp($string) {
-        ob_start();
-        $content = eval(preg_replace(['~\\<\\?php~', '~\\?\\>~'], '', $res->getContent()));
-        ob_end_clean();
-        return $content;
-    }
+	static public function parsePhp($string) {
+		ob_start();
+		$content = eval(preg_replace(['~\\<\\?php~', '~\\?\\>~'], '', $string));
+		ob_end_clean();
+		var_dump($content);
+		return $content;
+	}
 
 }

@@ -24,6 +24,9 @@ session_start();
  */
 $loader = require_once('../vendor/autoload.php');
 
+class App extends \Wtf\Core\App {
+    // short alias
+}
 /**
  * Run application
  */

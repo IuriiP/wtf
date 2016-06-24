@@ -17,16 +17,16 @@
  */
 namespace Wtf\Core;
 
-use Wtf\Core\Entity;
 
 /**
  * Chainable Response
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
+class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Bootstrap
 {
 
+    use \Wtf\Traits\Container;
     /**
      * @var array HTTP/1.1 response codes
      */
@@ -194,17 +194,6 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
     }
 
     /**
-     * Shortcut to immediatelly approval.
-     * 
-     * @param mixed $content
-     * @return \Wtf\Core\Response Chainable
-     */
-    public function apply($content)
-    {
-        return $this->approve($content);
-    }
-
-    /**
      * Magic setter for any type injection.
      * 
      * EG: Code below
@@ -243,21 +232,6 @@ class Response extends Aggregator implements \Wtf\Interfaces\Bootstrap
             trigger_error(__CLASS__ . "::{$type}: injecting not allowed to " . $this->content->getType());
         }
         return $this;
-    }
-
-    /**
-     * Static initialize.
-     * 
-     * EG:
-     * Resource::html('hello, world!') = new Resource(Entity::factory('html','hello, world!')) = new Resource(new Entities\Html('hello, world!'))
-     * 
-     * @param type $name
-     * @param type $args
-     * @return \Wtf\Core\Response new instance
-     */
-    static public function __callStatic($name, $args)
-    {
-        return new Response(Entity::factory($name, $args));
     }
 
     /**

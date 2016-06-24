@@ -13,5 +13,6 @@ namespace Wtf\Interfaces;
  * @author IuriiP
  */
 interface Pool {
-    public function instance($name);
+
+	static public function instance($name);
 }

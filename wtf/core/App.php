@@ -45,9 +45,6 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
      * 
      */
     private function __construct() {
-        self::contract('server', Server::singleton());
-        self::contract('path', Path::singleton());
-        self::contract('config', Config::singleton());
     }
 
     /**
@@ -78,6 +75,9 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
         ob_start();
         self::$_timer_stack[] = $start_time;
 
+        self::contract('server', Server::singleton());
+        self::contract('path', Path::singleton());
+        self::contract('config', Config::singleton());
         /**
          * @var \Wtf\Core\App Application get self instance
          */
