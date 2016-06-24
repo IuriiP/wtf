@@ -48,9 +48,9 @@ trait AdaptiveFactory {
         while ($types) {
             $method = implode('_', $types);
             try {
-                return call_user_func_array([__CLASS__, $method], $args);
+                return call_user_func([__CLASS__, $method], $args);
             } catch (Exception $exc) {
-                trigger_error(__CLASS__ . "::Builder: not found method '{$method}'");
+                trigger_error(__CLASS__ . "::produce: not found method '{$method}'");
             }
             array_pop($types);
         }

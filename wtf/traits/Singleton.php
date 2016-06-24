@@ -32,7 +32,7 @@ trait Singleton {
      * @return \static
      */
     public static function singleton() {
-        if (null === self::$instance) {
+        if (!self::$instance) {
             self::$instance = new static();
         }
         return self::$instance;
@@ -42,8 +42,6 @@ trait Singleton {
      * Construct protect
      */
     private function __construct() {
-        parent::__construct();
-        
     }
 
     /**

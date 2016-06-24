@@ -34,8 +34,8 @@ trait Container {
     protected $_container = [];
 
     protected static function _parseComplex($offset) {
-        if (is_string($offset) && (FALSE !== strpos($offset, '.'))) {
-            return explode('.', $offset);
+        if (is_string($offset) && (FALSE !== strpos($offset, '/'))) {
+            return explode('/', $offset);
         }
         return null;
     }
@@ -123,7 +123,7 @@ trait Container {
     }
 
     public function get($name, $def = null) {
-        if ($complex = self::_parseComplex($offset)) {
+        if ($complex = self::_parseComplex($name)) {
             return self::_complexExists($this->_container, $complex) ?
                     self::_complexGet($this->_container, $complex) :
                     $def;
