@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Interfaces;
 
 /**
@@ -23,78 +25,78 @@ namespace Wtf\Interfaces;
  */
 interface Resource {
 
-    /**
-     * Check if a container
-     * 
-     * @return boolean
-     */
-    public function isContainer();
+	/**
+	 * Check if a container
+	 * 
+	 * @return boolean
+	 */
+	public function isContainer();
 
-    /**
-     * Get the named child
-     * 
-     * @param type $name
-     * @return type
-     */
-    public function child($name);
+	/**
+	 * Get the named child
+	 * 
+	 * @param type $name
+	 * @return type
+	 */
+	public function child($name);
 
-    /**
-     * Get the object's container
-     * 
-     * @return \Wtf\Core\Resource
-     */
-    public function container();
+	/**
+	 * Get the object's container
+	 * 
+	 * @return \Wtf\Core\Resource
+	 */
+	public function container();
 
-    /**
-     * Get the specified timestamp of resource:
-     * 'c' - create time
-     * 'm' - modify time
-     * 'a' - access time (default)
-     * 
-     * @param string $type
-     * @return int
-     */
-    public function getTime($type = null);
+	/**
+	 * Get the specified timestamp of resource:
+	 * 'c' - create time
+	 * 'm' - modify time
+	 * 'a' - access time (default)
+	 * 
+	 * @param string $type
+	 * @return int
+	 */
+	public function getTime($type = null);
 
-    /**
-     * Get the scheme of the object
-     * 
-     * @return string
-     */
-    public function getScheme();
+	/**
+	 * Get the scheme of the object
+	 * 
+	 * @return string
+	 */
+	public function getScheme();
 
-    /**
-     * Get the full path to the object
-     * 
-     * @return string
-     */
-    public function getPath();
+	/**
+	 * Get the full path to the object
+	 * 
+	 * @return string
+	 */
+	public function getPath();
 
-    /**
-     * Get the object self name
-     * 
-     * @return string
-     */
-    public function getName();
+	/**
+	 * Get the object self name
+	 * 
+	 * @return string
+	 */
+	public function getName();
 
-    /**
-     * Get the object type
-     * 
-     * @return string
-     */
-    public function getType();
+	/**
+	 * Get the object type
+	 * 
+	 * @return string
+	 */
+	public function getType();
 
-    /**
-     * Get the object mime-type
-     * 
-     * @return string
-     */
-    public function getMime();
+	/**
+	 * Get the object mime-type
+	 * 
+	 * @return string
+	 */
+	public function getMime();
 
-    /**
-     * Get the object length
-     * 
-     * @return string
-     */
-    public function getLength();
+	/**
+	 * Get the object length
+	 * 
+	 * @return string
+	 */
+	public function getLength();
 }

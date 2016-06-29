@@ -28,19 +28,19 @@ use Wtf\Core\Event;
  */
 interface Observer {
 
-    /**
-     * Policy for observer name
-     * 
-     * @param string $name Event name from observer registration
-     * @return string
-     */
-    public function observer($name = null);
+	/**
+	 * Policy for observer name
+	 * 
+	 * @param string $name Event name from observer registration
+	 * @return string
+	 */
+	public function observer($name = null);
 
-    /**
-     * On event firing
-     * 
-     * @param Event $event
-     * @param string $regname Registered name from $this->observer()
-     */
-    public function notify(Event $event, $regname=null);
+	/**
+	 * On event firing
+	 * 
+	 * @param Event $event
+	 * @param string $regname Registered name from $this->observer()
+	 */
+	public function notify(Event $event, $regname = null);
 }

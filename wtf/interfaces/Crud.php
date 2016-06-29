@@ -25,33 +25,33 @@ namespace Wtf\Interfaces;
  */
 interface Crud {
 
-    /**
-     * Create from data
-     * 
-     * @param Iterator $data
-     */
-    public function create($data);
+	/**
+	 * Create from data
+	 * 
+	 * @param Iterator $data
+	 */
+	public function create($data);
 
-    /**
-     * Read data by conditions
-     * 
-     * @param Iterator $data
-     * @param array of Condition $conditions
-     */
-    public function read($data, $conditions);
+	/**
+	 * Read data by conditions
+	 * 
+	 * @param Iterator $data
+	 * @param array of Condition $conditions
+	 */
+	public function read($data, $conditions);
 
-    /**
-     * Updata data by conditions
-     * 
-     * @param Iterator $data
-     * @param array of Condition $conditions
-     */
-    public function update($data, $conditions);
+	/**
+	 * Updata data by conditions
+	 * 
+	 * @param Iterator $data
+	 * @param array of Condition $conditions
+	 */
+	public function update($data, $conditions);
 
-    /**
-     * Delete by conditions
-     * 
-     * @param array of Condition $conditions
-     */
-    public function delete($conditions);
+	/**
+	 * Delete by conditions
+	 * 
+	 * @param array of Condition $conditions
+	 */
+	public function delete($conditions);
 }

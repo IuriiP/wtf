@@ -27,54 +27,54 @@ use \Wtf\Dataset\Query;
  */
 interface Sql {
 
-    /**
-     * Direct selection
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return \Wtf\Dataset\Result Set
-     */
-    public function sqlSelect(Query $query);
-    
-    /**
-     * Direct insert
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return \Wtf\Dataset\Result Count
-     */
-    public function sqlInsert(Query $query);
+	/**
+	 * Direct selection
+	 * 
+	 * @param \Wtf\Dataset\Query $query
+	 * @return \Wtf\Dataset\Result Set
+	 */
+	public function sqlSelect(Query $query);
 
-    /**
-     * Direct update
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return \Wtf\Dataset\Result Count
-     */
-    public function sqlUpdate(Query $query);
+	/**
+	 * Direct insert
+	 * 
+	 * @param \Wtf\Dataset\Query $query
+	 * @return \Wtf\Dataset\Result Count
+	 */
+	public function sqlInsert(Query $query);
 
-    /**
-     * Direct deletion
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return \Wtf\Dataset\Result Count
-     */
-    public function sqlDelete(Query $query);
+	/**
+	 * Direct update
+	 * 
+	 * @param \Wtf\Dataset\Query $query
+	 * @return \Wtf\Dataset\Result Count
+	 */
+	public function sqlUpdate(Query $query);
 
-    /**
-     * Count by conditions
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return int
-     */
-    public function count(Query $query);
+	/**
+	 * Direct deletion
+	 * 
+	 * @param \Wtf\Dataset\Query $query
+	 * @return \Wtf\Dataset\Result Count
+	 */
+	public function sqlDelete(Query $query);
 
-    //
-    public function joins(Query $query);
+	/**
+	 * Count by conditions
+	 * 
+	 * @param \Wtf\Dataset\Query $query
+	 * @return int
+	 */
+	public function count(Query $query);
 
-    public function wheres(Query $query);
+	//
+	public function joins(Query $query);
 
-    public function havings(Query $query);
+	public function wheres(Query $query);
 
-    public function limits(Query $query);
+	public function havings(Query $query);
 
-    public function fields(Query $query);
+	public function limits(Query $query);
+
+	public function fields(Query $query);
 }

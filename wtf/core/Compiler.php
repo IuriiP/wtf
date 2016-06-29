@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 /**
@@ -22,28 +24,25 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Compiler implements \Wtf\Interfaces\Factory
-{
+abstract class Compiler implements \Wtf\Interfaces\Factory {
 
-    use \Wtf\Traits\Factory;
+	use \Wtf\Traits\Factory;
 
-    /**
-     * 
-     * 
-     * @param string $compiler
-     * @param Resource $source
-     * @return string Compiled content
-     */
-    final static public function compile($compiler, Resource $source)
-    {
-        $resource = Resource::produce($source);
-        if ($compiler && ($engine = self::factory(['',
-                    $compiler]))) {
-            return $engine->process($resource->getContent());
-        }
-        return $resource->getContent();
-    }
-    
-    abstract function process($content);
+	/**
+	 * 
+	 * 
+	 * @param string $compiler
+	 * @param Resource $source
+	 * @return string Compiled content
+	 */
+	final static public function compile($compiler, Resource $source) {
+		$resource = Resource::produce($source);
+		if($compiler && ($engine = self::factory(['',
+				$compiler]))) {
+			return $engine->process($resource->getContent());
+		}
+		return $resource->getContent();
+	}
 
+	abstract function process($content);
 }

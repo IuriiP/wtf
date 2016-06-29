@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Traits;
 
 /**
@@ -22,15 +24,13 @@ namespace Wtf\Traits;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-trait Attributes
-{
+trait Attributes {
 
-    public function attrsLines($array)
-    {
-        return array_map(function($val, $key) {
-            $str = addslashes($val); // slashing
-            return "{$key}=\"{$str}\"";
-        }, $array, array_keys($array));
-    }
+	public function attrsLines($array) {
+		return array_map(function($val, $key) {
+			$str = addslashes($val); // slashing
+			return "{$key}=\"{$str}\"";
+		}, $array, array_keys($array));
+	}
 
 }

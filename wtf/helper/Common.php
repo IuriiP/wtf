@@ -24,13 +24,12 @@ namespace Wtf\Helper;
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Common {
+abstract class Common {
 
 	static public function parsePhp($string) {
 		ob_start();
 		$content = eval(preg_replace(['~\\<\\?php~', '~\\?\\>~'], '', $string));
 		ob_end_clean();
-		var_dump($content);
 		return $content;
 	}
 

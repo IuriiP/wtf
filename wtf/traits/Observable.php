@@ -28,20 +28,20 @@ use Wtf\Core\Event;
  */
 trait Observable {
 
-    private $_observe = [];
+	private $_observe = [];
 
-    public function observe($list = null) {
-        if (!$list) {
-            $this->_observe = [];
-        } elseif (is_array($list)) {
-            foreach ($list as $event => $observer) {
-                $this->_observe[] = $event;
-                Event::enable($event, $observer);
-            }
-        } elseif ($observer instanceof \Wtf\Interfaces\Observer) {
-            $this->_observe = ['.*' => $observer];
-            Event::enable('.*', $observer);
-        }
-    }
+	public function observe($list = null) {
+		if(!$list) {
+			$this->_observe = [];
+		} elseif(is_array($list)) {
+			foreach($list as $event => $observer) {
+				$this->_observe[] = $event;
+				Event::enable($event, $observer);
+			}
+		} elseif($observer instanceof \Wtf\Interfaces\Observer) {
+			$this->_observe = ['.*' => $observer];
+			Event::enable('.*', $observer);
+		}
+	}
 
 }

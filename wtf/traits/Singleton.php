@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Traits;
 
 /**
@@ -24,41 +26,43 @@ namespace Wtf\Traits;
  */
 trait Singleton {
 
-    protected static $instance = null;
+	protected static $instance = null;
 
-    /**
-     * Singleton get instance
-     * 
-     * @return \static
-     */
-    public static function singleton() {
-        if (!self::$instance) {
-            self::$instance = new static();
-        }
-        return self::$instance;
-    }
+	/**
+	 * Singleton get instance
+	 * 
+	 * @return \static
+	 */
+	public static function singleton() {
+		if(!self::$instance) {
+			self::$instance = new static();
+		}
+		return self::$instance;
+	}
 
-    /**
-     * Construct protect
-     */
-    private function __construct() {
-    }
+	/**
+	 * Construct protect
+	 */
+	private function __construct() {
+		
+	}
 
-    /**
-     * Cloning protect
-     * 
-     * @throws \ErrorException
-     */
-    private function __clone() {
-        trigger_error( __CLASS__ . '::Singleton: cloning is not allowed');
-    }
+	/**
+	 * Cloning protect
+	 * 
+	 * @throws \ErrorException
+	 */
+	private function __clone() {
+		trigger_error(__CLASS__ . '::Singleton: cloning is not allowed');
+	}
 
-    /**
-     * Unserializing protect
-     * 
-     * @throws \ErrorException
-     */
-    private function __wakeup() {
-        trigger_error(__CLASS__ . '::Singleton: unserializing is not allowed');
-    }
+	/**
+	 * Unserializing protect
+	 * 
+	 * @throws \ErrorException
+	 */
+	private function __wakeup() {
+		trigger_error(__CLASS__ . '::Singleton: unserializing is not allowed');
+	}
+
 }

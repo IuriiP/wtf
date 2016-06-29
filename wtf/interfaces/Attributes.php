@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,14 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Interfaces;
 
 /**
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-interface Attributes
-{
+interface Attributes {
 
-    public function attrsLines($array);
+	public function attrsLines($array);
 }

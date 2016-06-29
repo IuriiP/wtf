@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 use Wtf\Core\Compiler;
@@ -24,60 +26,54 @@ use Wtf\Core\Compiler;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class View
-{
+class View {
 
-    static private $_caches = [];
-    
-    /**
-     * @param string $source
-     */
-    public function __construct($source)
-    {
-        if ($cached = self::find($source)) {
-            parent::__construct($this->resolve($cached, $vars));
-        } else {
-            parent::__construct(null);
-        }
-    }
+	static private $_caches = [];
 
-    static public function exists($view)
-    {
-        return self::find($view);
-    }
+	/**
+	 * @param string $source
+	 */
+	public function __construct($source) {
+		if($cached = self::find($source)) {
+			parent::__construct($this->resolve($cached, $vars));
+		} else {
+			parent::__construct(null);
+		}
+	}
 
-    static public function find($view)
-    {
-        if ($origin = self::search($view)) {
-            $cached = realpath(\Wtf\Core\App::path('cache') . DIRECTORY_SEPARATOR . sha1($view));
-            if (!file_exists($cached) || (filemtime($cached) < filemtime($origin['path']))) {
-                file_put_contents($cached, Compiler::compile($origin['compiler'], $origin['path']));
-            }
-            return $cached;
-        }
-        return null;
-    }
+	static public function exists($view) {
+		return self::find($view);
+	}
 
-    static protected function search($view)
-    {
-        foreach (\Wtf\Core\App::config('views') as $key => $value) {
-            $filename = sprintf($key, $view);
-            if (file_exists($filename)) {
-                return [
-                    'path' => $filename,
-                    'compiler' => $value,
-                ];
-            }
-        }
-        return null;
-    }
+	static public function find($view) {
+		if($origin = self::search($view)) {
+			$cached = realpath(\Wtf\Core\App::path('cache') . DIRECTORY_SEPARATOR . sha1($view));
+			if(!file_exists($cached) || (filemtime($cached) < filemtime($origin['path']))) {
+				file_put_contents($cached, Compiler::compile($origin['compiler'], $origin['path']));
+			}
+			return $cached;
+		}
+		return null;
+	}
 
-    protected function resolve($fname, $vars)
-    {
-        ob_start();
-        extract($vars);
-        include $fname;
-        return ob_get_clean();
-    }
+	static protected function search($view) {
+		foreach(\Wtf\Core\App::config('views') as $key => $value) {
+			$filename = sprintf($key, $view);
+			if(file_exists($filename)) {
+				return [
+					'path' => $filename,
+					'compiler' => $value,
+				];
+			}
+		}
+		return null;
+	}
+
+	protected function resolve($fname, $vars) {
+		ob_start();
+		extract($vars);
+		include $fname;
+		return ob_get_clean();
+	}
 
 }

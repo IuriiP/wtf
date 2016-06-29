@@ -15,13 +15,13 @@ namespace Wtf\Traits;
  */
 trait Pool {
 
-    static private $_pool = [];
+	static private $_pool = [];
 
-    public static function instance($name='') {
-        if (!isset(self::$_pool[$name])) {
-            return self::$_pool[$name] = new static($name);
-        }
-        return self::$_pool[$name];
-    }
+	public static function instance($name = '') {
+		if(!isset(self::$_pool[$name])) {
+			return self::$_pool[$name] = new static($name);
+		}
+		return self::$_pool[$name];
+	}
 
 }

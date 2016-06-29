@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Traits;
 
 /**
@@ -33,43 +35,43 @@ namespace Wtf\Traits;
  */
 trait AdaptiveFactory {
 
-    /**
-     * Build the object of some class
-     * dependent of the arguments list
-     * 
-     * @return Object
-     */
-    final static public function produce() {
-        $args = func_get_args();
-        $types = ['guess'];
-        foreach ($args as $arg) {
-            $types[] = gettype($arg);
-        }
-        while ($types) {
-            $method = implode('_', $types);
-            try {
-                return call_user_func([__CLASS__, $method], $args);
-            } catch (Exception $exc) {
-                trigger_error(__CLASS__ . "::produce: not found method '{$method}'");
-            }
-            array_pop($types);
-        }
-        return null;
-    }
+	/**
+	 * Build the object of some class
+	 * dependent of the arguments list
+	 * 
+	 * @return Object
+	 */
+	final static public function produce() {
+		$args = func_get_args();
+		$types = ['guess'];
+		foreach($args as $arg) {
+			$types[] = gettype($arg);
+		}
+		while($types) {
+			$method = implode('_', $types);
+			try {
+				return call_user_func([__CLASS__, $method], $args);
+			} catch(Exception $exc) {
+				trigger_error(__CLASS__ . "::produce: not found method '{$method}'");
+			}
+			array_pop($types);
+		}
+		return null;
+	}
 
-    /**
-     * Predefined basic guesser
-     * Just try create instance of the class
-     * 
-     * @return \static
-     */
-    static protected function guess() {
-        try {
-            return new static();
-        } catch (\Exception $exc) {
-            trigger_error(__CLASS__ . '::Builder: guess error: ' . $exc->getMessage());
-        }
-        return null;
-    }
+	/**
+	 * Predefined basic guesser
+	 * Just try create instance of the class
+	 * 
+	 * @return \static
+	 */
+	static protected function guess() {
+		try {
+			return new static();
+		} catch(\Exception $exc) {
+			trigger_error(__CLASS__ . '::Builder: guess error: ' . $exc->getMessage());
+		}
+		return null;
+	}
 
 }

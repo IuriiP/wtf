@@ -1,6 +1,7 @@
 <?php
-/*
- * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
+
+/* 
+ * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +17,3 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @author Iurii Prudius <hardwork.mouse@gmail.com>
- */
-// TODO: check include path
-//ini_set('include_path', ini_get('include_path'));
-
-require_once __DIR__.'/../vendor/autoload.php';

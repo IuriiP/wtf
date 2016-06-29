@@ -20,7 +20,7 @@
 namespace Wtf\Dataset;
 
 use \Wtf\Dataset\Query,
-    \Wtf\Dataset\Result;
+	\Wtf\Dataset\Result;
 
 /**
  * Description of Engine
@@ -29,195 +29,190 @@ use \Wtf\Dataset\Query,
  */
 abstract class Engine implements \Wtf\Interfaces\Factory, \Wtf\Interfaces\Crud {
 
-    use \Wtf\Traits\Factory;
+	use \Wtf\Traits\Factory;
 
-    private $_config = null;
-    private $_request = null;
-    private $_error = null;
-    private $_result = null;
+	private $_config = null;
 
-    /**
-     * Construct with config
-     * 
-     * @param array $config
-     */
-    final public function __construct($config) {
-        $this->_config = $config;
-    }
+	private $_request = null;
 
-    /**
-     * Get config subset
-     * 
-     * @return array
-     */
-    final public function config($only = []) {
-        return $only ? array_intersect_key($this->_config, array_fill_keys($only, true)) : $this->_config;
-    }
+	private $_error = null;
 
-    /**
-     * Map config options to driver-specific constants.
-     * I.e. in config file:
-     * option1=100
-     * option2=some text
-     * option3=20
-     * 
-     * Direct remap:
-     * Engine->options([OPTION1=>'option1',OPTION2=>'option2',OPTION4=>'option4']) 
-     * will produce:
-     * [OPTION1=>100,OPTION2=>'some text'] // option3 is omitted in array, option4 is omitted in config
-     * 
-     * Remap with default:
-     * Engine->options([OPTION1=>['option1'=>5],OPTION4=>['option4'=>333]])
-     * will produce:
-     * [OPTION1=>100,OPTION4=>333] // option4 is omitted in config and default value used
-     * 
-     * Remap by list:
-     * Engine->options([OPTION1=>['option1'=>[10=>'ten',100=>'hundred']],OPTION3=>['option3'=>[3=>'three']],OPTION4=>['option4'=>[''=>'default',2=>'two']]]) 
-     * will produce:
-     * [OPTION1=>'hundred',OPTION4=>'default'] // option3 value not in list and has no default, option4 is omitted in config but has default
-     * 
-     * Remap by list multiply:
-     * Engine->options([OPTION1=>['option1','option3']]) 
-     * will produce:
-     * [OPTION1=>'hundred',OPTION4=>'default'] // option3 value not in list and has no default, option4 is omitted in config but has default
-     * 
-     * 
-     * @param array $array Contains named driver-specific options
-     * @return array
-     */
-    final public function options($array = []) {
-        $maped = [];
-        foreach ($array as $key => $val) {
-            if (is_array($val)) {
-                // complex remap
-                $remap = [];
-                foreach ($val as $subkey => $subval) {
-                    if (is_scalar($subval)) {
-                        // use config or default
-                        $remap[] = isset($this->_config[$subkey]) ? $this->_config[$subkey] : $subval;
-                    } elseif(isset($this->_config[$subkey]) && isset($subval[$this->_config[$subkey]])) {
-                        // conventional remap
-                        $remap[] = $subval[$this->_config[$subkey]];
-                    } elseif(isset($subval[''])) {
-                        // default remap
-                        $remap[] = $subval[''];
-                    }
-                }
-                $maped[$key] = array_reduce($remap, function($carry, $item) {
-                    if ($carry) {
-                        if (is_numeric($carry) && is_numeric($item)) {
-                            return $carry + $item;
-                        }
-                        return $carry . $item;
-                    }
-                    return $item;
-                });
-            } elseif (isset($this->_config[$val])) {
-                $maped[$key] = $this->_config[$val];
-            }
-        }
-        return $maped;
-    }
+	private $_result = null;
 
-    /**
-     * Check ready state
-     * 
-     * @return bool
-     */
-    abstract public function isReady();
+	/**
+	 * Construct with config
+	 * 
+	 * @param array $config
+	 */
+	final public function __construct($config) {
+		$this->_config = $config;
+	}
 
-    /**
-     * Real opening connection
-     * 
-     * @return bool
-     */
-    abstract public function open();
+	/**
+	 * Get config subset
+	 * 
+	 * @return array
+	 */
+	final public function config($only = []) {
+		return $only ? array_intersect_key($this->_config, array_fill_keys($only, true)) : $this->_config;
+	}
 
-    /**
-     * Real closing connection
-     * 
-     * @return bool
-     */
-    abstract public function close();
+	/**
+	 * Map config options to driver-specific constants.
+	 * I.e. in config file:
+	 * option1=100
+	 * option2=some text
+	 * option3=20
+	 * 
+	 * Direct remap:
+	 * Engine->options([OPTION1=>'option1',OPTION2=>'option2',OPTION4=>'option4']) 
+	 * will produce:
+	 * [OPTION1=>100,OPTION2=>'some text'] // option3 is omitted in array, option4 is omitted in config
+	 * 
+	 * Remap with default:
+	 * Engine->options([OPTION1=>['option1'=>5],OPTION4=>['option4'=>333]])
+	 * will produce:
+	 * [OPTION1=>100,OPTION4=>333] // option4 is omitted in config and default value used
+	 * 
+	 * Remap by list:
+	 * Engine->options([OPTION1=>['option1'=>[10=>'ten',100=>'hundred']],OPTION3=>['option3'=>[3=>'three']],OPTION4=>['option4'=>[''=>'default',2=>'two']]]) 
+	 * will produce:
+	 * [OPTION1=>'hundred',OPTION4=>'default'] // option3 value not in list and has no default, option4 is omitted in config but has default
+	 * 
+	 * Remap by list multiply:
+	 * Engine->options([OPTION1=>['option1','option3']]) 
+	 * will produce:
+	 * [OPTION1=>'hundred',OPTION4=>'default'] // option3 value not in list and has no default, option4 is omitted in config but has default
+	 * 
+	 * 
+	 * @param array $array Contains named driver-specific options
+	 * @return array
+	 */
+	final public function options($array = []) {
+		$maped = [];
+		foreach($array as $key => $val) {
+			if(is_array($val)) {
+				// complex remap
+				$remap = [];
+				foreach($val as $subkey => $subval) {
+					if(is_scalar($subval)) {
+						// use config or default
+						$remap[] = isset($this->_config[$subkey]) ? $this->_config[$subkey] : $subval;
+					} elseif(isset($this->_config[$subkey]) && isset($subval[$this->_config[$subkey]])) {
+						// conventional remap
+						$remap[] = $subval[$this->_config[$subkey]];
+					} elseif(isset($subval[''])) {
+						// default remap
+						$remap[] = $subval[''];
+					}
+				}
+				$maped[$key] = array_reduce($remap, function($carry, $item) {
+					if($carry) {
+						if(is_numeric($carry) && is_numeric($item)) {
+							return $carry + $item;
+						}
+						return $carry . $item;
+					}
+					return $item;
+				});
+			} elseif(isset($this->_config[$val])) {
+				$maped[$key] = $this->_config[$val];
+			}
+		}
+		return $maped;
+	}
 
-    /**
-     * Get engine last error
-     * 
-     * @return \Wtf\Dataset\Error
-     */
-    abstract public function error();
+	/**
+	 * Check ready state
+	 * 
+	 * @return bool
+	 */
+	abstract public function isReady();
 
-    /**
-     * Conditional getter
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @param boolean $need Create new if not exists
-     * @return \Wtf\Dataset\Result Set
-     */
-    public function get(Query $query, $need = false) {
-        $exists = $this->read($query->reading(), $query->conditions());
-        if (!$exists->count && $need) {
-            $this->create($query->creating());
-            $exists = $this->read($query->reading(), $query->conditions());
-        }
-        return $exists;
-    }
+	/**
+	 * Real opening connection
+	 * 
+	 * @return bool
+	 */
+	abstract public function open();
 
-    /**
-     * Conditional setter
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @param boolean $existed Only update existed
-     * @return \Wtf\Dataset\Result Set
-     */
-    public function set(Query $query, $existed = false) {
-        $exists = $this->read($query->reading(), $query->conditions());
-        if ($exists->count) {
-            $this->update($query->updating(), $query->conditions());
-            $exists = $this->read($query->reading(), $query->conditions());
-        } elseif (!$existed) {
-            $this->create($query->creating());
-            $exists = $this->read($query->reading(), $query->conditions());
-        }
-        return $exists;
-    }
+	/**
+	 * Real closing connection
+	 * 
+	 * @return bool
+	 */
+	abstract public function close();
 
-    /**
-     * Pagination
-     * 
-     * @param \Wtf\Dataset\Query $squery
-     * @param int $size
-     * @param int $number
-     * @return \Wtf\Dataset\Result Set with pagination markup
-     */
-    public function page(Query $query, $size, $number) {
-        $squery = clone $query;
-        return $this->select($squery->limit($size)->offset($number * $size))->paginate($size, $number, $this->count($query));
-    }
+	/**
+	 * Get engine last error
+	 * 
+	 * @return \Wtf\Dataset\Error
+	 */
+	abstract public function error();
 
-    /**
-     * Direct update
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return \Wtf\Dataset\Result Count
-     */
-    abstract public function update(Query $query);
+	/**
+	 * Conditional getter
+	 * 
+	 * @param \Wtf\Dataset\Query $query
+	 * @param boolean $need Create new if not exists
+	 * @return \Wtf\Dataset\Result Set
+	 */
+	public function get(Query $query, $need = false) {
+		$exists = $this->read($query->reading(), $query->conditions());
+		if(!$exists->count && $need) {
+			$this->create($query->creating());
+			$exists = $this->read($query->reading(), $query->conditions());
+		}
+		return $exists;
+	}
 
-    /**
-     * Direct deletion
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return \Wtf\Dataset\Result Count
-     */
-    abstract public function delete(Query $query);
+	/**
+	 * Conditional setter
+	 * 
+	 * @param \Wtf\Dataset\Query $query
+	 * @param boolean $existed Only update existed
+	 * @return \Wtf\Dataset\Result Set
+	 */
+	public function set(Query $query, $existed = false) {
+		$exists = $this->read($query->reading(), $query->conditions());
+		if($exists->count) {
+			$this->update($query->updating(), $query->conditions());
+			$exists = $this->read($query->reading(), $query->conditions());
+		} elseif(!$existed) {
+			$this->create($query->creating());
+			$exists = $this->read($query->reading(), $query->conditions());
+		}
+		return $exists;
+	}
 
-    /**
-     * Touch set
-     * 
-     * @param \Wtf\Dataset\Query $query
-     * @return \Wtf\Dataset\Result Count
-     */
-    abstract public function touch(Query $query);
+	abstract public function count(Query $query);
 
-    abstract static public function getMessage($code);
+	/**
+	 * Pagination
+	 * 
+	 * @param \Wtf\Dataset\Query $squery
+	 * @param int $size
+	 * @param int $number
+	 * @return \Wtf\Dataset\Result Set with pagination markup
+	 */
+	public function page(Query $query, $size, $number) {
+		if($this instanceof \Wtf\Interfaces\Pageable) {
+			return $this->paginate($query, $size, $number);
+		}
+		return $this->get($query);
+	}
+
+	abstract public function touch(Query $query);
+
+	/**
+	 * Default for overloading
+	 * 
+	 * @param type $code
+	 * @return type
+	 */
+	static public function getMessage($code) {
+		$engine = static::class;
+		return "Engine::{$engine}: error #{$code}";
+	}
+
 }

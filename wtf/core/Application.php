@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 /**
@@ -23,9 +25,7 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Application implements \Wtf\Interfaces\Factory
-{
+abstract class Application implements \Wtf\Interfaces\Factory {
 
-    use \Wtf\Traits\Factory;
-
+	use \Wtf\Traits\Factory;
 }

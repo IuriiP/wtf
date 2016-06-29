@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 /**
@@ -22,88 +24,135 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Entity implements \Wtf\Interfaces\Factory
-{
+abstract class Entity implements \Wtf\Interfaces\Factory, \IteratorAggregate {
 
-    use \Wtf\Traits\Factory;
+	use \Wtf\Traits\Factory;
 
-    /**
-     * @var string type of content
-     */
-    protected $type = null;
+	/**
+	 * @var string type of content
+	 */
+	protected $type = null;
 
-    /**
-     * @var Object
-     */
-    protected $content = null;
+	/**
+	 * @var Object
+	 */
+	protected $content = null;
 
-    /**
-     * @var array options for processors
-     */
-    protected $options = [];
+	/**
+	 * @var array options for processors
+	 */
+	protected $options = [];
 
-    /**
-     * Check type
-     * 
-     * @param string $type
-     * @return boolean
-     */
-    final public function isType($type)
-    {
-        return strcasecmp($this->type, $type) === 0;
-    }
+	/**
+	 * Check type
+	 * 
+	 * @param string $type
+	 * @return boolean
+	 */
+	final public function isType($type) {
+		return strcasecmp($this->type, $type) === 0;
+	}
 
-    /**
-     * Shortcut to isType()
-     * 
-     * @param string $type
-     * @return boolean
-     */
-    final public function type($type)
-    {
-        return $this->isType($type);
-    }
+	/**
+	 * Shortcut to isType()
+	 * 
+	 * @param string $type
+	 * @return boolean
+	 */
+	final public function type($type) {
+		return $this->isType($type);
+	}
 
-    /**
-     * Set/get content
-     * 
-     * @param mixed $content
-     * @return mixed
-     */
-    public function content($content = null)
-    {
-        if ($content) {
-            $this->content = $content;
-        }
-        return $this->content;
-    }
+	/**
+	 * Set/get content
+	 * 
+	 * @param \Wtf\Interfaces\Content $content
+	 * @return mixed
+	 */
+	final public function content(\Wtf\Interfaces\Content $content = null) {
+		if($content && $content instanceof \Wtf\Interfaces\Content) {
+			$this->content = $content;
+		}
+		return $this->content;
+	}
 
-    /**
-     * 
-     * @param mixed $content
-     * @param string $type
-     */
-    public function __construct($content = null, $type = null)
-    {
-        $this->content = $content;
-        $this->type = $type? : __CLASS__;
-    }
+	/**
+	 * Magic to get content
+	 *
+	 * @return string 
+	 */
+	abstract public function __toString();
 
-    /**
-     * Magic to get content
-     *
-     * @return string 
-     */
-    abstract public function __toString();
-    
-    /**
-     * Apply processor to this object.
-     * 
-     * @param \Wtf\Core\Processor $processor
-     * @return $this
-     */
-    final public function apply(Processor $processor)
-    {
-        return $processor->process($this);
-    }
+	/**
+	 * Apply processor to this object.
+	 * 
+	 * @param \Wtf\Core\Processor $processor
+	 * @return $this
+	 */
+	final public function apply(Processor $processor) {
+		return $processor->process($this);
+	}
+
+	/**
+	 * @var array of dependent Objects
+	 */
+	protected $children = [];
+
+	/**
+	 * Create instance
+	 * 
+	 * @param Object $content
+	 * @param array $children
+	 */
+	public function __construct($content = null, $children = []) {
+		$this->content = $content;
+		$this->children = (array) $children;
+	}
+
+	/**
+	 * Implements \IteratorAggregate
+	 * 
+	 * @return array
+	 */
+	final public function getIterator() {
+		return $this->children;
+	}
+
+	/**
+	 * Get/set children array
+	 * 
+	 * @param type $children
+	 * @return Object
+	 */
+	final public function children($children = null) {
+		if($children !== null) {
+			$this->children = (array) $children;
+		}
+		return $this->children;
+	}
+
+	/**
+	 * Append new children.
+	 * Not replace existed!
+	 * 
+	 * @param array $children
+	 * @return array
+	 */
+	final public function addChild($children) {
+		if($children) {
+			$this->children = array_merge((array) $children, $this->children);
+		}
+		return $this->children;
+	}
+
+	/**
+	 * Check if child exists
+	 * 
+	 * @param string $name
+	 * @return boolean
+	 */
+	final public function hasChild($name) {
+		return (boolean) $name && isset($this->children[$name]);
+	}
+
 }

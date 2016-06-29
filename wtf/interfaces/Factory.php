@@ -25,7 +25,7 @@ namespace Wtf\Interfaces;
  */
 interface Factory {
 
-    public static function factory($param);
+	public static function factory($param);
 
-    public static function make();
+	public static function make();
 }

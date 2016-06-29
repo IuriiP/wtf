@@ -15,21 +15,22 @@ namespace Wtf\Traits;
  */
 trait Configurable {
 
-    static protected $s_config = null;
-    protected $_config = null;
+	static protected $s_config = null;
 
-    static public function configure($name = null) {
-        if (!static::$s_config) {
-            static::$s_config = \Wtf\Core\App::config($name? : (new \ReflectionClass(get_called_class()))->getShortName());
-        }
-        return static::$s_config;
-    }
+	protected $_config = null;
 
-    public function config($path = null) {
-        if ($config = static::configure()) {
-            return $path ? $config[$path] : null;
-        }
-        return null;
-    }
+	static public function configure($name = null) {
+		if(!static::$s_config) {
+			static::$s_config = \Wtf\Core\App::config($name? : (new \ReflectionClass(get_called_class()))->getShortName());
+		}
+		return static::$s_config;
+	}
+
+	public function config($path = null) {
+		if($config = static::configure()) {
+			return $path ? $config[$path] : null;
+		}
+		return null;
+	}
 
 }

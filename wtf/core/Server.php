@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 /**
@@ -24,11 +26,11 @@ namespace Wtf\Core;
  */
 class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 
-    use \Wtf\Traits\Singleton,
-        \Wtf\Traits\Container;
+	use \Wtf\Traits\Singleton,
+	 \Wtf\Traits\Container;
 
-    private function __construct() {
-        $this->set($_SERVER);
-    }
-    
+	private function __construct() {
+		$this->set($_SERVER);
+	}
+
 }

@@ -24,6 +24,8 @@ namespace Wtf\Interfaces;
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
 interface Pageable {
-    public function paginate($pagesize);
-    public function page($pageno);
+
+	public function paginate($pagesize);
+
+	public function page($pageno);
 }

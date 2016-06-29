@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Interfaces;
 
 /**
@@ -22,7 +24,10 @@ namespace Wtf\Interfaces;
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 interface Writable {
-    public function put($data);
-    public function append($data);
-    public function remove();
+
+	public function put($data);
+
+	public function append($data);
+
+	public function remove();
 }

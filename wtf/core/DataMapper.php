@@ -26,13 +26,14 @@ namespace Wtf\Core;
  */
 abstract class DataMapper implements \Wtf\Interfaces\Factory {
 
-    use \Wtf\Traits\Factory;
-    
-    protected $source = null;
-    protected $map = null;
+	use \Wtf\Traits\Factory;
 
-    public function create($name, $source) {
-        
-    }
+	protected $source = null;
+
+	protected $map = null;
+
+	public function create($name, $source) {
+		
+	}
 
 }

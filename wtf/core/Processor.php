@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 /**
@@ -23,40 +25,38 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Processor extends Entity
-{
+abstract class Processor extends Entity {
 
-    /**
-     * Prepare processor
-     * 
-     * @param mixed $param
-     */
-    public function __construct($param=[])
-    {
-        parent::__construct($param, 'processor');
-    }
+	/**
+	 * Prepare processor
+	 * 
+	 * @param mixed $param
+	 */
+	public function __construct($param = []) {
+		parent::__construct($param, 'processor');
+	}
 
-    /**
-     * Process given object
-     * 
-     * @param \Wtf\Core\Entity $object Description
-     * @return \Wtf\Core\Entity processed
-     */
-    final public function process(Entity $object) {
-        $method = 'process_'.$object->type;
-        if(method_exists($this,$method )) {
-            $this->$method($object);
-        }
-        return $object;
-    }
-    
-    /**
-     * Processor haven't representative data.
-     * 
-     * @return string
-     */
-    final public function __toString()
-    {
-        return '';
-    }
+	/**
+	 * Process given object
+	 * 
+	 * @param \Wtf\Core\Entity $object Description
+	 * @return \Wtf\Core\Entity processed
+	 */
+	final public function process(Entity $object) {
+		$method = 'process_' . $object->type;
+		if(method_exists($this, $method)) {
+			$this->$method($object);
+		}
+		return $object;
+	}
+
+	/**
+	 * Processor haven't representative data.
+	 * 
+	 * @return string
+	 */
+	final public function __toString() {
+		return '';
+	}
+
 }

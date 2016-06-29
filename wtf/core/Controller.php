@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 /**
@@ -23,5 +25,5 @@ namespace Wtf\Core;
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 class Controller {
-    //put your code here
+	//put your code here
 }

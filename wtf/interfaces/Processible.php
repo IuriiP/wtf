@@ -16,12 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Interfaces;
+
 /**
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 interface Processible {
-     public function inject_process($process,$position);
-     public function apply($process);
+
+	public function inject_process($process, $position);
+
+	public function apply($process);
 }

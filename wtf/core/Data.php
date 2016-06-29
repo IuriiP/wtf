@@ -25,25 +25,25 @@ namespace Wtf\Core;
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
 class Data implements \Iterator {
-    
-    public function current() {
-        
-    }
 
-    public function key() {
-        
-    }
+	public function current() {
+		
+	}
 
-    public function next() {
-        
-    }
+	public function key() {
+		
+	}
 
-    public function rewind() {
-        
-    }
+	public function next() {
+		
+	}
 
-    public function valid() {
-        
-    }
+	public function rewind() {
+		
+	}
+
+	public function valid() {
+		
+	}
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core;
 
 use Wtf\Core\Resource;
@@ -26,33 +28,33 @@ use Wtf\Core\Resource;
  */
 class Path implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 
-    use \Wtf\Traits\Container,
-        \Wtf\Traits\Singleton;
+	use \Wtf\Traits\Container,
+	 \Wtf\Traits\Singleton;
 
-    /**
-     * Set predefined paths:
-     * 
-     * root = base
-     * temp = upload
-     * config
-     * vendor
-     * private
-     * public
-     * 
-     */
-    private function __construct() {
-        $root = Resource::produce(getenv('DOCUMENT_ROOT'));
-        $this->offsetSet('root', $root);
-        $this->offsetSet('base', $root);
-        $this->offsetSet('vendor', Resource::produce($root,'vendor'));
-        $this->offsetSet('config', Resource::produce($root,'config'));
-        $this->offsetSet('private', Resource::produce($root,'private'));
-        $this->offsetSet('public', Resource::produce($root,'public'));
-        $this->offsetSet('cache', Resource::produce($root,'cache'));
+	/**
+	 * Set predefined paths:
+	 * 
+	 * root = base
+	 * temp = upload
+	 * config
+	 * vendor
+	 * private
+	 * public
+	 * 
+	 */
+	private function __construct() {
+		$root = Resource::produce(getenv('DOCUMENT_ROOT'));
+		$this->offsetSet('root', $root);
+		$this->offsetSet('base', $root);
+		$this->offsetSet('vendor', Resource::produce($root, 'vendor'));
+		$this->offsetSet('config', Resource::produce($root, 'config'));
+		$this->offsetSet('private', Resource::produce($root, 'private'));
+		$this->offsetSet('public', Resource::produce($root, 'public'));
+		$this->offsetSet('cache', Resource::produce($root, 'cache'));
 
-        $temp = Resource::produce(sys_get_temp_dir());
-        $this->offsetSet('temp', $temp);
-        $this->offsetSet('upload', $temp);
-    }
+		$temp = Resource::produce(sys_get_temp_dir());
+		$this->offsetSet('temp', $temp);
+		$this->offsetSet('upload', $temp);
+	}
 
 }

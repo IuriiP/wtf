@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Interfaces;
 
 /**
@@ -23,11 +25,11 @@ namespace Wtf\Interfaces;
  */
 interface Container extends \ArrayAccess, \IteratorAggregate {
 
-    public function __get($offset);
+	public function __get($offset);
 
-    public function __set($offset, $value);
+	public function __set($offset, $value);
 
-    public function __invoke();
+	public function __invoke();
 
-    public function __call($offset, $args = []);
+	public function __call($offset, $args = []);
 }
