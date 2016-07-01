@@ -17,7 +17,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-		$this->object = new Profiler;
+//		$this->object = new Profiler;
 	}
 
 	/**

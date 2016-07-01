@@ -25,5 +25,5 @@ namespace Wtf\Interfaces;
  */
 interface Bootstrap {
 
-	static public function bootstrap();
+	static public function bootstrap(\Wtf\Core\App $app);
 }

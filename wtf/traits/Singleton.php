@@ -35,7 +35,12 @@ trait Singleton {
 	 */
 	public static function singleton() {
 		if(!self::$instance) {
-			self::$instance = new static();
+			if($args = func_get_args()) {
+				$ref = new \ReflectionClass(static::class);
+				self::$instance = $ref->newInstanceArgs($args);
+			} else {
+				self::$instance = new static();
+			}
 		}
 		return self::$instance;
 	}

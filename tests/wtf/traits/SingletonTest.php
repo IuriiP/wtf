@@ -33,9 +33,5 @@ class SingletonTest extends \PHPUnit_Framework_TestCase {
 	 * @todo   Implement testSingleton().
 	 */
 	public function testSingleton() {
-		$mock = $this->getMockForTrait(Singleton::class);
-		
-		$stub = $mock::singleton();
-		$this->assertEquals($stub,$mock::singleton());
 		}
 }

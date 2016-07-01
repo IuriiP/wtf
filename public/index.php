@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -24,9 +25,26 @@ session_start();
  */
 $loader = require_once('../vendor/autoload.php');
 
+/**
+ * Use vlucas/dotenv to set environment
+ */
+$dotenv = new \Dotenv\Dotenv(dirname(__DIR__));
+/**
+ * Load environment
+ */
+//$dotenv->load();
+/**
+ * Or overload environment
+ */
+$dotenv->overload();
+
+/**
+ * Create shortcut to main application!
+ */
 class App extends \Wtf\Core\App {
-    // short alias
+	// short alias
 }
+
 /**
  * Run application
  */

@@ -19,9 +19,7 @@
 
 namespace Wtf\Core;
 
-use Wtf\Core\Path,
-	Wtf\Core\Config,
-	Wtf\Core\Request;
+use Wtf\Helper\Common;
 
 /**
  * Main Application Class
@@ -36,7 +34,7 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
 	use \Wtf\Traits\Container,
 	 \Wtf\Traits\Singleton;
 
-	// Use for profiling purposes
+// Use for profiling purposes
 	static private $_timer_stack = [];
 
 	/**
@@ -69,54 +67,74 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
 		return $self[$name];
 	}
 
+	static private function _performBoot(\ReflectionClass $ref) {
+		if($ref->implementsInterface('\\Wtf\\Interfaces\\Bootstrap')) {
+			return $ref->getMethod('bootstrap')->invoke(null, self::singleton());
+		}
+		return null;
+	}
+
+	static private function _makeBooting($bootstrap) {
+		foreach($bootstrap as $key => $value) {
+			if(is_numeric($key)) {
+				self::_performBoot(new \ReflectionClass($value));
+			} elseif(is_object($value)) {
+				self::contract($key, $value);
+			} elseif(is_string($value)) {
+				$ref = new \ReflectionClass($value);
+				self::contract($key, self::_performBoot($ref)? : $ref->newInstance());
+			}
+		}
+	}
+
 	/**
 	 * Process application
 	 * 
 	 * @return boolean FALSE prevent any output
 	 */
-	public static function run($start_time) {
+	static public function run($start_time) {
 		ob_start();
 		self::$_timer_stack[] = $start_time;
 
-		self::contract('server', Server::singleton());
-		self::contract('path', Path::singleton());
-		self::contract('config', Config::singleton());
 		/**
 		 * @var \Wtf\Core\App Application get self instance
 		 */
 		$self = self::singleton();
 
 		/**
-		 * Start profiler if exists
+		 * Bootstraping
 		 */
-		$self->profiler('start', __CLASS__);
+		$boot = getenv('BOOTSTRAP');
+		if($boot) {
+			self::_makeBooting(Common::parsePhp(Resource::produce($boot)->getContent()));
+		}
 
 		/**
 		 * @var \Wtf\Core\Request make default request from $_SERVER
 		 */
-		$self->request = new Request($self->server('request_uri'));
+		$self->request = new Request(Server('request_uri'));
 
 		/**
 		 * @var \Wtf\Core\Response execute request (recursive) and get response
 		 */
-		$self->response = $self->request->execute($self->server('request_method'));
+		$self->response = $self->request->execute(Server('request_method'));
 
-		/**
-		 * On the prepared response try add the last debug info 
-		 */
 		if(!$self->response->sent) {
-			$trashbin = [];
+			/**
+			 * Clear output buffers into trashbin
+			 */
+			$trash = [];
 			while(FALSE !== ($str = ob_get_clean())) {
 				if($str) {
-					$trashbin[] = $str;
+					$trash[] = $str;
 				}
 			}
-			if($trashbin) {
+			if($trash && $self->trashbin) {
 				$self->trashbin($trashbin);
 			}
 
-			// response ready & may be sent over sendResponse
-			$self->response->send($self->profiler('flush', __CLASS__));
+			// Send Response
+			$self->response->send();
 		}
 	}
 

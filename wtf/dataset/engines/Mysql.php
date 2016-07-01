@@ -179,6 +179,10 @@ class Mysql extends \Wtf\Dataset\Engine implements \Wtf\Interfaces\Sql, \Wtf\Int
 		
 	}
 
+	public function page($pageno) {
+		
+	}
+
 	public function read($data, $conditions) {
 		
 	}

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -21,14 +22,15 @@
  * as set of the any callables.
  */
 return [
-    // predifined system contracts to singletons
-    App::contract('session', Wtf\Core\Session::singleton()),
-    App::contract('logger', Wtf\Core\Logger::singleton()),
-    App::contract('profiler', Wtf\Core\Profiler::singleton()),
-    App::contract('trashbin', Wtf\Core\Trashbin::singleton()),
-    // self registered contracts to common builders
-    'Wtf\Core\Request',
-    'Wtf\Core\Response',
-    'Wtf\Core\Rule',
-    'Wtf\Core\Resource',
+	// predifined system contracts to singletons
+	'config' => \Wtf\Core\Config::singleton(),
+//	'session' => Wtf\Core\Session::singleton(),
+//	'logger' => Wtf\Core\Logger::singleton(),
+//	'profiler' => Wtf\Core\Profiler::singleton(),
+//	'trashbin' => Wtf\Core\Trashbin::singleton(),
+	// self registered contracts to common builders
+	\Wtf\Core\Request::class,
+	\Wtf\Core\Response::class,
+	\Wtf\Core\Rule::class,
+	\Wtf\Core\Resource::class,
 ];

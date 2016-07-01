@@ -34,27 +34,39 @@ class Path implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 	/**
 	 * Set predefined paths:
 	 * 
-	 * root = base
-	 * temp = upload
+	 * root
+	 * temp
+	 * upload
 	 * config
 	 * vendor
 	 * private
 	 * public
+	 * cache
 	 * 
 	 */
 	private function __construct() {
-		$root = Resource::produce(getenv('DOCUMENT_ROOT'));
-		$this->offsetSet('root', $root);
-		$this->offsetSet('base', $root);
-		$this->offsetSet('vendor', Resource::produce($root, 'vendor'));
-		$this->offsetSet('config', Resource::produce($root, 'config'));
-		$this->offsetSet('private', Resource::produce($root, 'private'));
-		$this->offsetSet('public', Resource::produce($root, 'public'));
-		$this->offsetSet('cache', Resource::produce($root, 'cache'));
+		$base = getenv('ROOT') || getenv('DOCUMENT_ROOT');
+		$root = Resource::produce($base);
 
-		$temp = Resource::produce(sys_get_temp_dir());
+		$vendor = getenv('VENDOR');
+		$this->offsetSet('vendor', $vendor ? Resource::produce($vendor) : Resource::produce($root, 'vendor'));
+		$config = getenv('CONFIG');
+		$this->offsetSet('config', $config ? Resource::produce($config) : Resource::produce($root, 'config'));
+		$private = getenv('PRIVATE');
+		$this->offsetSet('private', $private ? Resource::produce($private) : Resource::produce($root, 'private'));
+		$public = getenv('PUBLIC');
+		$this->offsetSet('public', $public ? Resource::produce($public) : Resource::produce($root, 'public'));
+		$cache = getenv('CACHE');
+		$this->offsetSet('cache', $cache ? Resource::produce($cache) : Resource::produce($root, 'cache'));
+
+		$temp_dir = getenv('TEMP') || sys_get_temp_dir();
+		$temp = Resource::produce($temp_dir);
 		$this->offsetSet('temp', $temp);
-		$this->offsetSet('upload', $temp);
+		if($upload = getenv('UPLOAD')) {
+			$this->offsetSet('upload', Resource::produce($upload));
+		} else {
+			$this->offsetSet('upload', $temp);
+		}
 	}
 
 }

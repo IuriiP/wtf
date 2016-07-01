@@ -234,8 +234,8 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 		return $request->execute($this->_method, array_replace_recursive($this->_input, $mapped));
 	}
 
-	public static function bootstrap() {
-		App::contract('request', __CLASS__);
+	public static function bootstrap(\Wtf\Core\App $app) {
+		$app::contract('request', __CLASS__);
 	}
 
 }

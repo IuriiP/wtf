@@ -35,9 +35,4 @@ class HttpDebug extends \Wtf\Core\Entity implements \IteratorAggregate
         return \implode(\PHP_EOL, $this->content);
     }
 
-    public function getIterator()
-    {
-        return $this->content;
-    }
-
 }

@@ -185,25 +185,6 @@ abstract class Engine implements \Wtf\Interfaces\Factory, \Wtf\Interfaces\Crud {
 		return $exists;
 	}
 
-	abstract public function count(Query $query);
-
-	/**
-	 * Pagination
-	 * 
-	 * @param \Wtf\Dataset\Query $squery
-	 * @param int $size
-	 * @param int $number
-	 * @return \Wtf\Dataset\Result Set with pagination markup
-	 */
-	public function page(Query $query, $size, $number) {
-		if($this instanceof \Wtf\Interfaces\Pageable) {
-			return $this->paginate($query, $size, $number);
-		}
-		return $this->get($query);
-	}
-
-	abstract public function touch(Query $query);
-
 	/**
 	 * Default for overloading
 	 * 
