@@ -67,6 +67,12 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
 		return $self[$name];
 	}
 
+	/**
+	 * Perform 'bootstrap' method if exists.
+	 * 
+	 * @param \ReflectionClass $ref
+	 * @return mixed
+	 */
 	static private function _performBoot(\ReflectionClass $ref) {
 		if($ref->implementsInterface('\\Wtf\\Interfaces\\Bootstrap')) {
 			return $ref->getMethod('bootstrap')->invoke(null, self::singleton());
@@ -74,13 +80,21 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
 		return null;
 	}
 
+	/**
+	 * Conditional bootstrapping
+	 * 
+	 * @param array $bootstrap
+	 */
 	static private function _makeBooting($bootstrap) {
 		foreach($bootstrap as $key => $value) {
 			if(is_numeric($key)) {
+				// just perform 'bootstrap' method
 				self::_performBoot(new \ReflectionClass($value));
 			} elseif(is_object($value)) {
-				self::contract($key, $value);
+				// register bootstraped|object as contract
+				self::contract($key, self::_performBoot(new \ReflectionClass($value))? : $value);
 			} elseif(is_string($value)) {
+				// register bootstraped|instance as contract
 				$ref = new \ReflectionClass($value);
 				self::contract($key, self::_performBoot($ref)? : $ref->newInstance());
 			}
@@ -88,9 +102,26 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
 	}
 
 	/**
+	 * Clear output buffers into trashbin and turn off buffering
+	 * 
+	 * @param object $param
+	 */
+	private function _clear($trashbin) {
+		$trash = [];
+		while(FALSE !== ($str = ob_get_clean())) {
+			if($str) {
+				$trash[] = $str;
+			}
+		}
+		if($trasbin) {
+			$this->trashbin($trash);
+		}
+	}
+
+	/**
 	 * Process application
 	 * 
-	 * @return boolean FALSE prevent any output
+	 * @param double $start_time Real start time
 	 */
 	static public function run($start_time) {
 		ob_start();
@@ -104,7 +135,7 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
 		/**
 		 * Bootstraping
 		 */
-		$boot = getenv('BOOTSTRAP');
+		$boot = Server('bootstrap');
 		if($boot) {
 			self::_makeBooting(Common::parsePhp(Resource::produce($boot)->getContent()));
 		}
@@ -120,20 +151,9 @@ class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
 		$self->response = $self->request->execute(Server('request_method'));
 
 		if(!$self->response->sent) {
-			/**
-			 * Clear output buffers into trashbin
-			 */
-			$trash = [];
-			while(FALSE !== ($str = ob_get_clean())) {
-				if($str) {
-					$trash[] = $str;
-				}
-			}
-			if($trash && $self->trashbin) {
-				$self->trashbin($trashbin);
-			}
-
-			// Send Response
+			// clear output
+			$this->_clear($self->trashbin);
+			// send Response
 			$self->response->send();
 		}
 	}

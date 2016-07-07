@@ -17,7 +17,7 @@ class AppTest extends \PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-//		$this->object = new App;
+		$this->object = App::singleton();
 	}
 
 	/**
@@ -30,13 +30,48 @@ class AppTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Core\App::contract
-	 * @todo   Implement testContract().
 	 */
 	public function testContract() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$obj = new \stdClass();
+		$other = new \stdClass();
+		$this->assertSame($obj, App::contract('contracted', $obj));
+		$this->assertSame($obj, App::contract('contracted', $other));
+		$this->assertSame($other, App::contract('another', $other));
+	}
+
+	/**
+	 * @covers Wtf\Core\App::startTimer
+	 * @covers Wtf\Core\App::getTimer
+	 * @covers Wtf\Core\App::getTimerTotal
+	 */
+	public function testTimer() {
+		// check property
+		$timeref = new \ReflectionProperty(App::class,'_timer_stack');
+		$this->assertTrue($timeref->isPrivate());
+		$this->assertTrue($timeref->isStatic());
+		$timeref->setAccessible(true);
+		$this->assertEmpty($timeref->getValue());
+		// check start
+		$start = App::startTimer();
+		$stack = $timeref->getValue();
+		$this->assertCount(1,$stack);
+		$this->assertInternalType('double',$stack[0]);
+		$this->assertEquals($start,$stack[0]);
+		// append control point
+		App::startTimer();
+		$this->assertCount(2,$timeref->getValue());
+		// check non-destructive access
+		$total = App::getTimerTotal();
+		$this->assertInternalType('double',$total);
+		$this->assertCount(2,$timeref->getValue());
+		// check destructive access
+		$middle = App::getTimer();
+		$this->assertInternalType('double',$middle);
+		$this->assertCount(1,$timeref->getValue());
+		// check internal point is lesser then external point
+		$this->assertGreaterThan($middle,App::getTimer());
+		// check if stack is empty
+		$this->assertEmpty($timeref->getValue());
 	}
 
 	/**
@@ -44,193 +79,6 @@ class AppTest extends \PHPUnit_Framework_TestCase {
 	 * @todo   Implement testRun().
 	 */
 	public function testRun() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::startTimer
-	 * @todo   Implement testStartTimer().
-	 */
-	public function testStartTimer() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::getTimer
-	 * @todo   Implement testGetTimer().
-	 */
-	public function testGetTimer() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::getTimerTotal
-	 * @todo   Implement testGetTimerTotal().
-	 */
-	public function testGetTimerTotal() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::__get
-	 * @todo   Implement test__get().
-	 */
-	public function test__get() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::__set
-	 * @todo   Implement test__set().
-	 */
-	public function test__set() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::__invoke
-	 * @todo   Implement test__invoke().
-	 */
-	public function test__invoke() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::__call
-	 * @todo   Implement test__call().
-	 */
-	public function test__call() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::offsetExists
-	 * @todo   Implement testOffsetExists().
-	 */
-	public function testOffsetExists() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::offsetGet
-	 * @todo   Implement testOffsetGet().
-	 */
-	public function testOffsetGet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::offsetSet
-	 * @todo   Implement testOffsetSet().
-	 */
-	public function testOffsetSet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::offsetUnset
-	 * @todo   Implement testOffsetUnset().
-	 */
-	public function testOffsetUnset() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::getIterator
-	 * @todo   Implement testGetIterator().
-	 */
-	public function testGetIterator() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::singleton
-	 * @todo   Implement testSingleton().
-	 */
-	public function testSingleton() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::eliminate
-	 * @todo   Implement testEliminate().
-	 */
-	public function testEliminate() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::get
-	 * @todo   Implement testGet().
-	 */
-	public function testGet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::set
-	 * @todo   Implement testSet().
-	 */
-	public function testSet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\App::__callStatic
-	 * @todo   Implement test__callStatic().
-	 */
-	public function test__callStatic() {
 		// Remove the following lines when you implement this test.
 		$this->markTestIncomplete(
 			'This test has not been implemented yet.'

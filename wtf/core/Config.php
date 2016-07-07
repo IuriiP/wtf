@@ -19,8 +19,7 @@
 
 namespace Wtf\Core;
 
-use Wtf\Core\App,
-	Wtf\Core\Resource,
+use Wtf\Core\Resource,
 	Wtf\Helper\Common;
 
 /**
@@ -36,33 +35,42 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 	use \Wtf\Traits\Singleton,
 	 \Wtf\Traits\Container;
 
+	private $_resource = null;
+
 	/**
-	 * @var \Wtf\Core\Resource
+	 * Prepare config
+	 * 
+	 * @param Resource|string $cfg Dependency injection
 	 */
-	private $_cfgRoot = null;
-
-	private function __construct() {
-		$this->_cfgRoot = App::singleton()->get('path')->config;
-
-		$list = $this->_cfgRoot->get();
-		if($this->_cfgRoot->isContainer()) {
-			foreach($list as $file) {
-				$res = Resource::produce($this->_cfgRoot, $file);
-				$this->offsetSet($res->getName(), $res);
-			}
-		} else {
-			foreach($list as $key => $line) {
-				$this->offsetSet($key, $line);
-			}
+	public function __construct($cfg = null) {
+		if(!$cfg) {
+			$cfg = Server::config();
 		}
+		$this->load($cfg);
+	}
 
-		if($bootstrap = $this['bootstrap']) {
-			foreach($bootstrap as $action) {
-				if(is_callable([$action, 'bootstrap'])) {
-					call_user_func([$action, 'bootstrap']);
+	/**
+	 * Overload current config.
+	 * 
+	 * @param Resource|string $cfg
+	 * @return $this
+	 */
+	public function load($cfg) {
+		if($cfg) {
+			$cfgRoot = Resource::produce($cfg);
+			if($cfgRoot->isContainer()) {
+				$this->set([]);
+				foreach($cfgRoot->get() as $file) {
+					$res = Resource::produce($cfgRoot, $file);
+					if($res->isContainer() || (false !== array_search($res->getType(), ['php', 'ini', 'json', 'xml']))) {
+						$this->offsetSet($res->getName(), new Config($res));
+					}
 				}
+			} else {
+				$this->_resource = $cfgRoot;
 			}
 		}
+		return $this;
 	}
 
 	/**
@@ -72,12 +80,15 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 	 * @return array
 	 */
 	public function offsetGet($offset) {
-		$cfg = $this->_container[strtolower($offset)];
-		if($cfg instanceof Resource) {
-			// not loaded config
-			$this->offsetSet($offset, $cfg = self::load($cfg));
+		$offset = strtolower($offset);
+		if($this->_resource) {
+			$this->set(self::_load($this->_resource));
+			$this->_resource = null;
 		}
-		return $cfg;
+		if(isset($this->_container[$offset])) {
+			return $this->_container[$offset];
+		}
+		return null;
 	}
 
 	/**
@@ -86,9 +97,8 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 	 * @param Resource $res
 	 * @return array
 	 */
-	static protected function load(Resource $res) {
+	static protected function _load(Resource $res) {
 		switch($res->getType()) {
-			case 'cfg':
 			case 'php':
 				// eval PHP file
 				return Common::parsePhp($res->getContent());
@@ -101,9 +111,6 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 			case 'xml':
 				// XML as array
 				return json_decode(json_encode(simplexml_load_string($res->getContent())), true);
-			case 'engine':
-				// 
-				return $res;
 		}
 		return [];
 	}

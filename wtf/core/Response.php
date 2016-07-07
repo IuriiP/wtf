@@ -114,8 +114,8 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Container, \W
 	/**
 	 * Contracted name.
 	 */
-	public static function bootstrap() {
-		App::contract('response', __CLASS__);
+	public static function bootstrap(App $app) {
+		$app::contract('response', __CLASS__);
 	}
 
 	/**

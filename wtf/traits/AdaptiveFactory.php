@@ -49,10 +49,8 @@ trait AdaptiveFactory {
 		}
 		while($types) {
 			$method = implode('_', $types);
-			try {
+			if(method_exists(__CLASS__, $method)) {
 				return call_user_func([__CLASS__, $method], $args);
-			} catch(Exception $exc) {
-				trigger_error(__CLASS__ . "::produce: not found method '{$method}'");
 			}
 			array_pop($types);
 		}
@@ -66,12 +64,7 @@ trait AdaptiveFactory {
 	 * @return \static
 	 */
 	static protected function guess() {
-		try {
-			return new static();
-		} catch(\Exception $exc) {
-			trigger_error(__CLASS__ . '::Builder: guess error: ' . $exc->getMessage());
-		}
-		return null;
+		return new static();
 	}
 
 }

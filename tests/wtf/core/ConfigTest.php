@@ -12,6 +12,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	 */
 	protected $object;
 
+	private $fixture = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config';
+
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
@@ -29,157 +31,128 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::offsetGet
-	 * @todo   Implement testOffsetGet().
-	 */
-	public function testOffsetGet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
 	 * @covers Wtf\Core\Config::singleton
-	 * @todo   Implement testSingleton().
 	 */
 	public function testSingleton() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$this->object = Config::singleton($this->fixture);
+
+		$this->assertSame($this->object, Config::singleton());
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::__get
-	 * @todo   Implement test__get().
+	 * @covers Wtf\Core\Config::__construct
 	 */
-	public function test__get() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function test__construct() {
+		$this->object = new Config();
+
+		$this->assertNotSame($this->object, Config::singleton());
+		$this->assertEmpty((array) $this->object->getIterator());
+
+		return $this->object;
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::__set
-	 * @todo   Implement test__set().
+	 * @covers Wtf\Core\Config::load
+	 * @depends test__construct
 	 */
-	public function test__set() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function testLoad($object) {
+		$this->assertNull($object['php']);
+
+		$object->load($this->fixture);
+
+		$this->assertNull($object['nothing']);
+		$this->assertNull($object['css']);
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['ini']);
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['json']);
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['php']);
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['xml']);
+
+		return $object;
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::__invoke
-	 * @todo   Implement test__invoke().
+	 * @covers Wtf\Core\Config::offsetGet
+	 * @depends testLoad
 	 */
-	public function test__invoke() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function testOffsetGet($object) {
+		$dir = $object['dir'];
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $dir);
+
+		$php = $dir['php'];
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $php);
+
+		$this->assertAttributeEmpty('_container', $php);
+		$string = $php['string'];
+		$this->assertAttributeNotEmpty('_container', $php);
+
+		return $object;
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::__call
-	 * @todo   Implement test__call().
+	 * @covers Wtf\Core\Config::_load
+	 * @depends testOffsetGet
 	 */
-	public function test__call() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function test_php($object) {
+		$php = $object['php'];
+
+		$this->assertEquals('ONE', $php['string']);
+		$this->assertInstanceOf('stdClass', $php['object']);
+		$this->assertInternalType('array', $php['array']);
+		$this->assertEquals($_SERVER['SCRIPT_FILENAME'], $php['indirect']);
+		$this->assertNull($php['nothing']);
+
+		return $object;
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::offsetExists
-	 * @todo   Implement testOffsetExists().
+	 * @covers Wtf\Core\Config::_load
+	 * @depends testOffsetGet
 	 */
-	public function testOffsetExists() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function test_ini($object) {
+		$ini = $object['ini'];
+
+		$this->assertEquals('string', $ini['string']);
+		$this->assertEquals('string with spaces', $ini['spaced']);
+		$this->assertEquals(1, $ini['bool']);
+		$this->assertEquals(999, $ini['number']);
+		$this->assertEquals(['key' => 'value', 'otherkey' => 'othervalue'], $ini['section']);
+		$this->assertNull($ini['nothing']);
+
+		return $object;
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::offsetSet
-	 * @todo   Implement testOffsetSet().
+	 * @covers Wtf\Core\Config::_load
+	 * @depends testOffsetGet
 	 */
-	public function testOffsetSet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function test_json($object) {
+		$json = $object['json'];
+
+		$this->assertEquals('json', $json['format']);
+		$this->assertEquals('IuriiP <hardwork.mouse@gmail.com>', $json['name']);
+		$this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9, 0], $json['array']);
+		$this->assertNull($json['nothing']);
+
+		return $object;
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::offsetUnset
-	 * @todo   Implement testOffsetUnset().
+	 * @covers Wtf\Core\Config::_load
+	 * @depends testOffsetGet
 	 */
-	public function testOffsetUnset() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
+	public function test_xml($object) {
+		$xml = $object['xml'];
+		$xml['load'];
+		var_dump($xml);
 
-	/**
-	 * @covers Wtf\Core\Config::getIterator
-	 * @todo   Implement testGetIterator().
-	 */
-	public function testGetIterator() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
+		$this->assertEquals('some text', $xml['text']);
+		$this->assertEquals(['first' => "ONE", 'second' => "TWO"], $xml['complex']);
 
-	/**
-	 * @covers Wtf\Core\Config::eliminate
-	 * @todo   Implement testEliminate().
-	 */
-	public function testEliminate() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
+		$this->assertEquals(["duplicated 0", "duplicated 1", "duplicated 2", "duplicated 3", "duplicated 4"], $xml['dup']);
 
-	/**
-	 * @covers Wtf\Core\Config::get
-	 * @todo   Implement testGet().
-	 */
-	public function testGet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
+		$this->assertNull($xml['nothing']);
 
-	/**
-	 * @covers Wtf\Core\Config::set
-	 * @todo   Implement testSet().
-	 */
-	public function testSet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Config::__callStatic
-	 * @todo   Implement test__callStatic().
-	 */
-	public function test__callStatic() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		return $object;
 	}
 
 }

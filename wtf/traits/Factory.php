@@ -120,7 +120,7 @@ trait Factory {
 	 * @return mixed|null
 	 */
 	final static function __callStatic($name, $params) {
-		return static::factory(['', $name], $params);
+		return self::factory(['', $name], $params);
 	}
 
 }

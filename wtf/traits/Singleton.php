@@ -35,12 +35,8 @@ trait Singleton {
 	 */
 	public static function singleton() {
 		if(!self::$instance) {
-			if($args = func_get_args()) {
-				$ref = new \ReflectionClass(static::class);
-				self::$instance = $ref->newInstanceArgs($args);
-			} else {
-				self::$instance = new static();
-			}
+			$args = func_get_args();
+			self::$instance = new static(...$args);
 		}
 		return self::$instance;
 	}
@@ -58,7 +54,7 @@ trait Singleton {
 	 * @throws \ErrorException
 	 */
 	private function __clone() {
-		trigger_error(__CLASS__ . '::Singleton: cloning is not allowed');
+		throw new \ErrorException(__CLASS__ . '::Singleton: cloning is not allowed',E_ERROR);
 	}
 
 	/**
@@ -67,7 +63,7 @@ trait Singleton {
 	 * @throws \ErrorException
 	 */
 	private function __wakeup() {
-		trigger_error(__CLASS__ . '::Singleton: unserializing is not allowed');
+		throw new \ErrorException(__CLASS__ . '::Singleton: unserializing is not allowed',E_ERROR);
 	}
 
 }

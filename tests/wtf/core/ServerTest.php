@@ -17,7 +17,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-//		$this->object = new Server;
+		$this->object = Server::singleton();
 	}
 
 	/**
@@ -29,157 +29,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Core\Server::singleton
-	 * @todo   Implement testSingleton().
-	 */
-	public function testSingleton() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::__get
-	 * @todo   Implement test__get().
-	 */
-	public function test__get() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::__set
-	 * @todo   Implement test__set().
-	 */
-	public function test__set() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::__invoke
-	 * @todo   Implement test__invoke().
-	 */
-	public function test__invoke() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::__call
-	 * @todo   Implement test__call().
-	 */
-	public function test__call() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::offsetExists
-	 * @todo   Implement testOffsetExists().
-	 */
-	public function testOffsetExists() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::offsetGet
-	 * @todo   Implement testOffsetGet().
-	 */
-	public function testOffsetGet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::offsetSet
-	 * @todo   Implement testOffsetSet().
-	 */
-	public function testOffsetSet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::offsetUnset
-	 * @todo   Implement testOffsetUnset().
-	 */
-	public function testOffsetUnset() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::getIterator
-	 * @todo   Implement testGetIterator().
-	 */
-	public function testGetIterator() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::eliminate
-	 * @todo   Implement testEliminate().
-	 */
-	public function testEliminate() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
 	 * @covers Wtf\Core\Server::get
-	 * @todo   Implement testGet().
 	 */
-	public function testGet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function testContainer() {
+		$this->assertEquals($_SERVER['SCRIPT_FILENAME'],$this->object->get('Script_FileName'));
 	}
-
-	/**
-	 * @covers Wtf\Core\Server::set
-	 * @todo   Implement testSet().
-	 */
-	public function testSet() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Server::__callStatic
-	 * @todo   Implement test__callStatic().
-	 */
-	public function test__callStatic() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
 }

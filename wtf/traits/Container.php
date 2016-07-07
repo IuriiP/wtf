@@ -43,7 +43,7 @@ trait Container {
 	}
 
 	protected static function _complexCheck($container, $param) {
-		$offset = array_shift($param);
+		$offset = strtolower(array_shift($param));
 		if(isset($container[$offset])) {
 			if($param) {
 				return self::_complexCheck($container[$offset], $param);
@@ -54,21 +54,18 @@ trait Container {
 	}
 
 	protected static function _complexGet($container, $param) {
-		$offset = array_shift($param);
+		$offset = strtolower(array_shift($param));
 		if(isset($container[$offset])) {
-			if($param) {
-				return self::_complexGet($container[$offset], $param);
-			}
-			return $container[$offset];
+			return $param ? self::_complexGet($container[$offset], $param) : $container[$offset];
 		}
 		return null;
 	}
 
 	protected static function _complexSet(&$container, $param, $value) {
-		$offset = array_shift($param);
+		$offset = strtolower(array_shift($param));
 		if($param) {
 			if(!isset($container[$offset])) {
-				$container[$offset] = array();
+				$container[$offset] = [];
 			}
 			return self::_complexSet($container[$offset], $param, $value);
 		}
@@ -76,7 +73,7 @@ trait Container {
 	}
 
 	protected static function _complexUnset(&$container, $param) {
-		$offset = array_shift($param);
+		$offset = strtolower(array_shift($param));
 		if($param) {
 			if(isset($container[$offset])) {
 				self::_complexUnset($container[$offset], $param);
@@ -97,7 +94,7 @@ trait Container {
 		if($complex = self::_parseComplex($offset)) {
 			return self::_complexGet($this->_container, $complex);
 		}
-		return $this->_container[strtolower($offset)];
+		return self::_complexGet($this->_container, [$offset]);
 	}
 
 	public function offsetSet($offset, $value) {
@@ -115,7 +112,7 @@ trait Container {
 	}
 
 	public function getIterator() {
-		return $this->_container;
+		return new \ArrayIterator($this->_container);
 	}
 
 	public function eliminate($offset, $def = null) {
@@ -125,18 +122,15 @@ trait Container {
 	}
 
 	public function get($name, $def = null) {
-		if($complex = self::_parseComplex($name)) {
-			return self::_complexExists($this->_container, $complex) ?
-				self::_complexGet($this->_container, $complex) :
-				$def;
-		}
 		return $this->offsetExists($name) ? $this->offsetGet($name) : $def;
 	}
 
-	public function set(array $array) {
+	public function set($array) {
 		$this->_container = [];
-		foreach($array as $key => $value) {
-			$this->offsetSet($key, $value);
+		if(is_array($array) || $array instanceof \Traversable) {
+			foreach($array as $key => $value) {
+				$this->offsetSet($key, $value);
+			}
 		}
 		return $this->_container;
 	}
@@ -158,8 +152,22 @@ trait Container {
 		return $this;
 	}
 
+	private function _expandArgs(array $args) {
+		$reargs = [];
+		foreach($args as $value) {
+			if(false !== strpos($value, '/')) {
+				$parts = explode('/', $value);
+				$reargs = array_merge($reargs, $parts);
+			} else {
+				$reargs[] = $value;
+			}
+		}
+		return $reargs;
+	}
+
 	public function __call($offset, $args = []) {
 		if(($elem = $this->__get($offset)) && count($args)) {
+			$args = $this->_expandArgs($args);
 			if(is_object($elem)) {
 				$obj = new \ReflectionObject($elem);
 				if($obj->hasMethod('__invoke')) {
@@ -168,20 +176,20 @@ trait Container {
 				}
 			} elseif(is_callable($elem)) {
 				return call_user_func_array($elem, $args);
-			} else {
-				trigger_error(__CLASS__ . '::Container: incorrect invoking.');
+			} elseif(is_array($elem)) {
+				return self::_complexGet($elem, $args);
 			}
+			return null;
 		}
 		return $elem;
 	}
 
 	static public function __callStatic($offset, $args = []) {
 		$class = get_called_class();
-		if(is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
-			return call_user_func_array([static::singleton(), $offset], $args);
+		if(!is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
+			throw new Exception(__CLASS__ . '::Container: static calling accepted by Singleton only.', E_ERROR);
 		}
-		trigger_error(__CLASS__ . '::Container: static calling accepted by Singleton only.');
-		return null;
+		return call_user_func_array([static::singleton(), $offset], $args);
 	}
 
 }

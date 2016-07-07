@@ -173,8 +173,8 @@ class Rule implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory
 		return null;
 	}
 
-	public static function bootstrap() {
-		App::contract('rule', __CLASS__);
+	public static function bootstrap(App $app) {
+		$app::contract('rule', __CLASS__);
 	}
 
 }

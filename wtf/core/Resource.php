@@ -300,8 +300,8 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
 	 */
 	abstract function exists();
 
-	public static function bootstrap() {
-		App::contract('resource', __CLASS__);
+	public static function bootstrap(App $app) {
+		$app::contract('resource', __CLASS__);
 	}
 
 }
