@@ -12,14 +12,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	 */
 	protected $object;
 
-	private $fixture = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config';
+	private $fixture;
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-		
+		$this->fixture = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config';
 	}
 
 	/**
@@ -143,13 +143,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	public function test_xml($object) {
 		$xml = $object['xml'];
 		$xml['load'];
-		var_dump($xml);
 
 		$this->assertEquals('some text', $xml['text']);
 		$this->assertEquals(['first' => "ONE", 'second' => "TWO"], $xml['complex']);
-
 		$this->assertEquals(["duplicated 0", "duplicated 1", "duplicated 2", "duplicated 3", "duplicated 4"], $xml['dup']);
-
 		$this->assertNull($xml['nothing']);
 
 		return $object;

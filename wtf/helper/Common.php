@@ -26,6 +26,49 @@ namespace Wtf\Helper;
  */
 abstract class Common {
 
+	/**
+	 * Make name in CamelCase style
+	 * 
+	 * @param string $string
+	 * @param boolean $ucfirst
+	 * @return string
+	 */
+	static public function camelCase($string, $ucfirst = true) {
+		$str = preg_replace_callback('~_([a-z])~i', function($matches) {
+			return ucfirst($matches[1]);
+		}, $string);
+		return $ucfirst ? ucfirst($str) : $str;
+	}
+
+	/**
+	 * Make name in snake_case style
+	 * 
+	 * @param string $string
+	 * @return string
+	 */
+	static public function snakeCase($string) {
+		$str = preg_replace_callback('~[A-Z]~', function($matches) {
+			return '_' . strtolower($matches[0]);
+		}, lcfirst($string));
+		return $str;
+	}
+
+	/**
+	 * Pluralise last element in string
+	 * 
+	 * @param string $string
+	 * @return string
+	 */
+	static public function plural($string) {
+		return preg_replace_callback('~[a-z]$~', function($matches) {
+			switch($matches[0]) {
+				case 's': return 'ses';
+				case 'y': return 'ies';
+				default: return $matches[0] . 's';
+			}
+		}, $string);
+	}
+
 	static public function parsePhp($string) {
 		ob_start();
 		$content = eval(preg_replace(['~\\<\\?php~', '~\\?\\>~'], '', $string));

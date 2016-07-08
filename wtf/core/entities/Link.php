@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,25 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core\Entities;
+
+use Wtf\Helper\Html;
 
 /**
  * Description of Link
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Link extends \Wtf\Core\Entity
-{
-    use \Wtf\Traits\Attributes;
-    
-    public function __construct($data=[])
-    {
-        parent::__construct((array) $data, 'link');
-    }
+class Link extends \Wtf\Core\Entity {
 
-    public function __toString()
-    {
-        return '<link '. implode(' ',$this->attrsLines($this->content)) .' />';
-    }
+	public function __construct($data = []) {
+		parent::__construct((array) $data, 'link');
+	}
+
+	public function __toString() {
+		return '<link ' . implode(' ', Html::showAttrs($this->content)) . ' />';
+	}
 
 }

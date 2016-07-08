@@ -18,9 +18,6 @@ class ContainerSingletonMock implements \Wtf\Interfaces\Container, \Wtf\Interfac
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {
 
-	/**
-	 * @var Html
-	 */
 	protected $object;
 
 	protected $fixture = [

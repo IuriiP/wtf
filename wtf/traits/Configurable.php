@@ -8,6 +8,8 @@
 
 namespace Wtf\Traits;
 
+use Wtf\Core\Config;
+
 /**
  * Description of Configurable
  *
@@ -17,11 +19,11 @@ trait Configurable {
 
 	static protected $s_config = null;
 
-	protected $_config = null;
+//	protected $_config = null;
 
 	static public function configure($name = null) {
 		if(!static::$s_config) {
-			static::$s_config = \Wtf\Core\App::config($name? : (new \ReflectionClass(get_called_class()))->getShortName());
+			static::$s_config = Config::singleton()->get($name? : \Wtf\Helper\Common::snakeCase((new \ReflectionClass(get_called_class()))->getShortName()));
 		}
 		return static::$s_config;
 	}

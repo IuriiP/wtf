@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,25 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core\Entities;
+
+use Wtf\Helper\Html;
 
 /**
  * Description of Css
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Css extends \Wtf\Core\Entity
-{
-    use \Wtf\Traits\Attributes;
-    
-    public function __construct($data=[])
-    {
-        parent::__construct((array) $data, 'css');
-    }
+class Css extends \Wtf\Core\Entity {
 
-    public function __toString()
-    {
-        return '<link rel="stylesheet" '. \implode(' ',$this->attrsLines($this->content)) .' />';
-    }
+	public function __construct($data = []) {
+		parent::__construct((array) $data, 'css');
+	}
+
+	public function __toString() {
+		return '<link rel="stylesheet" ' . \implode(' ', Html::showAttrs($this->content)) . ' />';
+	}
 
 }

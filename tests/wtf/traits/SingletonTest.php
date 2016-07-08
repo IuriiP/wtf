@@ -28,9 +28,6 @@ class SingletonMockComplex implements \Wtf\Interfaces\Singleton {
  */
 class SingletonTest extends \PHPUnit_Framework_TestCase {
 
-	/**
-	 * @var Html
-	 */
 	protected $object;
 
 	/**

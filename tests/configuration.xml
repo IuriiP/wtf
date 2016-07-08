@@ -22,7 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
-         stopOnFailure="true">
+         stopOnFailure="false">
+    <filter>
+        <whitelist>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="C:\wamp\tmp\report" lowUpperBound="35" highLowerBound="70" />
+    </logging>
 </phpunit>
-
-<!--phpunit colors="false" /-->

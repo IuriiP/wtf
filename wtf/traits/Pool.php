@@ -9,7 +9,7 @@
 namespace Wtf\Traits;
 
 /**
- * Description of Pool
+ * Pool of named descendants/
  *
  * @author IuriiP
  */
@@ -17,6 +17,13 @@ trait Pool {
 
 	static private $_pool = [];
 
+	/**
+	 * If descendant is registered - returns it.
+	 * If not registered - create and register new descendant.
+	 * 
+	 * @param string $name
+	 * @return static
+	 */
 	public static function instance($name = '') {
 		if(!isset(self::$_pool[$name])) {
 			return self::$_pool[$name] = new static($name);
