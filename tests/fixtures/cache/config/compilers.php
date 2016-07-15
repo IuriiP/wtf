@@ -17,31 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Wtf\Traits;
-
-use Wtf\Core\Event;
-
-/**
- * Description of Observable
- *
- * @author IuriiP <hardwork.mouse@gmail.com>
- */
-trait Observable {
-
-	private $_observe = [];
-
-	public function observe($list = null) {
-		if(!$list) {
-			$this->_observe = [];
-		} elseif(is_array($list)) {
-			foreach($list as $event => $observer) {
-				$this->_observe["@^{$event}.*@"] = $event;
-				Event::enable($event, $observer);
-			}
-		} elseif($list instanceof \Wtf\Interfaces\Observer) {
-			$this->_observe = ['@.*@' => $list];
-			Event::enable('~.*~', $list);
-		}
-	}
-
-}
+return [
+	'tpl' => function($resource) {
+		$source = $resource->getContent();
+		return preg_replace([
+			'~\\{\\@for(.+?)\\}~',
+			'~\\{\\@endfor\\}~',
+			'~\\{\\@if(.+?)\\}~',
+			'~\\{\\@else\\}~',
+			'~\\{\\@endif\\}~',
+			'~\\{\\@endifelse\\}~',
+			'~\\{\\@include(.+?)\\}~',
+			], [
+			'<For $1>',
+			'</For>',
+			'<If $1>',
+			'<Else />',
+			'</If>',
+			'</Else></If>',
+			'<Include  />',
+			], $source);
+	},
+	];
+	

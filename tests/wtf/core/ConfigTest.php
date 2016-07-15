@@ -81,9 +81,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 		$php = $dir['php'];
 		$this->assertInstanceOf('\\Wtf\\Core\\Config', $php);
 
-		$this->assertAttributeEmpty('_container', $php);
+		$this->assertAttributeEmpty('_collection', $php);
 		$string = $php['string'];
-		$this->assertAttributeNotEmpty('_container', $php);
+		$this->assertAttributeNotEmpty('_collection', $php);
 
 		return $object;
 	}
@@ -99,6 +99,18 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('stdClass', $php['object']);
 		$this->assertInternalType('array', $php['array']);
 		$this->assertEquals($_SERVER['SCRIPT_FILENAME'], $php['indirect']);
+		$this->assertNull($php['nothing']);
+
+		return $object;
+	}
+
+	/**
+	 * @covers Wtf\Core\Config::_load
+	 * @depends testOffsetGet
+	 */
+	public function test_phpError($object) {
+		$php = $object['broken'];
+
 		$this->assertNull($php['nothing']);
 
 		return $object;

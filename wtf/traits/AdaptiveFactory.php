@@ -47,10 +47,14 @@ trait AdaptiveFactory {
 		foreach($args as $arg) {
 			$types[] = gettype($arg);
 		}
+
+		$self = new static();
+		$ref = new \ReflectionClass($self);
+
 		while($types) {
 			$method = implode('_', $types);
-			if(method_exists(__CLASS__, $method)) {
-				return call_user_func([__CLASS__, $method], $args);
+			if($ref->hasMethod($method)) {
+				return $self->$method(...$args);
 			}
 			array_pop($types);
 		}
@@ -59,11 +63,11 @@ trait AdaptiveFactory {
 
 	/**
 	 * Predefined basic guesser
-	 * Just try create instance of the class
+	 * Return instance of the class
 	 * 
-	 * @return \static
+	 * @return bool
 	 */
-	static protected function guess() {
+	protected function guess() {
 		return new static();
 	}
 

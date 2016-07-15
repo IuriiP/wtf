@@ -12,12 +12,30 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 */
 	protected $object;
 
+	static private $fixture = 'fixtures/cache';
+
+	static private $data;
+
+	static public function setUpBeforeClass() {
+		// prepage basic config data
+		Config::singleton(self::$fixture . '/config');
+
+		// clear cached files
+		$dir = self::$fixture . '/cached';
+		$files = array_diff(scandir($dir), array('.', '..'));
+		foreach($files as $file) {
+			(is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+		}
+
+		self::$data = self::$fixture . '/data/';
+	}
+
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-//		$this->object = new Cache;
+		
 	}
 
 	/**
@@ -29,58 +47,63 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers Wtf\Core\Cache::__construct
+	 */
+	public function test__construct() {
+		$object = Cache::singleton();
+
+		$this->assertInstanceOf('\\Wtf\\Core\\Cache', $object);
+	}
+
+	/**
 	 * @covers Wtf\Core\Cache::__invoke
-	 * @todo   Implement test__invoke().
+	 * @depends test__construct
 	 */
 	public function test__invoke() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$object = Cache::singleton();
+
+		$this->assertInstanceOf('\\Wtf\\Core\\Cache', $object);
+
+		$lambda = function($resource) {
+			$lines = $resource->get();
+			foreach($lines as $key => $value) {
+				$lines[$key] = $key . ': ' . $value;
+			}
+			return $lines;
+		};
+
+		$this->assertInstanceOf('\\Closure', $lambda);
+
+		$content = $object(self::$data . 'numbering', $lambda);
+
+		$name = hash($object->config('algorithm') ? : 'md4', Resource::produce(self::$data . 'numbering')->getPath() . '?');
+		$this->assertFileExists(self::$fixture . "/cached/$name");
+		$this->assertFileEquals(self::$data . 'numbered', self::$fixture . "/cached/$name");
+
+		return $content;
 	}
 
 	/**
 	 * @covers Wtf\Core\Cache::supply
-	 * @todo   Implement testSupply().
+	 * @depends test__invoke
 	 */
-	public function testSupply() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function testSupply($content) {
+		$cached = Cache::supply(self::$data . 'numbering');
+
+		$this->assertEquals($content, $cached);
 	}
 
 	/**
-	 * @covers Wtf\Core\Cache::configure
-	 * @todo   Implement testConfigure().
+	 * @covers Wtf\Core\Cache::supply
+	 * @depends testSupply
 	 */
-	public function testConfigure() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Cache::config
-	 * @todo   Implement testConfig().
-	 */
-	public function testConfig() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
-	/**
-	 * @covers Wtf\Core\Cache::singleton
-	 * @todo   Implement testSingleton().
-	 */
-	public function testSingleton() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function testCompiler() {
+		$cached = Cache::supply(self::$data . 'compile.tpl');
+		
+		$name = hash(Cache::singleton()->config('algorithm') ? : 'md4', Resource::produce(self::$data . 'compile.tpl')->getPath() . '?');
+		
+		$this->assertFileExists(self::$fixture . "/cached/$name");
+		$this->assertFileEquals(self::$data . 'compiled', self::$fixture . "/cached/$name");
 	}
 
 }

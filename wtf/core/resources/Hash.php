@@ -26,9 +26,9 @@ use Wtf\Helper\Common;
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Hash extends \Wtf\Core\Resource implements \Wtf\Interfaces\Container {
+class Hash extends \Wtf\Core\Resource implements \Wtf\Interfaces\Collection {
 
-    use \Wtf\Traits\Container;
+    use \Wtf\Traits\Collection;
 
     /**
      * @var \Wtf\Core\Resource
@@ -98,23 +98,23 @@ class Hash extends \Wtf\Core\Resource implements \Wtf\Interfaces\Container {
     }
 
     public function get() {
-        if (!$this->_container) {
+        if (!$this->_collection) {
             switch ($this->_resource->getType()) {
                 case 'php':
                     // eval PHP file
-                    $this->_container = (array) Common::parsePhp($this->_resource->getContent());
+                    $this->_collection = (array) Common::parsePhp($this->_resource->getContent());
                     break;
                 case 'json':
                     // JSON object as array
-                    $this->_container = json_decode($this->_resource->getContent(), true);
+                    $this->_collection = json_decode($this->_resource->getContent(), true);
                     break;
                 case 'engine':
                     // try
-                    $this->_container = $this->_resource;
+                    $this->_collection = $this->_resource;
                     break;
             }
         }
-        return $this->_container;
+        return $this->_collection;
     }
 
     public function getContent() {

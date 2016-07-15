@@ -1,6 +1,6 @@
 <?php
 
-/*
+/* 
  * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,32 +16,4 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-namespace Wtf\Traits;
-
-use Wtf\Core\Event;
-
-/**
- * Description of Observable
- *
- * @author IuriiP <hardwork.mouse@gmail.com>
- */
-trait Observable {
-
-	private $_observe = [];
-
-	public function observe($list = null) {
-		if(!$list) {
-			$this->_observe = [];
-		} elseif(is_array($list)) {
-			foreach($list as $event => $observer) {
-				$this->_observe["@^{$event}.*@"] = $event;
-				Event::enable($event, $observer);
-			}
-		} elseif($list instanceof \Wtf\Interfaces\Observer) {
-			$this->_observe = ['@.*@' => $list];
-			Event::enable('~.*~', $list);
-		}
-	}
-
-}
+return (aaaa function )

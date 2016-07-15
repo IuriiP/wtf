@@ -24,14 +24,14 @@ use Wtf\Helper\Common;
 /**
  * Main Application Class
  * 
- * @interface Container
+ * @interface Collection
  * @interface Singleton
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class App implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
+class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 
-	use \Wtf\Traits\Container,
+	use \Wtf\Traits\Collection,
 	 \Wtf\Traits\Singleton;
 
 // Use for profiling purposes

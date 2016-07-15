@@ -17,31 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Wtf\Traits;
-
-use Wtf\Core\Event;
+namespace Wtf\Core;
 
 /**
- * Description of Observable
+ * Description of EventCollection
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-trait Observable {
+class EventCollection implements \Wtf\Interfaces\Collection {
 
-	private $_observe = [];
-
-	public function observe($list = null) {
-		if(!$list) {
-			$this->_observe = [];
-		} elseif(is_array($list)) {
-			foreach($list as $event => $observer) {
-				$this->_observe["@^{$event}.*@"] = $event;
-				Event::enable($event, $observer);
-			}
-		} elseif($list instanceof \Wtf\Interfaces\Observer) {
-			$this->_observe = ['@.*@' => $list];
-			Event::enable('~.*~', $list);
-		}
-	}
-
+	use \Wtf\Traits\Collection;
 }

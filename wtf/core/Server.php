@@ -24,10 +24,10 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
+class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 
 	use \Wtf\Traits\Singleton,
-	 \Wtf\Traits\Container;
+	 \Wtf\Traits\Collection;
 
 	private function __construct() {
 		$this->set($_SERVER);

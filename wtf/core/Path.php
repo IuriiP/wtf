@@ -26,9 +26,9 @@ use Wtf\Core\Resource;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Path implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
+class Path implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 
-	use \Wtf\Traits\Container,
+	use \Wtf\Traits\Collection,
 	 \Wtf\Traits\Singleton;
 
 	/**

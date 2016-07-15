@@ -2,21 +2,21 @@
 
 namespace Wtf\Traits;
 
-class ContainerMock implements \Wtf\Interfaces\Container {
+class CollectionMock implements \Wtf\Interfaces\Collection {
 
-	use Container;
+	use Collection;
 }
 
-class ContainerSingletonMock implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Singleton {
+class CollectionSingletonMock implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 
-	use Container,
+	use Collection,
 	 Singleton;
 }
 
 /**
  * @group Traits
  */
-class ContainerTest extends \PHPUnit_Framework_TestCase {
+class CollectionTest extends \PHPUnit_Framework_TestCase {
 
 	protected $object;
 
@@ -44,7 +44,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-		$this->object = new ContainerMock;
+		$this->object = new CollectionMock;
 		$this->object->set($this->fixture);
 	}
 
@@ -57,7 +57,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::set
+	 * @covers Wtf\Traits\Collection::set
 	 */
 	public function testSet() {
 		$this->assertEmpty($this->object->set([]));
@@ -65,7 +65,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::getIterator
+	 * @covers Wtf\Traits\Collection::getIterator
 	 */
 	public function testGetIterator() {
 		$iterator = $this->object->getIterator();
@@ -77,7 +77,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::get
+	 * @covers Wtf\Traits\Collection::get
 	 */
 	public function testGet() {
 		$array = $this->fixture;
@@ -91,7 +91,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::eliminate
+	 * @covers Wtf\Traits\Collection::eliminate
 	 */
 	public function testEliminate() {
 		$array = $this->fixture;
@@ -109,7 +109,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::__get
+	 * @covers Wtf\Traits\Collection::__get
 	 */
 	public function test__get() {
 		$array = $this->fixture;
@@ -120,7 +120,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::__set
+	 * @covers Wtf\Traits\Collection::__set
 	 */
 	public function test__set() {
 		$this->object->One = 'ONE';
@@ -135,7 +135,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::__call
+	 * @covers Wtf\Traits\Collection::__call
 	 */
 	public function test__call() {
 		$array = $this->fixture;
@@ -149,23 +149,23 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::__callStatic
+	 * @covers Wtf\Traits\Collection::__callStatic
 	 */
 	public function test__callStatic() {
-		$obj = ContainerSingletonMock::singleton();
+		$obj = CollectionSingletonMock::singleton();
 		$obj->set($this->fixture);
 		$array = $this->fixture;
 
-		$this->assertEquals($array['two'], ContainerSingletonMock::Two());
-		$this->assertNull(ContainerSingletonMock::nothing());
-		$this->assertNull(ContainerSingletonMock::three('four'));
-		$this->assertEquals($array['complex']['sub0'], ContainerSingletonMock::Complex('Sub0'));
-		$this->assertEquals($array['toocomplex']['sub0']['sub0'], ContainerSingletonMock::TooComplex('Sub0', 'Sub0'));
-		$this->assertEquals($array['toocomplex']['sub1']['sub1'], ContainerSingletonMock::TooComplex('Sub1/Sub1'));
+		$this->assertEquals($array['two'], CollectionSingletonMock::Two());
+		$this->assertNull(CollectionSingletonMock::nothing());
+		$this->assertNull(CollectionSingletonMock::three('four'));
+		$this->assertEquals($array['complex']['sub0'], CollectionSingletonMock::Complex('Sub0'));
+		$this->assertEquals($array['toocomplex']['sub0']['sub0'], CollectionSingletonMock::TooComplex('Sub0', 'Sub0'));
+		$this->assertEquals($array['toocomplex']['sub1']['sub1'], CollectionSingletonMock::TooComplex('Sub1/Sub1'));
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::__invoke
+	 * @covers Wtf\Traits\Collection::__invoke
 	 */
 	public function test__invoke() {
 		$array = $this->fixture;
@@ -180,7 +180,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::offsetExists
+	 * @covers Wtf\Traits\Collection::offsetExists
 	 * @depends test__invoke
 	 */
 	public function testOffsetExists() {
@@ -194,7 +194,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::offsetGet
+	 * @covers Wtf\Traits\Collection::offsetGet
 	 */
 	public function testOffsetGet() {
 		$array = $this->fixture;
@@ -207,7 +207,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::offsetSet
+	 * @covers Wtf\Traits\Collection::offsetSet
 	 */
 	public function testOffsetSet() {
 		$this->assertEquals('oNE', $this->object->offsetSet('oNe', 'oNE'));
@@ -222,7 +222,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Traits\Container::offsetUnset
+	 * @covers Wtf\Traits\Collection::offsetUnset
 	 */
 	public function testOffsetUnset() {
 		$this->object->offsetUnset('two');

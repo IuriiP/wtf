@@ -24,9 +24,9 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
+class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 
-	use \Wtf\Traits\Container,
+	use \Wtf\Traits\Collection,
 	 \Wtf\Traits\Singleton;
 
 	private function __construct() {

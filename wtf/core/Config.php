@@ -25,15 +25,15 @@ use Wtf\Core\Resource,
 /**
  * General Config access Class
  * 
- * @interface Container
+ * @interface Collection
  * @interface Singleton
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
+class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 
 	use \Wtf\Traits\Singleton,
-	 \Wtf\Traits\Container;
+	 \Wtf\Traits\Collection;
 
 	private $_resource = null;
 
@@ -74,7 +74,7 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 	}
 
 	/**
-	 * Override Container::offsetGet
+	 * Override Collection::offsetGet
 	 * 
 	 * @param string $offset
 	 * @return array
@@ -85,8 +85,8 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Container {
 			$this->set(self::_load($this->_resource));
 			$this->_resource = null;
 		}
-		if(isset($this->_container[$offset])) {
-			return $this->_container[$offset];
+		if(isset($this->_collection[$offset])) {
+			return $this->_collection[$offset];
 		}
 		return null;
 	}

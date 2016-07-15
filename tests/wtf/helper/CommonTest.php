@@ -30,7 +30,6 @@ class CommonTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Common::parsePhp
-	 * @todo   Implement testParsePhp().
 	 */
 	public function testParsePhp() {
 		$phpret = <<<EOT
@@ -54,9 +53,69 @@ EOT;
 
 EOT;
 
+		$phperr = <<<EOT
+<?php
+	return ['some text';
+EOT;
+
 		$this->assertEquals('some text', Common::parsePhp($phpret));
-		$this->assertNull(Common::parsePhp($phpstr));
+		$this->assertEmpty(Common::parsePhp($phpstr));
 		$this->assertEquals(['some text'], Common::parsePhp($phparr));
+		$this->assertEmpty(Common::parsePhp($phperr));
+	}
+
+	/**
+	 * @covers Wtf\Helper\Common::camelCase
+	 */
+	public function testCamelCase() {
+
+		$this->assertEquals('SomeSnakedString', Common::camelCase('some_snaked_string'));
+		$this->assertEquals('someSnakedString', Common::camelCase('some_snaked_string', false));
+	}
+
+	/**
+	 * @covers Wtf\Helper\Common::snakeCase
+	 */
+	public function testSnakeCase() {
+
+		$this->assertEquals('some_camel_cased_string', Common::snakeCase('someCamelCasedString'));
+		$this->assertEquals('some_camel_cased_string', Common::snakeCase('SomeCamelCasedString'));
+	}
+
+	/**
+	 * @covers Wtf\Helper\Common::plural
+	 */
+	public function testPlural() {
+
+		$this->assertEquals('nuses', Common::plural('nus'));
+		$this->assertEquals('boxes', Common::plural('box'));
+		$this->assertEquals('entities', Common::plural('entity'));
+		$this->assertEquals('clezes', Common::plural('clez'));
+		$this->assertEquals('bars', Common::plural('bar'));
+		$this->assertEquals('foos', Common::plural('foo'));
+	}
+
+	/**
+	 * @covers Wtf\Helper\Common::normalizePath
+	 */
+	public function testNormalizePath() {
+
+		$this->assertEquals('foo', Common::normalizePath('foo'));
+		$this->assertEquals('foo/bar', Common::normalizePath('/foo/./bar'));
+		$this->assertEquals('this/a/test/is', Common::normalizePath('this/is/../a/./test/.///is'));
+		$this->assertEquals('foo/bar', Common::normalizePath('/./foo/./bar/./'));
+	}
+
+	/**
+	 * @covers Wtf\Helper\Common::absolutePath
+	 */
+	public function testAbsolutePath() {
+
+		$this->assertEquals(str_replace('\\', '/', realpath('')) . '/foo', Common::absolutePath('foo'));
+		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'foo', Common::absolutePath('foo','/'));
+		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'foo', Common::absolutePath('/foo','/bar'));
+		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'bar', Common::absolutePath('foo/../bar','/'));
+		$this->assertEquals(str_replace('\\', '/', realpath('.')) . '/foo', Common::absolutePath(realpath('.').'/foo','/'));
 	}
 
 }

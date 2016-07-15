@@ -20,20 +20,20 @@
 namespace Wtf\Traits;
 
 /**
- * Container functionality for Wtf\Interfaces\Container
+ * Collection functionality for Wtf\Interfaces\Collection
  * 
  * Supports access:
  * - Iterator
- * - $container[$key] : \ArrayAccess
- * - $container($key) : __invoke
- * - $container->$key : __get, __set
- * - $container->$key() : __call
+ * - $collection[$key] : \ArrayAccess
+ * - $collection($key) : __invoke
+ * - $collection->$key : __get, __set
+ * - $collection->$key() : __call
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-trait Container {
+trait Collection {
 
-	protected $_container = [];
+	protected $_collection = [];
 
 	protected static function _parseComplex($offset) {
 		if(is_string($offset) && (FALSE !== strpos($offset, '/'))) {
@@ -42,77 +42,77 @@ trait Container {
 		return null;
 	}
 
-	protected static function _complexCheck($container, $param) {
+	protected static function _complexCheck($collection, $param) {
 		$offset = strtolower(array_shift($param));
-		if(isset($container[$offset])) {
+		if(isset($collection[$offset])) {
 			if($param) {
-				return self::_complexCheck($container[$offset], $param);
+				return self::_complexCheck($collection[$offset], $param);
 			}
 			return true;
 		}
 		return false;
 	}
 
-	protected static function _complexGet($container, $param) {
+	protected static function _complexGet($collection, $param) {
 		$offset = strtolower(array_shift($param));
-		if(isset($container[$offset])) {
-			return $param ? self::_complexGet($container[$offset], $param) : $container[$offset];
+		if(isset($collection[$offset])) {
+			return $param ? self::_complexGet($collection[$offset], $param) : $collection[$offset];
 		}
 		return null;
 	}
 
-	protected static function _complexSet(&$container, $param, $value) {
+	protected static function _complexSet(&$collection, $param, $value) {
 		$offset = strtolower(array_shift($param));
 		if($param) {
-			if(!isset($container[$offset])) {
-				$container[$offset] = [];
+			if(!isset($collection[$offset])) {
+				$collection[$offset] = [];
 			}
-			return self::_complexSet($container[$offset], $param, $value);
+			return self::_complexSet($collection[$offset], $param, $value);
 		}
-		return $container[$offset] = $value;
+		return $collection[$offset] = $value;
 	}
 
-	protected static function _complexUnset(&$container, $param) {
+	protected static function _complexUnset(&$collection, $param) {
 		$offset = strtolower(array_shift($param));
 		if($param) {
-			if(isset($container[$offset])) {
-				self::_complexUnset($container[$offset], $param);
+			if(isset($collection[$offset])) {
+				self::_complexUnset($collection[$offset], $param);
 			}
 			return;
 		}
-		unset($container[$offset]);
+		unset($collection[$offset]);
 	}
 
 	public function offsetExists($offset) {
 		if($complex = self::_parseComplex($offset)) {
-			return self::_complexCheck($this->_container, $complex);
+			return self::_complexCheck($this->_collection, $complex);
 		}
-		return isset($this->_container[strtolower($offset)]);
+		return isset($this->_collection[strtolower($offset)]);
 	}
 
 	public function offsetGet($offset) {
 		if($complex = self::_parseComplex($offset)) {
-			return self::_complexGet($this->_container, $complex);
+			return self::_complexGet($this->_collection, $complex);
 		}
-		return self::_complexGet($this->_container, [$offset]);
+		return self::_complexGet($this->_collection, [$offset]);
 	}
 
 	public function offsetSet($offset, $value) {
 		if($complex = self::_parseComplex($offset)) {
-			return self::_complexSet($this->_container, $complex, $value);
+			return self::_complexSet($this->_collection, $complex, $value);
 		}
-		return $this->_container[strtolower($offset)] = $value;
+		return $this->_collection[strtolower($offset)] = $value;
 	}
 
 	public function offsetUnset($offset) {
 		if($complex = self::_parseComplex($offset)) {
-			return self::_complexUnset($this->_container, $complex);
+			return self::_complexUnset($this->_collection, $complex);
 		}
-		unset($this->_container[strtolower($offset)]);
+		unset($this->_collection[strtolower($offset)]);
 	}
 
 	public function getIterator() {
-		return new \ArrayIterator($this->_container);
+		return new \ArrayIterator($this->_collection);
 	}
 
 	public function eliminate($offset, $def = null) {
@@ -126,13 +126,13 @@ trait Container {
 	}
 
 	public function set($array) {
-		$this->_container = [];
+		$this->_collection = [];
 		if(is_array($array) || $array instanceof \Traversable) {
 			foreach($array as $key => $value) {
 				$this->offsetSet($key, $value);
 			}
 		}
-		return $this->_container;
+		return $this->_collection;
 	}
 
 	public function __get($offset) {
@@ -187,9 +187,9 @@ trait Container {
 	static public function __callStatic($offset, $args = []) {
 		$class = get_called_class();
 		if(!is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
-			throw new Exception(__CLASS__ . '::Container: static calling accepted by Singleton only.', E_ERROR);
+			throw new Exception(__CLASS__ . '::Collection: static calling accepted by Singleton only.', E_ERROR);
 		}
-		return call_user_func_array([static::singleton(), $offset], $args);
+		return call_user_method_array($offset, static::singleton(), $args);
 	}
 
 }

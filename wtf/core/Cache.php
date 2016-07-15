@@ -51,34 +51,58 @@ class Cache implements \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Singleton {
 	/**
 	 * @var Wtf\Core\Resource
 	 */
-	static private $_resource = null;
+	static public $_resource = null;
 
 	/**
 	 * Produce root resource for caching.
 	 */
 	private function __construct() {
-		static::$_resource = Resource::produce($this->config('resource'), $this->config('options'));
+		self::$_resource = Resource::produce($this->config('resource')? : \Wtf\Helper\Common::absolutePath('cache'), $this->config('options')? : []);
+	}
+
+	/**
+	 * Compile source resource to target resource
+	 * 
+	 * @param \Wtf\Core\Resource $target
+	 * @param \Wtf\Core\Resource $source
+	 * @param \Closure|array $callback
+	 * @return type
+	 */
+	private function _compile($target, $source, $callback) {
+		if($callback) {
+			if(is_callable($callback)) {
+				return $target
+						->put($callback($source))
+						->getContent();
+			} elseif(is_array($callback)) {
+				return $target
+						->put(preg_replace(array_keys($callback), array_values($callback), $source->getContent()))
+						->getContent();
+			}
+		}
+		return $known
+				->put($source->getContent())
+				->getContent();
 	}
 
 	/**
 	 * Get or create cached resource.
 	 * 
-	 * @param \Wtf\Core\Resource $resource
-	 * @param \Callback $callback gets the original resource, returns the prepared content
+	 * @param string|\Wtf\Core\Resource $source
+	 * @param \Closure|array|null $callback gets the original resource, returns the prepared content
 	 * @return string
 	 */
-	public function __invoke(Resource $resource, $callback = null) {
-		if(static::$_resource) {
+	public function __invoke($source, $callback = null) {
+		$resource = Resource::produce($source);
+
+		if(self::$_resource) {
 			// algo = md4 default as the fastest one
-			$known = static::$_resource->child(hash($this->config('algorithm') ? : 'md4', $resource->getPath() . '?' . $resource->getData()));
+			$known = self::$_resource->child(hash($this->config('algorithm') ? : 'md4', $resource->getPath() . '?' . $resource->getData()));
 			if($known->exists() && ($known->getTime() >= $resource->getTime())) {
 				return $known->getContent();
 			}
 			// make/rebuild cache
-			if(!$callback) {
-				$callback = \Wtf\Core\Config::get('compilers/' . $resource->getType());
-			}
-			return $known->put(($callback && is_callable($callback)) ? $callback($resource) : $resource->getContent())->getContent();
+			return $this->_compile($known, $resource, $callback ? : Config::singleton()->get('compilers')[$resource->getType()]);
 		}
 		return $resource->getContent();
 	}
@@ -86,13 +110,14 @@ class Cache implements \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Singleton {
 	/**
 	 * Static invoking.
 	 * 
-	 * @param Resource $resource
+	 * @param string|Resource $source
 	 * @param Callback $callback gets the original resource, returns the prepared content
+	 * @param array $args parameters for preparing
 	 * @return string
 	 */
-	static public function supply(Resource $resource, $callback = null) {
-		$self = static::singleton();
-		return $self($resource, $callback);
+	static public function supply($source, $callback = null) {
+		$self = self::singleton();
+		return $self($source, $callback);
 	}
 
 }

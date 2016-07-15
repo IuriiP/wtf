@@ -23,7 +23,7 @@ namespace Wtf\Interfaces;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-interface Container extends \ArrayAccess, \IteratorAggregate {
+interface Collection extends \ArrayAccess, \IteratorAggregate {
 
 	public function __get($offset);
 

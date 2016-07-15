@@ -99,4 +99,25 @@ interface Resource {
 	 * @return string
 	 */
 	public function getLength();
+
+	/**
+	 * Get data as array
+	 * 
+	 * @return array
+	 */
+	public function get($keep = false);
+
+	/**
+	 * Get binary data
+	 * 
+	 * @return string
+	 */
+	function getContent();
+
+	/**
+	 * Check if resource exists.
+	 * 
+	 * @return bool
+	 */
+	function exists();
 }

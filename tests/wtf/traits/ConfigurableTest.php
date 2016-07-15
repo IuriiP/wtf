@@ -22,7 +22,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
     public static function setUpBeforeClass()
     {
 		// init basic singleton
-		\Wtf\Core\Config::singleton(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config');
+		var_dump(\Wtf\Core\Config::singleton(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config'));
     }
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -44,6 +44,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testConfigureNamed() {
 		$object = new ConfigurableNamedMock();
+		var_dump($object);
 		$php = $object::configure('php');
 		
 		$this->assertInstanceOf('\\Wtf\\Core\\Config',$php);

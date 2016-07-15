@@ -26,229 +26,230 @@ namespace Wtf\Core\Resources;
  */
 class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 
-    private $_origin = null;
-    private $_content = null;
+	private $_origin = null;
 
-    /**
-     * @param string $path path to file
-     * @param array $options file options
-     */
-    public function __construct($path, $options = []) {
-        // $data ignored!
-        $this->_origin = realpath($path);
-        $this->_opt = $options;
-    }
+	private $_content = null;
 
-    /**
-     * Check if already exists.
-     * 
-     * @return bool
-     */
-    public function exists() {
-        return file_exists($this->_origin);
-    }
-    
-    /**
-     * Check if is directory
-     * 
-     * @return boolean
-     */
-    public function isContainer() {
-        return is_dir($this->_origin);
-    }
+	/**
+	 * @param string $path path to file
+	 * @param array $options file options
+	 */
+	public function __construct($path, $options = []) {
+		// $data ignored!
+		$this->_origin = \Wtf\Helper\Common::absolutePath($path);
+		$this->_opt = $options;
+	}
 
-    /**
-     * Get scheme = `file://`
-     * 
-     * @return string
-     */
-    public function getScheme() {
-        return 'file://';
-    }
+	/**
+	 * Check if already exists.
+	 * 
+	 * @return bool
+	 */
+	public function exists() {
+		return file_exists($this->_origin);
+	}
 
-    /**
-     * Get the file from dir
-     * 
-     * @param string $name
-     * @return File
-     */
-    public function child($name) {
-        if (is_dir($this->_origin)) {
-            return new File($this->_origin . ($name ? DIRECTORY_SEPARATOR . $name : ''), $this->_opt);
-        }
-        return null;
-    }
+	/**
+	 * Check if is directory
+	 * 
+	 * @return boolean
+	 */
+	public function isContainer() {
+		return is_dir($this->_origin);
+	}
 
-    /**
-     * Get the object's container
-     * 
-     * @return \Wtf\Core\Resource
-     */
-    public function container() {
-        $cont = dirname($this->_origin);
-        return new File($cont, []);
-    }
+	/**
+	 * Get scheme = `file://`
+	 * 
+	 * @return string
+	 */
+	public function getScheme() {
+		return 'file://';
+	}
 
-    /**
-     * Get the specified timestamp of file:
-     * 'c' - create time
-     * 'm' - modify time  (default)
-     * 'a' - access time
-     * 
-     * @param string $type
-     * @return int
-     */
-    public function getTime($type = null) {
-        switch (strtolower($type)) {
-            case 'c':
-                return filectime($this->_origin);
-            case 'a':
-                return fileatime($this->_origin);
-        }
-        return filemtime($this->_origin);
-    }
+	/**
+	 * Get the file from dir
+	 * 
+	 * @param string $name
+	 * @return File
+	 */
+	public function child($name) {
+		if(is_dir($this->_origin)) {
+			return new File($this->_origin . ($name ? DIRECTORY_SEPARATOR . $name : ''), $this->_opt);
+		}
+		return null;
+	}
 
-    /**
-     * Get the full path of the file
-     * 
-     * @return string
-     */
-    public function getPath() {
-        return $this->_origin;
-    }
+	/**
+	 * Get the object's container
+	 * 
+	 * @return \Wtf\Core\Resource
+	 */
+	public function container() {
+		$cont = dirname($this->_origin);
+		return new File($cont, []);
+	}
 
-    /**
-     * Get the file name or dir basename
-     * 
-     * @return string
-     */
-    public function getName() {
-        if (is_dir($this->_origin)) {
-            return pathinfo($this->_origin, PATHINFO_BASENAME);
-        }
-        return pathinfo($this->_origin, PATHINFO_FILENAME);
-    }
+	/**
+	 * Get the specified timestamp of file:
+	 * 'c' - create time
+	 * 'm' - modify time  (default)
+	 * 'a' - access time
+	 * 
+	 * @param string $type
+	 * @return int
+	 */
+	public function getTime($type = null) {
+		switch(strtolower($type)) {
+			case 'c':
+				return filectime($this->_origin);
+			case 'a':
+				return fileatime($this->_origin);
+		}
+		return filemtime($this->_origin);
+	}
 
-    /**
-     * Get the file extension (empty for dir)
-     * 
-     * @return string
-     */
-    public function getType() {
-        if (is_dir($this->_origin)) {
-            return '';
-        }
-        return pathinfo($this->_origin, PATHINFO_EXTENSION);
-    }
+	/**
+	 * Get the full path of the file
+	 * 
+	 * @return string
+	 */
+	public function getPath() {
+		return $this->_origin;
+	}
 
-    public function getMime() {
-        if (is_dir($this->_origin)) {
-            return '';
-        }
-        $finfo = new \finfo(FILEINFO_MIME);
-        return $finfo->file($this->_origin, FILEINFO_PRESERVE_ATIME);
-    }
+	/**
+	 * Get the file name or dir basename
+	 * 
+	 * @return string
+	 */
+	public function getName() {
+		if(is_dir($this->_origin)) {
+			return pathinfo($this->_origin, PATHINFO_BASENAME);
+		}
+		return pathinfo($this->_origin, PATHINFO_FILENAME);
+	}
 
-    /**
-     * Get file content as array
-     * 
-     * @param boolean $keep true for keep empty lines
-     * @return array|boolean FALSE when error
-     */
-    public function get($keep = false) {
-        if (is_dir($this->_origin)) {
-            $cdir = scandir($this->_origin);
-            return $keep ? $cdir : array_filter($cdir, function($val) {
-                        return '.' !== $val[0];
-                    });
-        } else {
-            if ($content = str_replace("\r", '', $this->getContent())) {
-                $array = explode("\n", $content);
-            }
-            return $keep ? $array : array_filter($array);
-        }
-        return FALSE;
-    }
+	/**
+	 * Get the file extension (empty for dir)
+	 * 
+	 * @return string
+	 */
+	public function getType() {
+		if(is_dir($this->_origin)) {
+			return '';
+		}
+		return pathinfo($this->_origin, PATHINFO_EXTENSION);
+	}
 
-    /**
-     * Get file content (binary)
-     * 
-     * @return boolean
-     */
-    public function getContent() {
-        if (!is_dir($this->_origin)) {
-            return $this->_content? : $this->_content = file_get_contents($this->_origin);
-        }
-        return FALSE;
-    }
+	public function getMime() {
+		if(is_dir($this->_origin)) {
+			return '';
+		}
+		$finfo = new \finfo(FILEINFO_MIME);
+		return $finfo->file($this->_origin, FILEINFO_PRESERVE_ATIME);
+	}
 
-    public function getLength() {
-        if (!is_dir($this->_origin)) {
-            return filesize($this->_origin);
-        }
-        return 0;
-    }
+	/**
+	 * Get file content as array
+	 * 
+	 * @param boolean $keep true for keep empty lines
+	 * @return array|boolean FALSE when error
+	 */
+	public function get($keep = false) {
+		if(is_dir($this->_origin)) {
+			$cdir = scandir($this->_origin);
+			return $keep ? $cdir : array_filter($cdir, function($val) {
+					return '.' !== $val[0];
+				});
+		} else {
+			if($content = str_replace("\r", '', $this->getContent())) {
+				$array = explode("\n", $content);
+			}
+			return $keep ? $array : array_filter($array);
+		}
+		return FALSE;
+	}
 
-    /**
-     * Write/Append $data to file
-     * 
-     * @param string|array|Resource $data
-     * @param int $mode 0|FILE_APPEND
-     */
-    private function _write($data, $mode) {
-        if ($data instanceof \Wtf\Core\Resource) {
-            $res = file_put_contents($this->_origin, $data->getContent(), $mode);
-        } elseif (is_array($data)) {
-            $res = file_put_contents($this->_origin, implode(PHP_EOL, $data), $mode);
-        } else {
-            $res = file_put_contents($this->_origin, $data, $mode);
-        }
-        if (FALSE === $res) {
-            trigger_error(__CLASS__ . "::write: error in file '{$this->_origin}'");
-        }
-        return $this;
-    }
+	/**
+	 * Get file content (binary)
+	 * 
+	 * @return boolean
+	 */
+	public function getContent() {
+		if(!is_dir($this->_origin)) {
+			return $this->_content? : $this->_content = file_get_contents($this->_origin);
+		}
+		return FALSE;
+	}
 
-    /**
-     * Append $data to file
-     * 
-     * @param string|array|Resource $data
-     */
-    public function append($data) {
-        return $this->_write($data, FILE_APPEND);
-    }
+	public function getLength() {
+		if(!is_dir($this->_origin)) {
+			return filesize($this->_origin);
+		}
+		return 0;
+	}
 
-    /**
-     * Write/overwrite $data to file
-     * 
-     * @param string|array|Resource $data
-     */
-    public function put($data) {
-        return $this->_write($data, 0);
-    }
+	/**
+	 * Write/Append $data to file
+	 * 
+	 * @param string|array|Resource $data
+	 * @param int $mode 0|FILE_APPEND
+	 */
+	private function _write($data, $mode) {
+		if($data instanceof \Wtf\Core\Resource) {
+			$res = file_put_contents($this->_origin, $data->getContent(), $mode);
+		} elseif(is_array($data)) {
+			$res = file_put_contents($this->_origin, implode(PHP_EOL, $data), $mode);
+		} else {
+			$res = file_put_contents($this->_origin, $data, $mode);
+		}
+		if(FALSE === $res) {
+			trigger_error(__CLASS__ . "::write: error in file '{$this->_origin}'");
+		}
+		return $this;
+	}
 
-    /**
-     * Remove file | directory
-     */
-    public function remove() {
-        if (is_dir($this->_origin)) {
-            return static::_delTree($this->_origin);
-        }
-        return unlink($this->_origin);
-    }
+	/**
+	 * Append $data to file
+	 * 
+	 * @param string|array|Resource $data
+	 */
+	public function append($data) {
+		return $this->_write($data, FILE_APPEND);
+	}
 
-    /**
-     * Recursive remove dir tree
-     * 
-     * @param type $dir
-     * @return type
-     */
-    private static function _delTree($dir) {
-        $files = array_diff(scandir($dir), ['.', '..']);
-        foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? static::_delTree("$dir/$file") : unlink("$dir/$file");
-        }
-        return rmdir($dir);
-    }
+	/**
+	 * Write/overwrite $data to file
+	 * 
+	 * @param string|array|Resource $data
+	 */
+	public function put($data) {
+		return $this->_write($data, 0);
+	}
+
+	/**
+	 * Remove file | directory
+	 */
+	public function remove() {
+		if(is_dir($this->_origin)) {
+			return static::_delTree($this->_origin);
+		}
+		return unlink($this->_origin);
+	}
+
+	/**
+	 * Recursive remove dir tree
+	 * 
+	 * @param type $dir
+	 * @return type
+	 */
+	private static function _delTree($dir) {
+		$files = array_diff(scandir($dir), ['.', '..']);
+		foreach($files as $file) {
+			(is_dir("$dir/$file")) ? static::_delTree("$dir/$file") : unlink("$dir/$file");
+		}
+		return rmdir($dir);
+	}
 
 }

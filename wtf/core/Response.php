@@ -24,9 +24,9 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Container, \Wtf\Interfaces\Bootstrap {
+class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Bootstrap {
 
-	use \Wtf\Traits\Container;
+	use \Wtf\Traits\Collection;
 
 	/**
 	 * @var array HTTP/1.1 response codes

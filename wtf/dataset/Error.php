@@ -36,7 +36,7 @@ class Error {
     public $data = null;
 
     /**
-     * Make extended error container
+     * Make extended error object
      * 
      * @param int $level
      * @param string $desc

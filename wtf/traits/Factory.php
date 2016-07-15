@@ -38,7 +38,10 @@ trait Factory {
 	 */
 	final public static function factory($named, $args = []) {
 		if(is_array($named)) {
-			$ns = $named[0] ? \Wtf\Core\Config::singleton()->get(Common::plural($named[0]), $named[1]) : '';
+			$ns = '';
+			if($named[0] && ($context = \Wtf\Core\Config::singleton()->get(Common::plural($named[0])))) {
+				$ns = $context($named[1])? : '';
+			}
 			$class = ($ns? : Common::plural(get_called_class())) . '\\' . Common::camelCase($named[1]);
 		} elseif(is_object($named)) {
 			$class = get_class($named);
@@ -52,7 +55,6 @@ trait Factory {
 			return $class;
 		}
 
-		var_dump($class);
 		$ref = new \ReflectionClass($class);
 		return $ref->newInstanceArgs($args);
 	}

@@ -27,7 +27,7 @@ namespace Wtf\Core;
  * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory {
+class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory, \Wtf\Interfaces\Factory {
 
 	use \Wtf\Traits\AdaptiveFactory,
 	 \Wtf\Traits\Factory;
@@ -47,81 +47,70 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
 	protected $_data = null;
 
 	/**
-	 * Builder dependent static methods
-	 * returns the Resource descentant instance
-	 */
-
-	/**
 	 * Clone Resource descendant
 	 * from Resource
 	 * 
-	 * @param array $args
+	 * @param Resource $obj
 	 */
-	final static protected function guess_object(array $args) {
-		$obj = $args[0];
-		if($obj instanceof Resource) {
-			return self::factory($obj, [$obj->getPath(), $obj->getOptions(), $obj->getData()]);
-		}
-		return null;
+	final protected function guess_object(Resource $obj) {
+		return $this->guess_object_string_array($obj, '', []);
 	}
 
 	/**
 	 * Create Resource descendant
 	 * from the child of Resource
 	 * 
-	 * @param array $args
+	 * @param Resource $obj
+	 * @param string $string
 	 */
-	final static protected function guess_object_string(array $args, array $opts = []) {
-		$obj = $args[0];
-		if($obj instanceof Resource) {
-			$parts = [];
-			if(preg_match('~^([^?]*)(\?(.*))?$~', $args[1], $parts)) {
-				$child = $parts[1];
-				$data = (count($parts) > 2) ? $parts[3] : '';
-				if('' === $child) {
-					return self::factory($obj, [$obj->getPath(), $obj->getOptions(), $data])->options($opts);
-				} elseif($child = $obj->child($child)) {
-					return $child->data($data)->options($opts);
-				}
+	final protected function guess_object_string(Resource $obj, $string) {
+		return $this->guess_object_string_array($obj, $string, []);
+	}
+
+	/**
+	 * Create Resource descendant
+	 * from the child of Resource 
+	 * with adding options
+	 * 
+	 * @param Resource $obj
+	 * @param array $opts
+	 */
+	final protected function guess_object_array(Resource $obj, array $opts) {
+		return $this->guess_object_string_array($obj, '', $opts);
+	}
+
+	/**
+	 * Create Resource descendant
+	 * from the child of Resource 
+	 * with adding options
+	 * 
+	 * @param Resource $obj
+	 * @param string $string
+	 * @param array $opts
+	 */
+	final protected function guess_object_string_array(Resource $obj, $string, array $opts) {
+		$parts = [];
+		if(preg_match('~^([^?]*)(\?(.*))?$~', $string, $parts)) {
+			$branch = $parts[1];
+			$data = (count($parts) > 2) ? $parts[3] : '';
+			if(!strlen($branch)) {
+				return static::factory($obj, [$obj->getPath(), $obj->getOptions(), $data])->options($opts);
+			} elseif($child = $obj->child($branch)) {
+				return $child->data($data)->options($opts);
 			}
 		}
 		return null;
 	}
 
 	/**
-	 * Create Resource descendant
-	 * from the child of Resource 
-	 * with adding options
-	 * 
-	 * @param array $args
-	 */
-	final static protected function guess_object_array(array $args) {
-		$obj = $args[0];
-		if($obj instanceof Resource) {
-			return self::factory($obj, [$obj->getPath(), $obj->getOptions(), ''])->options($args[1]);
-		}
-		return null;
-	}
-
-	/**
-	 * Create Resource descendant
-	 * from the child of Resource 
-	 * with adding options
-	 * 
-	 * @param array $args
-	 */
-	final static protected function guess_object_string_array(array $args) {
-		return self::guess_object_string_array($args, $args[2]);
-	}
-
-	/**
 	 * Create Resource descendant 
 	 * from init URL string
 	 * 
-	 * @param array $args
+	 * @param string $string
 	 */
-	final static protected function guess_string(array $args) {
-		if($parsed = self::_parseURL($args[0])) {
+	final protected function guess_string($string) {
+		$parsed = self::_parseURL($string);
+		if($parsed) {
 			return static::factory($parsed['scheme'], [$parsed['path'], $parsed['options'], $parsed['data']]);
 		}
 		return null;
@@ -134,9 +123,9 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
 	 * 
 	 * @param array $args
 	 */
-	final static protected function guess_string_array(array $args) {
-		if($obj = self::guess_string($args)) {
-			return $obj->options($args[1]);
+	final protected function guess_string_array($string, array $opts) {
+		if($obj = $this->guess_string($string)) {
+			return $obj->options($opts);
 		}
 		return null;
 	}
@@ -275,32 +264,13 @@ abstract class Resource implements \Wtf\Interfaces\Resource, \Wtf\Interfaces\Boo
 	}
 
 	/**
-	 * Specific constructor
+	 * Pseudo constructor
 	 */
-	abstract public function __construct($path, $options = []);
+	private function __construct() {
+		
+	}
 
-	/**
-	 * Get data as array
-	 * 
-	 * @return array
-	 */
-	abstract public function get($keep = false);
-
-	/**
-	 * Get binary data
-	 * 
-	 * @return string
-	 */
-	abstract function getContent();
-
-	/**
-	 * Check if resource exists.
-	 * 
-	 * @return bool
-	 */
-	abstract function exists();
-
-	public static function bootstrap(App $app) {
+	static public function bootstrap(App $app) {
 		$app::contract('resource', __CLASS__);
 	}
 

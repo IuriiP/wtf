@@ -19,8 +19,6 @@
 
 namespace Wtf\Interfaces;
 
-use Wtf\Core\Event;
-
 /**
  * Observer pattern
  *
@@ -29,18 +27,16 @@ use Wtf\Core\Event;
 interface Observer {
 
 	/**
-	 * Policy for observer name
+	 * Get observer short alias
 	 * 
-	 * @param string $name Event name from observer registration
 	 * @return string
 	 */
-	public function observer($name = null);
+	public function alias();
 
 	/**
 	 * On event firing
 	 * 
-	 * @param Event $event
-	 * @param string $regname Registered name from $this->observer()
+	 * @param \Wtf\Core\Event $event
 	 */
-	public function notify(Event $event, $regname = null);
+	public function notify(\Wtf\Core\Event $event);
 }

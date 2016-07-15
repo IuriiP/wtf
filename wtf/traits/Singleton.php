@@ -26,7 +26,7 @@ namespace Wtf\Traits;
  */
 trait Singleton {
 
-	protected static $instance = null;
+	protected static $singleton = null;
 
 	/**
 	 * Singleton get instance
@@ -34,11 +34,12 @@ trait Singleton {
 	 * @return \static
 	 */
 	public static function singleton() {
-		if(!self::$instance) {
-			$args = func_get_args();
-			self::$instance = new static(...$args);
+		$args = func_get_args();
+
+		if($args || !self::$singleton) {
+			self::$singleton = new static(...$args);
 		}
-		return self::$instance;
+		return self::$singleton;
 	}
 
 	/**
@@ -54,7 +55,7 @@ trait Singleton {
 	 * @throws \ErrorException
 	 */
 	private function __clone() {
-		throw new \ErrorException(__CLASS__ . '::Singleton: cloning is not allowed',E_ERROR);
+		throw new \ErrorException(__CLASS__ . '::Singleton: cloning is not allowed', E_ERROR);
 	}
 
 	/**
@@ -63,7 +64,7 @@ trait Singleton {
 	 * @throws \ErrorException
 	 */
 	private function __wakeup() {
-		throw new \ErrorException(__CLASS__ . '::Singleton: unserializing is not allowed',E_ERROR);
+		throw new \ErrorException(__CLASS__ . '::Singleton: unserializing is not allowed', E_ERROR);
 	}
 
 }

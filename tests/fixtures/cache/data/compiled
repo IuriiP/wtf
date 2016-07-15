@@ -1,0 +1,9 @@
+<Include  />
+<For (some as thing)>
+  <If (thing=='somebody')>
+    SomeBody
+  <Else />
+    NoBody
+  </If>
+</For>
+with {nothing} special
