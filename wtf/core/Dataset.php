@@ -17,7 +17,7 @@ use \Wtf\Dataset\Engine,
  *
  * @author IuriiP
  */
-class Dataset implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Observable {
+class Dataset implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable {
 
 	use \Wtf\Traits\Configurable,
 	 \Wtf\Traits\Observable,
@@ -29,7 +29,7 @@ class Dataset implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable, \Wt
 	 */
 	protected $_engine = null;
 
-	protected $_id = null;
+	public $id = null;
 
 	/**
 	 * Called by (Pool) self::instance()
@@ -37,15 +37,16 @@ class Dataset implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable, \Wt
 	 * @param string $name
 	 */
 	final private function __construct($name) {
-		$config = self::configure('datasets')[$name];
-		if($engine = $config['engine']) {
+		self::configure('datasets');
+		$config = $this->config($name);
+		$engine = $config['engine'];
+
+		if($engine) {
 			$this->_engine = Engine::make(['', $engine], $config);
-		}
-		if($observe = $this->config('observe')) {
-			$this->observe($observe);
+			EventManager::observe($config['observe']);
 		}
 
-		$this->_id = $name;
+		$this->id = $name;
 	}
 
 	/**
@@ -54,12 +55,19 @@ class Dataset implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable, \Wt
 	 * @return \Wtf\Dataset\Result
 	 */
 	final public function execute() {
+		$params = func_get_args();
+		$method = array_shift($params);
+		return $this->__call($method, $params);
+	}
+
+	final public function __call($name, $args) {
 		if($this->_engine) {
-			$params = func_get_args();
-			$method = array_shift($params);
-			return call_user_method_array($method, $this->_engine, $params);
+			if(method_exists($this->_engine, $name)) {
+				return call_user_func_array([$this->_engine, $name], $args);
+			}
+			return new Result(null, new Error("Method {$this->id}::{$name}: not defined", Error::ERROR));
 		}
-		return new Result(null, new Error("Engine '{$this->_id}' not available", Error::ERROR));
+		return new Result(null, new Error("Dataset::{$this->id}: engine not available", Error::ERROR));
 	}
 
 }

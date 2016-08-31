@@ -158,7 +158,7 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 	 */
 	public function get($keep = false) {
 		if(is_dir($this->_origin)) {
-			$cdir = scandir($this->_origin);
+			$cdir = array_diff(scandir($this->_origin), ['.', '..']);
 			return $keep ? $cdir : array_filter($cdir, function($val) {
 					return '.' !== $val[0];
 				});

@@ -20,87 +20,53 @@
 namespace Wtf\Dataset;
 
 use Field,
-    Expression,
-    Join,
-    Where;
+	Expression,
+	Join,
+	Where;
 
 /**
  * Description of Query
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Query {
+class Query implements \Wtf\Interfaces\Aggregator {
 
-    private $_table = null;
-    private $_alias = null;
-    private $_action = null;
-    private $_distinct = false;
-    private $_fields = [];
-    private $_joins = [];
-    private $_wheres = [];
-    private $_havings = [];
-    private $_group = [];
-    private $_order = [];
-    private $_offset = 0;
-    private $_limit = 0;
+	use \Wtf\Traits\Aggregator;
 
-    public function __construct($table, $alias = null) {
-        $this->_table = $table;
-        $this->_alias = $alias ? : $table;
-    }
+	public function __construct($conditions = null) {
+		if($conditions) {
+			foreach($conditions as $key => $cbranch) {
+				foreach($cbranch as $condition) {
+					$this->$key = $condition;
+				}
+			}
+		}
+	}
 
-    public function join($table, Join $join) {
-        $this->_joins[$join->alias()] = $join($table);
-        return $this;
-    }
+	public function getConditions() {
+		return $this([
+			'join',
+			'leftJoin',
+			'where',
+			'whereOr',
+			'having',
+			'order',
+			'groupBy',
+			'limit',
+			'offset',
+		]);
+	}
 
-    public function where(Where $where, $glue = 'AND') {
-        $this->_wheres[] = $where($glue);
-        return $this;
-    }
+	public function getReading() {
+		return $this(['fields']);
+	}
 
-    public function having(Where $where, $glue = 'AND') {
-        $this->_havings[] = $where($glue);
-        return $this;
-    }
+	public function getCreating() {
+		return $this(['data']);
+	}
 
-    public function group($alias) {
-        $this->_group[$alias] = $alias;
-        return $this;
-    }
+	public function getUpdating() {
+		return $this(['data']);
+	}
 
-    public function ascending($alias) {
-        $this->_order[$alias] = false;
-        return $this;
-    }
-
-    public function descending($alias) {
-        $this->_order[$alias] = true;
-        return $this;
-    }
-
-    public function offset($offset) {
-        $this->_offset = $offset;
-        return $this;
-    }
-
-    public function limit($limit) {
-        $this->_limit = $limit;
-        return $this;
-    }
-
-    public function fields($fields = []) {
-        $ret = $this->_fields;
-        $this->_fields = $fields;
-        return $ret;
-    }
-
-    public function field($name, $alias = null, Expression $expr = null) {
-        $field = new Field($name, $this->_alias);
-        $value = $field->expression($expr);
-        $alias = $field->alias($alias);
-        $this->_fields[$alias] = $value;
-        return $this;
-    }
-    
 }

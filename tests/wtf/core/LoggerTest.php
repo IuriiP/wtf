@@ -29,14 +29,14 @@ class LoggerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Core\Logger::singleton
-	 * @todo   Implement testSingleton().
+	 * @covers Wtf\Core\Logger::onEvent
 	 */
-	public function testSingleton() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+	public function testOnEvent() {
+		$self = Logger::singleton();
+		
+		$self->onEvent(Event::_('test/event')->message('MessAge')->data(['data'=>'data','bool'=>true])->fire());
+		
+		$this->assertSame($self,  Logger::singleton());
 	}
 
 }

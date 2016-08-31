@@ -24,7 +24,39 @@ namespace Wtf\Core;
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Logger implements \Wtf\Interfaces\Singleton {
+class Logger extends Observer implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Configurable {
 
-	use \Wtf\Traits\Singleton;
+	use \Wtf\Traits\Singleton,
+	 \Wtf\Traits\Configurable;
+
+	private $_target = null;
+
+	protected function __construct() {
+		if($this->config('enabled')) {
+			$this->_target = $config['target'] ? : null;
+		}
+	}
+
+	public function onEvent($event, $subevents = null) {
+		if(in_array($event->type, $this->config('levels')? : [$event->type])) {
+			$target = $this->_target;
+			if($target) {
+				// log on resource
+				if($target instanceof \Wtf\Interfaces\Writable) {
+					$target->append([
+						'level' => $event->type,
+						'event' => $event->name,
+						'time' => $event->time,
+						'message' => $event->message,
+						'source' => $event->source,
+						'data' => $event->data,
+					]);
+				}
+			} else {
+				// log into trashbin
+				printf(__CLASS__ . "::%s:%s\t%d\t'%s'\t[%s]\t[%s]", $event->name, date('c', $event->time), $event->type, implode(' & ',$event->message), implode(', ',\Wtf\Helper\Html::showAttrs($event->source)), implode(', ',\Wtf\Helper\Html::showAttrs($event->data)));
+			}
+		}
+	}
+
 }

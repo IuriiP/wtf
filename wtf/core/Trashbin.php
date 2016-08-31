@@ -28,4 +28,13 @@ class Trashbin implements \Wtf\Interfaces\Singleton {
 
 	//put your code here
 	use \Wtf\Traits\Singleton;
+	
+	protected $content = [];
+	
+	public function __invoke($trash=null) {
+		if($trash) {
+			$this->content = array_merge($this->content, (array)$trash);
+		}
+		return $this->content;
+	}
 }

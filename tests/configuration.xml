@@ -17,16 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <!-- see http://www.phpunit.de/wiki/Documentation -->
-<phpunit bootstrap="./bootstrap.php"
+<phpunit 
          colors="false"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          stopOnFailure="false">
     <filter>
-        <whitelist>
+        <!-- this is required, even if empty, until
+        https://github.com/sebastianbergmann/phpunit/issues/1872
+        is resolved -->
+        <whitelist processUncoveredFilesFromWhitelist="true">
         </whitelist>
-    </filter>
+    </filter>    
     <logging>
         <log type="coverage-html" target="C:\wamp\tmp\report" lowUpperBound="35" highLowerBound="70" />
     </logging>

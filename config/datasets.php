@@ -6,13 +6,16 @@
  */
 
 return [
-	'' => [ // default
+	'default' => [
 		'engine' => 'mysql',
 		'host' => 'localhost',
 		'name' => 'my_db',
 		'user' => 'root',
 		'password' => 'password',
 		'persistent' => true,
+		'observe' => [
+			'' => 'Logger',
+		]
 	],
 	'log' => [
 		'engine' => 'vertica',

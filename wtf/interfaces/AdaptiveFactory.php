@@ -25,5 +25,5 @@ namespace Wtf\Interfaces;
  */
 interface AdaptiveFactory {
 
-	static public function produce();
+	public static function produce();
 }

@@ -270,7 +270,7 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 		
 	}
 
-	static public function bootstrap(App $app) {
+	public static function bootstrap(App $app) {
 		$app::contract('resource', __CLASS__);
 	}
 

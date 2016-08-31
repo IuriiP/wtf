@@ -24,10 +24,11 @@
 return [
 	// predifined system contracts to singletons
 	'config' => \Wtf\Core\Config::singleton(),
+	'events' => Wtf\Core\EventManager::singleton(),
 //	'session' => Wtf\Core\Session::singleton(),
 //	'logger' => Wtf\Core\Logger::singleton(),
 //	'profiler' => Wtf\Core\Profiler::singleton(),
-//	'trashbin' => Wtf\Core\Trashbin::singleton(),
+	'trashbin' => Wtf\Core\Trashbin::singleton(),
 	// self registered contracts to common builders
 	\Wtf\Core\Request::class,
 	\Wtf\Core\Response::class,

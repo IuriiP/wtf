@@ -51,7 +51,7 @@ class Cache implements \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Singleton {
 	/**
 	 * @var Wtf\Core\Resource
 	 */
-	static public $_resource = null;
+	public static $_resource = null;
 
 	/**
 	 * Produce root resource for caching.
@@ -115,7 +115,7 @@ class Cache implements \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Singleton {
 	 * @param array $args parameters for preparing
 	 * @return string
 	 */
-	static public function supply($source, $callback = null) {
+	public static function supply($source, $callback = null) {
 		$self = self::singleton();
 		return $self($source, $callback);
 	}

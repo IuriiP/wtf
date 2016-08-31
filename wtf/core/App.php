@@ -38,17 +38,6 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	static private $_timer_stack = [];
 
 	/**
-	 * Set default contracts:
-	 * server
-	 * path
-	 * config
-	 * 
-	 */
-	private function __construct() {
-		
-	}
-
-	/**
 	 * Register the contract for
 	 * the Class or
 	 * the created singletone object.
@@ -59,7 +48,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	 * @param type $instance
 	 * @return type
 	 */
-	static public function contract($name, $instance) {
+	public static function contract($name, $instance) {
 		$self = self::singleton();
 		if(!$self->offsetExists($name)) {
 			$self->offsetSet($name, $instance);
@@ -104,17 +93,17 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	/**
 	 * Clear output buffers into trashbin and turn off buffering
 	 * 
-	 * @param object $param
+	 * @param object $trashbin
 	 */
-	private function _clear($trashbin) {
+	private function _clear($trashbin = null) {
 		$trash = [];
 		while(FALSE !== ($str = ob_get_clean())) {
 			if($str) {
 				$trash[] = $str;
 			}
 		}
-		if($trasbin) {
-			$this->trashbin($trash);
+		if($trashbin) {
+			$trashbin($trash);
 		}
 	}
 
@@ -123,7 +112,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	 * 
 	 * @param double $start_time Real start time
 	 */
-	static public function run($start_time) {
+	public static function run($start_time) {
 		ob_start();
 		self::$_timer_stack[] = $start_time;
 
@@ -135,7 +124,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 		/**
 		 * Bootstraping
 		 */
-		$boot = Server('bootstrap');
+		$boot = getenv('BOOTSTRAP');
 		if($boot) {
 			self::_makeBooting(Common::parsePhp(Resource::produce($boot)->getContent()));
 		}
@@ -143,19 +132,27 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 		/**
 		 * @var \Wtf\Core\Request make default request from $_SERVER
 		 */
-		$self->request = new Request(Server('request_uri'));
+		$self->request = new Request($self->server('request_uri'));
 
 		/**
 		 * @var \Wtf\Core\Response execute request (recursive) and get response
 		 */
-		$self->response = $self->request->execute(Server('request_method'));
+		$self->response = $self->request->execute($self->server('request_method'));
+
+		echo 'Send!';
 
 		if(!$self->response->sent) {
+			$trashbin = $self('trashbin');
 			// clear output
-			$this->_clear($self->trashbin);
+			$self->_clear($trashbin);
 			// send Response
-			$self->response->send();
+			$self->response->send($trashbin ? $trashbin() : []);
 		}
+
+		echo $boot;
+
+		var_export($_SERVER);
+		echo 'Done!';
 	}
 
 	/**
@@ -163,7 +160,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	 * 
 	 * @return double Current microtime
 	 */
-	static public function startTimer() {
+	public static function startTimer() {
 		return self::$_timer_stack[] = microtime(true);
 	}
 
@@ -172,7 +169,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	 * 
 	 * @return double Difference between current microtime & last stored
 	 */
-	static public function getTimer() {
+	public static function getTimer() {
 		return microtime(true) - array_pop(self::$_timer_stack);
 	}
 
@@ -181,7 +178,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	 * 
 	 * @return double Total microtime
 	 */
-	static public function getTimerTotal() {
+	public static function getTimerTotal() {
 		return microtime(true) - reset(self::$_timer_stack);
 	}
 

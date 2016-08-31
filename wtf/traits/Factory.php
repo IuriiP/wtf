@@ -37,19 +37,20 @@ trait Factory {
 	 * @return mixed|null
 	 */
 	final public static function factory($named, $args = []) {
-		if(is_array($named)) {
-			$ns = '';
-			if($named[0] && ($context = \Wtf\Core\Config::singleton()->get(Common::plural($named[0])))) {
-				$ns = $context($named[1])? : '';
-			}
-			$class = ($ns? : Common::plural(get_called_class())) . '\\' . Common::camelCase($named[1]);
-		} elseif(is_object($named)) {
+		if(is_object($named)) {
 			$class = get_class($named);
 		} elseif(is_string($named)) {
 			$class = \Wtf\Core\App::singleton()->get($named)? : $named;
+		} elseif(is_array($named)) {
+			$ns = '';
+			if($named[0] && ($context = \Wtf\Core\Config::singleton()->get(Common::snakeCase(Common::plural($named[0]))))) {
+				$ns = $context($named[1], 'class')? : '';
+			}
+			$class = $ns? : Common::plural(get_called_class()) . '\\' . Common::camelCase($named[1]);
 		} else {
 			return null;
 		}
+
 		if(is_object($class)) {
 			// it's contract for object
 			return $class;

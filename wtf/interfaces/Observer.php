@@ -27,16 +27,35 @@ namespace Wtf\Interfaces;
 interface Observer {
 
 	/**
-	 * Get observer short alias
-	 * 
-	 * @return string
-	 */
-	public function alias();
-
-	/**
 	 * On event firing
 	 * 
 	 * @param \Wtf\Core\Event $event
+	 * @return $this
 	 */
 	public function notify(\Wtf\Core\Event $event);
+
+	/**
+	 * Callback on event enabled.
+	 * 
+	 * @param \Wtf\Core\Event $event
+	 * @return $this
+	 */
+	public function enable($event);
+
+	/**
+	 * Callback on event disabled.
+	 * 
+	 * @param \Wtf\Core\Event $event
+	 * @return $this
+	 */
+	public function disable($event);
+	
+	/**
+	 * Perform event action.
+	 * 
+	 * @param \Wtf\Core\Event $event
+	 * @param array $subevents
+	 * @return $this
+	 */
+	public function onEvent($event,$subevents=null);
 }

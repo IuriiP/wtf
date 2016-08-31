@@ -17,7 +17,7 @@ class EventTest extends \PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-//		$this->object = new Event;
+		
 	}
 
 	/**
@@ -29,36 +29,57 @@ class EventTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers Wtf\Core\Event::_
+	 */
+	public function testBuilder() {
+		$event = Event::_('some/event');
+
+		$this->assertInstanceOf(Event::class, $event);
+		$this->assertEquals('some/event', $event->name);
+		$this->assertEquals([
+			'function' => __FUNCTION__,
+			'class' => __CLASS__,
+			'type' => '->',
+			], $event->source);
+		$this->assertEquals(0, $event->time);
+		$this->assertNull($event->message);
+		$this->assertNull($event->type);
+		$this->assertNull($event->data);
+
+		$this->assertInstanceOf(Event::class, $event->message('MesSsage'));
+		$this->assertEquals(['MesSsage'], $event->message);
+		$this->assertInstanceOf(Event::class, $event->type(Event::MESSAGE));
+		$this->assertEquals([Event::MESSAGE], $event->type);
+		$this->assertInstanceOf(Event::class, $event->data('the data'));
+		$this->assertEquals(['the data'], $event->data);
+
+		return $event;
+	}
+
+	/**
 	 * @covers Wtf\Core\Event::fire
-	 * @todo   Implement testFire().
+	 * @depends testBuilder
 	 */
-	public function testFire() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
+	public function testFire($event) {
+		// need preregister linked objects
+		$manager = EventManager::singleton();
+		$observer = $this->getMockForAbstractClass(Observer::class);
+		$record = new \stdClass();
+		$observer->expects($this->any())
+			->method('onEvent')
+			->will($this->returnCallback(function() use($record) {
+					$record->name = 'onEvent';
+					$record->args = func_get_args();
+				}));
 
-	/**
-	 * @covers Wtf\Core\Event::enable
-	 * @todo   Implement testEnable().
-	 */
-	public function testEnable() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
+		$manager->add($observer, 'some');
 
-	/**
-	 * @covers Wtf\Core\Event::disable
-	 * @todo   Implement testDisable().
-	 */
-	public function testDisable() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$this->assertInstanceOf(Event::class, $event->fire());
+		$this->assertInternalType('double', $event->time);
+
+		$this->assertEquals('onEvent', $record->name);
+		$this->assertSame($event, $record->args[0]);
+		$this->assertEquals(['some', 'event'], $record->args[1]);
 	}
 
 }

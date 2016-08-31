@@ -44,6 +44,11 @@ abstract class Entity implements \Wtf\Interfaces\Factory, \IteratorAggregate {
 	protected $options = [];
 
 	/**
+	 * @var array of dependent Objects
+	 */
+	protected $children = [];
+
+	/**
 	 * Check type
 	 * 
 	 * @param string $type
@@ -94,19 +99,14 @@ abstract class Entity implements \Wtf\Interfaces\Factory, \IteratorAggregate {
 	}
 
 	/**
-	 * @var array of dependent Objects
-	 */
-	protected $children = [];
-
-	/**
 	 * Create instance
 	 * 
 	 * @param Object $content
 	 * @param array $children
 	 */
-	public function __construct($content = null, $children = []) {
+	public function __construct($content = null, $type = '') {
 		$this->content = $content;
-		$this->children = (array) $children;
+		$this->type = strtolower($type);
 	}
 
 	/**

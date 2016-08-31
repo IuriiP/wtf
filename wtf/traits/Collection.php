@@ -35,6 +35,12 @@ trait Collection {
 
 	protected $_collection = [];
 
+	/**
+	 * Parse the complex offset by '/'.
+	 * 
+	 * @param string $offset
+	 * @return array|null
+	 */
 	protected static function _parseComplex($offset) {
 		if(is_string($offset) && (FALSE !== strpos($offset, '/'))) {
 			return explode('/', $offset);
@@ -42,6 +48,13 @@ trait Collection {
 		return null;
 	}
 
+	/**
+	 * Check if the path exists.
+	 * 
+	 * @param \ArrayAccess $collection
+	 * @param array $param
+	 * @return bool
+	 */
 	protected static function _complexCheck($collection, $param) {
 		$offset = strtolower(array_shift($param));
 		if(isset($collection[$offset])) {
@@ -53,6 +66,13 @@ trait Collection {
 		return false;
 	}
 
+	/**
+	 * Get a value from the path.
+	 * 
+	 * @param \ArrayAccess $collection
+	 * @param array $param
+	 * @return mixed
+	 */
 	protected static function _complexGet($collection, $param) {
 		$offset = strtolower(array_shift($param));
 		if(isset($collection[$offset])) {
@@ -61,6 +81,14 @@ trait Collection {
 		return null;
 	}
 
+	/**
+	 * Set the value by the path.
+	 * 
+	 * @param \ArrayAccess $collection
+	 * @param array $param
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	protected static function _complexSet(&$collection, $param, $value) {
 		$offset = strtolower(array_shift($param));
 		if($param) {
@@ -72,6 +100,12 @@ trait Collection {
 		return $collection[$offset] = $value;
 	}
 
+	/**
+	 * Unset by the path.
+	 * 
+	 * @param \ArrayAccess $collection
+	 * @param array $param
+	 */
 	protected static function _complexUnset(&$collection, $param) {
 		$offset = strtolower(array_shift($param));
 		if($param) {
@@ -83,48 +117,102 @@ trait Collection {
 		unset($collection[$offset]);
 	}
 
+	/**
+	 * Check if the offset exists.
+	 * 
+	 * @param string $offset
+	 * @return bool
+	 */
 	public function offsetExists($offset) {
-		if($complex = self::_parseComplex($offset)) {
+		$complex = self::_parseComplex($offset);
+		if($complex) {
 			return self::_complexCheck($this->_collection, $complex);
 		}
 		return isset($this->_collection[strtolower($offset)]);
 	}
 
+	/**
+	 * Get a value by the offset.
+	 * 
+	 * @param string $offset
+	 * @return mixed
+	 */
 	public function offsetGet($offset) {
-		if($complex = self::_parseComplex($offset)) {
+		$complex = self::_parseComplex($offset);
+		if($complex) {
 			return self::_complexGet($this->_collection, $complex);
 		}
 		return self::_complexGet($this->_collection, [$offset]);
 	}
 
+	/**
+	 * Set the value by the offset.
+	 * 
+	 * @param string $offset
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public function offsetSet($offset, $value) {
-		if($complex = self::_parseComplex($offset)) {
+		$complex = self::_parseComplex($offset);
+		if($complex) {
 			return self::_complexSet($this->_collection, $complex, $value);
 		}
 		return $this->_collection[strtolower($offset)] = $value;
 	}
 
+	/**
+	 * Unset by the offset.
+	 * 
+	 * @param string $offset
+	 */
 	public function offsetUnset($offset) {
-		if($complex = self::_parseComplex($offset)) {
-			return self::_complexUnset($this->_collection, $complex);
+		$complex = self::_parseComplex($offset);
+		if($complex) {
+			self::_complexUnset($this->_collection, $complex);
+		} else {
+			unset($this->_collection[strtolower($offset)]);
 		}
-		unset($this->_collection[strtolower($offset)]);
 	}
 
+	/**
+	 * Get the collection iterator.
+	 * 
+	 * @return \ArrayIterator
+	 */
 	public function getIterator() {
 		return new \ArrayIterator($this->_collection);
 	}
 
+	/**
+	 * Get and unset by the offset. Returns default if not exists.
+	 * 
+	 * @param string $offset
+	 * @param mixed $def
+	 * @return mixed
+	 */
 	public function eliminate($offset, $def = null) {
 		$elem = $this->get($offset, $def);
 		$this->offsetUnset($offset);
 		return $elem;
 	}
 
-	public function get($name, $def = null) {
-		return $this->offsetExists($name) ? $this->offsetGet($name) : $def;
+	/**
+	 * Get a value by the offset. Returns default if not exists.
+	 * 
+	 * @param string $offset
+	 * @param mixed $def
+	 * @return mixed
+	 */
+	public function get($offset, $def = null) {
+		return $this->offsetExists($offset) ? $this->offsetGet($offset) : $def;
 	}
 
+	/**
+	 * Set the initial collection tree.
+	 * 
+	 * @param \Traversable $array
+	 * @return \ArrayAccess
+	 */
 	public function set($array) {
 		$this->_collection = [];
 		if(is_array($array) || $array instanceof \Traversable) {
@@ -135,24 +223,34 @@ trait Collection {
 		return $this->_collection;
 	}
 
+	/**
+	 * Magic getter.
+	 * 
+	 * @param string $offset
+	 * @return mixed
+	 */
 	public function __get($offset) {
 		return $this->offsetExists($offset) ? $this->offsetGet($offset) : null;
 	}
 
+	/**
+	 * Magic setter.
+	 * 
+	 * @param string $offset
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public function __set($offset, $value) {
 		return $this->offsetSet($offset, $value);
 	}
 
-	public function __invoke() {
-		$args = func_get_args();
-		if(count($args)) {
-			$offset = array_shift($args);
-			return $this->__call($offset, $args);
-		}
-		return $this;
-	}
-
-	private function _expandArgs(array $args) {
+	/**
+	 * Hook for expanding a complex parameter.
+	 * 
+	 * @param array $args
+	 * @return array
+	 */
+	static private function _expandArgs(array $args) {
 		$reargs = [];
 		foreach($args as $value) {
 			if(false !== strpos($value, '/')) {
@@ -165,6 +263,33 @@ trait Collection {
 		return $reargs;
 	}
 
+	/**
+	 * Magic invoking.
+	 * 
+	 * $collection = new Collection();
+	 * var_dump($collection('long/path',$part,'long/tail'));
+	 * 
+	 * @return mixed
+	 */
+	public function __invoke() {
+		$args = self::_expandArgs(func_get_args());
+		if(count($args)) {
+			$offset = array_shift($args);
+			return $this->__call($offset, $args);
+		}
+		return $this;
+	}
+
+	/**
+	 * Magic calling.
+	 * 
+	 * $collection = new Collection();
+	 * var_dump($collection->long('path',$part,'long/tail'));
+	 * 
+	 * @param string $offset
+	 * @param array $args
+	 * @return mixed
+	 */
 	public function __call($offset, $args = []) {
 		if(($elem = $this->__get($offset)) && count($args)) {
 			$args = $this->_expandArgs($args);
@@ -176,7 +301,7 @@ trait Collection {
 				}
 			} elseif(is_callable($elem)) {
 				return call_user_func_array($elem, $args);
-			} elseif(is_array($elem)) {
+			} elseif(is_array($elem) || ($elem instanceof \ArrayAccess)) {
 				return self::_complexGet($elem, $args);
 			}
 			return null;
@@ -184,12 +309,20 @@ trait Collection {
 		return $elem;
 	}
 
-	static public function __callStatic($offset, $args = []) {
+	/**
+	 * Magic static for singletons.
+	 * 
+	 * @param string $offset
+	 * @param array $args
+	 * @return mixed
+	 * @throws Exception If the called class isn't singleton.
+	 */
+	public static function __callStatic($offset, $args = []) {
 		$class = get_called_class();
-		if(!is_subclass_of(get_called_class(), 'Wtf\\Interfaces\\Singleton')) {
-			throw new Exception(__CLASS__ . '::Collection: static calling accepted by Singleton only.', E_ERROR);
+		if(!is_subclass_of($class, 'Wtf\\Interfaces\\Singleton')) {
+			throw new Exception("{$class}::Collection: static calling accepted by Singleton only.", E_ERROR);
 		}
-		return call_user_method_array($offset, static::singleton(), $args);
+		return call_user_func_array([static::singleton(), $offset], $args);
 	}
 
 }

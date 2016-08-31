@@ -54,7 +54,7 @@ class I18n implements \Wtf\Interfaces\Configurable {
 	 * 
 	 * @param int $lang
 	 */
-	static public function init($lang = []) {
+	public static function init($lang = []) {
 		static::$_default = new static($lang);
 	}
 
@@ -90,6 +90,9 @@ class I18n implements \Wtf\Interfaces\Configurable {
 		}
 	}
 
+	public function current() {
+		
+	}
 	/**
 	 * Allow access to default engine via static calls.
 	 * 
@@ -97,12 +100,12 @@ class I18n implements \Wtf\Interfaces\Configurable {
 	 * @param array $arguments
 	 * @return mixed
 	 */
-	static public function __callStatic($method, $arguments = []) {
+	public static function __callStatic($method, $arguments = []) {
 		if(!static::$_default) {
 			static::init();
 		}
 		if(method_exists(static::$_default, $method)) {
-			return call_user_method_array($method, static::$_default, $params);
+			return call_user_func_array([static::$_default, $method], $arguments);
 		}
 		return null;
 	}

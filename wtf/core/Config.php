@@ -60,10 +60,18 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 			$cfgRoot = Resource::produce($cfg);
 			if($cfgRoot->isContainer()) {
 				$this->set([]);
-				foreach($cfgRoot->get() as $file) {
+				foreach($cfgRoot->get(true) as $file) {
 					$res = Resource::produce($cfgRoot, $file);
-					if($res->isContainer() || (false !== array_search($res->getType(), ['php', 'ini', 'json', 'xml']))) {
-						$this->offsetSet($res->getName(), new Config($res));
+					if($res->isContainer() || (false !== array_search($res->getType(), ['php', 'ini', 'env','json', 'xml']))) {
+						$name=$res->getName();
+						if($name) {
+							$this->offsetSet($res->getName(), new Config($res));
+						} else {
+							$local = self::_load($res);
+							foreach($local as $key=>$val) {
+								$this->offsetSet($key, $val);
+							}
+						}
 					}
 				}
 			} else {
@@ -106,6 +114,7 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 				// JSON object as array
 				return json_decode($res->getContent(), true);
 			case 'ini':
+			case 'env':
 				// INI array
 				return parse_ini_string($res->getContent(), true);
 			case 'xml':

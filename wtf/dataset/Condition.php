@@ -20,46 +20,22 @@
 namespace Wtf\Dataset;
 
 /**
- * Description of Condition
+ * Condition is aggregator for conditions.
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Condition implements \Iterator{
+class Condition implements \Wtf\Interfaces\Aggregator {
 
-    private $_glue = null;
-    private $_list = [];
+	use \Wtf\Traits\Aggregator;
 
-    public function __construct($glue = 'and') {
-        $this->_glue = $glue;
-    }
+	private $_style = '';
 
-    public function append($first, $second, $third = null) {
-        if (!$third) {
-            $this->_list[] = [ $first, '=', $second];
-        } else {
-            $this->_list[] = [ $first, $second, $third];
-        }
-        return $this;
-    }
+	public function __construct($style = '') {
+		$this->_style = (string) $style;
+	}
 
-    public function current() {
-        return current($this->_list);
-    }
-
-    public function key() {
-        return key($this->_list);
-    }
-
-    public function next() {
-        next($this->_list);
-    }
-
-    public function rewind() {
-        reset($this->_list);
-    }
-
-    public function valid() {
-        return null !== key($this->_list);
-    }
+	public function __toString() {
+		return $this->_style;
+	}
 
 }

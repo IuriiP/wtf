@@ -41,7 +41,7 @@ trait AdaptiveFactory {
 	 * 
 	 * @return Object
 	 */
-	final static public function produce() {
+	final public static function produce() {
 		$args = func_get_args();
 		$types = ['guess'];
 		foreach($args as $arg) {

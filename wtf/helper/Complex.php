@@ -34,7 +34,7 @@ abstract class Complex {
 	 * @param array $black Array of the blacklisted keys
 	 * @return array Cleared array
 	 */
-	static public function except($array, $black) {
+	public static function except($array, $black) {
 		return array_diff_key((array) $array, array_flip((array) $black));
 	}
 
@@ -45,7 +45,7 @@ abstract class Complex {
 	 * @param array $white Array of the whitelisted keys
 	 * @return array Cleared array
 	 */
-	static public function only($array, $white) {
+	public static function only($array, $white) {
 		return array_intersect_key((array) $array, array_flip((array) $white));
 	}
 
@@ -56,7 +56,7 @@ abstract class Complex {
 	 *  @param array|boolean $remove Remove the array specified keys or '@attributes' if true
 	 *  @return array
 	 */
-	static public function obj2arr($obj, $remove = null) {
+	public static function obj2arr($obj, $remove = null) {
 		if(is_object($obj)) {
 			$elem = (array) $obj;
 		} else {
@@ -78,7 +78,7 @@ abstract class Complex {
 	 * @param array $arr  
 	 * @return object
 	 */
-	static public function arr2obj($arr) {
+	public static function arr2obj($arr) {
 		return json_decode(json_encode($arr));
 	}
 
@@ -89,7 +89,7 @@ abstract class Complex {
 	 * @parameter array $parent  
 	 * @return string
 	 */
-	static public function arr2ini($a, array $parent = []) {
+	public static function arr2ini($a, array $parent = []) {
 		$out = array();
 		$a = (array) $a;
 		uasort($a, function($a, $b) {
@@ -124,7 +124,7 @@ abstract class Complex {
 	 * @param string $ini
 	 * @return array
 	 */
-	static public function ini2arr($ini) {
+	public static function ini2arr($ini) {
 		$arr = parse_ini_string($ini, true, INI_SCANNER_TYPED);
 		$complex = array_filter($arr, function($key) {
 			return false !== strpos($key, '.');
@@ -148,7 +148,7 @@ abstract class Complex {
 	 * @param mixed $dflt Default value
 	 * @return mixed
 	 */
-	static public function get($from, $key, $dflt = null) {
+	public static function get($from, $key, $dflt = null) {
 		$afrom = (array) $from;
 		if(isset($afrom[$key])) {
 			return $afrom[$key];
@@ -164,7 +164,7 @@ abstract class Complex {
 	 * @param mixed $dflt
 	 * @return mixed
 	 */
-	static public function eliminate(&$from, $key, $dflt = null) {
+	public static function eliminate(&$from, $key, $dflt = null) {
 		$afrom = (array) $from;
 		if(isset($afrom[$key])) {
 			$ret = $afrom[$key];
@@ -181,7 +181,7 @@ abstract class Complex {
 	 * @parameter array $only  
 	 * @return array
 	 */
-	static public function arr2attr(array $a, array $only = null) {
+	public static function arr2attr(array $a, array $only = null) {
 		$arr = $only ? array_intersect_key($a, array_flip($only)) : $a;
 		array_walk($arr, function(&$v, $k) {
 			if(is_null($v)) {
@@ -201,7 +201,7 @@ abstract class Complex {
 	 * @param mixed $el DOMNode or SimpleXMLElement 
 	 * @return array|null
 	 */
-	static public function attr2arr($el) {
+	public static function attr2arr($el) {
 		if($el instanceof \DOMElement) {
 			if(!$el->attributes) {
 				return [];

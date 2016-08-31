@@ -87,6 +87,9 @@ EOT;
 	 */
 	public function testPlural() {
 
+		$this->assertEquals('leaves', Common::plural('leaf'));
+		$this->assertEquals('processes', Common::plural('process'));
+		$this->assertEquals('bodies', Common::plural('bodies'));
 		$this->assertEquals('nuses', Common::plural('nus'));
 		$this->assertEquals('boxes', Common::plural('box'));
 		$this->assertEquals('entities', Common::plural('entity'));

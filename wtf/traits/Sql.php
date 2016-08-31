@@ -245,7 +245,7 @@ trait Sql {
 	 * @param string $code 5-sym SQL-92 code
 	 * @return string
 	 */
-	static public function getMessage($code) {
+	public static function getMessage($code) {
 		$hi = substr($code, 0, 2);
 		$lo = substr($code, 2, 3);
 		if(isset(self::$_sql92[$hi])) {

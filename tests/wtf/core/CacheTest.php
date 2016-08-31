@@ -16,7 +16,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 
 	static private $data;
 
-	static public function setUpBeforeClass() {
+	public static function setUpBeforeClass() {
 		// prepage basic config data
 		Config::singleton(self::$fixture . '/config');
 
@@ -24,7 +24,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$dir = self::$fixture . '/cached';
 		$files = array_diff(scandir($dir), array('.', '..'));
 		foreach($files as $file) {
-			(is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+			(is_dir("{$dir}/{$file}")) ? delTree("{$dir}/{$file}") : unlink("{$dir}/{$file}");
 		}
 
 		self::$data = self::$fixture . '/data/';

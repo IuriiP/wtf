@@ -24,14 +24,12 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Bootstrap {
-
-	use \Wtf\Traits\Collection;
+class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 
 	/**
 	 * @var array HTTP/1.1 response codes
 	 */
-	private static $_http = [
+	protected static $_http = [
 		//1xx: Informational:
 		100 => 'Continue',
 		101 => 'Switching Protocols',
@@ -126,7 +124,7 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Collection, \
 	 */
 	public function headers($array = null) {
 		if(!headers_sent()) {
-			if(null === $array) {
+			if(is_null($array)) {
 				$this->_headers = [];
 			} else {
 				$this->_headers = array_merge($this->_headers, (array) $array);
@@ -201,31 +199,31 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Collection, \
 	 * ~~~
 	 * will inject <style> and <script> tags into html.
 	 * 
-	 * @param type $type
-	 * @param type $args
+	 * @param string $offset
+	 * @param array $args
 	 * @return \Wtf\Core\Response Chainable
 	 */
-	public function __call($type, $args) {
+	public function __call($offset, $args = []) {
 		if((count($args) < 1) || (null === $args[0])) {
-			$this->approve(Entity::make($type, null));
+			$this->approve(Entity::make($offset, null));
 		} elseif(!$this->content) {
-			$content = Entity::factory($type, $args);
+			$content = Entity::factory($offset, $args);
 			if($content && ($content instanceof \Wtf\Interfaces\Content)) {
 				$this->content($content);
 			} else {
-				trigger_error(__CLASS__ . "::{$type}: can't be content");
+				throw new Exception(__CLASS__ . "::{$offset}: can't be content");
 			}
-		} elseif($this->content->canInject($type)) {
+		} elseif($this->content->canInject($offset)) {
 			switch(count($args)) {
-				case 2: $this->approve(Entity::make($type, $args[1]), $args[0]);
+				case 2: $this->approve(Entity::make($offset, $args[1]), $args[0]);
 					break;
-				case 1: $this->approve(Entity::make($type, $args[0]));
+				case 1: $this->approve(Entity::make($offset, $args[0]));
 					break;
-				default: $this->approve(Entity::make($type, $args[1]), $args[0], $args[2]);
+				default: $this->approve(Entity::make($offset, $args[1]), $args[0], $args[2]);
 					break;
 			}
 		} else {
-			trigger_error(__CLASS__ . "::{$type}: injecting not allowed to " . $this->content->getType());
+			throw new Exception(__CLASS__ . "::{$offset}: injecting not allowed to " . $this->content->getType());
 		}
 		return $this;
 	}
@@ -305,7 +303,7 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Collection, \
 		}
 		return $this->sent = true;
 	}
-
+	
 	/**
 	 * Magic cast to string.
 	 * 

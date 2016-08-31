@@ -62,10 +62,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertNull($object['nothing']);
 		$this->assertNull($object['css']);
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['ini']);
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['json']);
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['php']);
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $object['xml']);
+		$this->assertInstanceOf(Config::class, $object['ini']);
+		$this->assertInstanceOf(Config::class, $object['json']);
+		$this->assertInstanceOf(Config::class, $object['php']);
+		$this->assertInstanceOf(Config::class, $object['xml']);
 
 		return $object;
 	}
@@ -76,10 +76,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testOffsetGet($object) {
 		$dir = $object['dir'];
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $dir);
+		var_export($dir);
+		$this->assertInstanceOf(Config::class, $dir);
+		$this->assertInternalType('string', $dir['some']);
+		$this->assertInstanceOf(Config::class, $dir['php']);
 
 		$php = $dir['php'];
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $php);
+		$this->assertInstanceOf(Config::class, $php);
 
 		$this->assertAttributeEmpty('_collection', $php);
 		$string = $php['string'];

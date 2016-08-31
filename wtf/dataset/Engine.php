@@ -158,10 +158,12 @@ abstract class Engine implements \Wtf\Interfaces\Factory, \Wtf\Interfaces\Crud {
 	 * @return \Wtf\Dataset\Result Set
 	 */
 	public function get(Query $query, $need = false) {
-		$exists = $this->read($query->reading(), $query->conditions());
+		$rd = $query->reading();
+		$cd = $query->conditions();
+		$exists = $this->read($rd, $cd);
 		if(!$exists->count && $need) {
 			$this->create($query->creating());
-			$exists = $this->read($query->reading(), $query->conditions());
+			$exists = $this->read($rd, $cd);
 		}
 		return $exists;
 	}
@@ -174,13 +176,15 @@ abstract class Engine implements \Wtf\Interfaces\Factory, \Wtf\Interfaces\Crud {
 	 * @return \Wtf\Dataset\Result Set
 	 */
 	public function set(Query $query, $existed = false) {
-		$exists = $this->read($query->reading(), $query->conditions());
+		$rd = $query->reading();
+		$cd = $query->conditions();
+		$exists = $this->read($rd, $cd);
 		if($exists->count) {
-			$this->update($query->updating(), $query->conditions());
-			$exists = $this->read($query->reading(), $query->conditions());
+			$this->update($query->updating(), $cd);
+			$exists = $this->read($rd, $cd);
 		} elseif(!$existed) {
 			$this->create($query->creating());
-			$exists = $this->read($query->reading(), $query->conditions());
+			$exists = $this->read($rd, $cd);
 		}
 		return $exists;
 	}
@@ -191,9 +195,10 @@ abstract class Engine implements \Wtf\Interfaces\Factory, \Wtf\Interfaces\Crud {
 	 * @param type $code
 	 * @return type
 	 */
-	static public function getMessage($code) {
+	public static function getMessage($code) {
 		$engine = static::class;
 		return "Engine::{$engine}: error #{$code}";
 	}
 
+	abstract public static function getAttributes(Data $data);
 }

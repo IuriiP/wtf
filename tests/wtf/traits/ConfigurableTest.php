@@ -19,16 +19,17 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
 
 	protected $object;
 
-    public static function setUpBeforeClass()
-    {
+	public static function setUpBeforeClass() {
 		// init basic singleton
-		var_dump(\Wtf\Core\Config::singleton(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config'));
-    }
+		\Wtf\Core\Config::singleton(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config');
+	}
+
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
+		
 	}
 
 	/**
@@ -44,11 +45,10 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testConfigureNamed() {
 		$object = new ConfigurableNamedMock();
-		var_dump($object);
 		$php = $object::configure('php');
-		
-		$this->assertInstanceOf('\\Wtf\\Core\\Config',$php);
-		$this->assertEquals('ONE',$php['string']);
+
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $php);
+		$this->assertEquals('ONE', $php['string']);
 	}
 
 	/**
@@ -57,9 +57,9 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
 	public function testConfigureUnnamed() {
 		$object = new ConfigurableMock();
 		$def = $object::configure();
-		
-		$this->assertInstanceOf('\\Wtf\\Core\\Config',$def);
-		$this->assertEquals('IuriiP <hardwork.mouse@gmail.com>',$def['name']);
+
+		$this->assertInstanceOf('\\Wtf\\Core\\Config', $def);
+		$this->assertEquals('IuriiP <hardwork.mouse@gmail.com>', $def['name']);
 	}
 
 	/**
@@ -68,8 +68,9 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testConfig() {
 		$object = new ConfigurableMock();
-		
-		$this->assertEquals('json',$object->config('format'));
+
+		$this->assertEquals('json', $object->config('format'));
 		$this->assertNull($object->config('nothing'));
 	}
+
 }

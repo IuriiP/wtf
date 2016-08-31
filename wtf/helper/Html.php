@@ -40,7 +40,7 @@ abstract class Html {
 	 *  @param array $marker 
 	 *  @return string[]
 	 */
-	static public function show($arr, $templates, $marker = null) {
+	public static function show($arr, $templates, $marker = null) {
 		$arr = (array) $arr;
 		$marker = (array) $marker;
 		$templates = (array) $templates;
@@ -64,7 +64,7 @@ abstract class Html {
 	 * @param array $arr 
 	 * @return string[]
 	 */
-	static public function showAttrs($arr) {
+	public static function showAttrs($arr) {
 		return array_values(self::show($arr, '%1$s="%2$s"'));
 	}
 
@@ -75,7 +75,7 @@ abstract class Html {
 	 * @param mixed $selected 
 	 * @return string[]
 	 */
-	static public function showOptions($arr, $selected = null) {
+	public static function showOptions($arr, $selected = null) {
 		return array_values(self::show($arr, array(
 				'<option value="%1$s"%3$s>%2$s</option>',
 				'<optgroup label="%1$s">%2$s</optgroup>'), is_array($selected) ? $selected : (is_string($selected) ? array(
@@ -91,7 +91,7 @@ abstract class Html {
 	 * @param string $value
 	 * @return string[]
 	 */
-	static public function showInput($attr = null, $type = '', $name = '', $value = '') {
+	public static function showInput($attr = null, $type = '', $name = '', $value = '') {
 		$ret = array();
 		if($div = Complex::eliminate($attr, 'div')) {
 			$ret[] = '<div ' . implode(' ', self::showAttrs($div)) . '>';
@@ -142,7 +142,7 @@ abstract class Html {
 	 * @param string $rootas 
 	 * @return string[]
 	 */
-	static public function showTree($tree, $rootas = 'ul') {
+	public static function showTree($tree, $rootas = 'ul') {
 		$ret = [];
 		if($atree = Complex::obj2arr($tree)) {
 			$ret = ["<{$rootas}>"];
@@ -173,7 +173,7 @@ abstract class Html {
 	 * @param array $attr 
 	 * @return string[]
 	 */
-	static public function showMenu($tree, $attr = null) {
+	public static function showMenu($tree, $attr = null) {
 		$ret = array();
 		if($menu = Complex::obj2arr($tree)) {
 			$ret[] = '<ul ' . implode(' ', self::showAttrs($attr)) . '>';

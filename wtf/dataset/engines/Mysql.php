@@ -31,7 +31,7 @@ use Wtf\Helper\Complex;
 class Mysql extends \Wtf\Dataset\Engine implements \Wtf\Interfaces\Sql, \Wtf\Interfaces\Pageable {
 
 	use \Wtf\Traits\Sql;
-	
+
 	private $_mysqli = null;
 
 	// Wtf\Dataset\Engine::
@@ -137,6 +137,7 @@ class Mysql extends \Wtf\Dataset\Engine implements \Wtf\Interfaces\Sql, \Wtf\Int
 				echo $exc->getTraceAsString();
 			}
 		}
+		return $this->_mysqli;
 	}
 
 	public function close() {
@@ -147,7 +148,7 @@ class Mysql extends \Wtf\Dataset\Engine implements \Wtf\Interfaces\Sql, \Wtf\Int
 		
 	}
 
-	public function count(\Wtf\Dataset\Query $query) {
+	public function count($conditions) {
 		
 	}
 
@@ -213,6 +214,14 @@ class Mysql extends \Wtf\Dataset\Engine implements \Wtf\Interfaces\Sql, \Wtf\Int
 
 	public function wheres(\Wtf\Dataset\Query $query) {
 		
+	}
+
+	public static function getAttributes(\Wtf\Dataset\Data $data) {
+		$ret = [];
+		foreach($data as $key => $value) {
+			$ret[] = $value ? $key . '(' . implode(',', $value) . ')' : $key;
+		}
+		return implode(' ', $ret);
 	}
 
 }

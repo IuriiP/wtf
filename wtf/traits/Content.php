@@ -30,12 +30,12 @@ trait Content {
 	 * Get the private method name for injecting
 	 * 
 	 * @param string $type
-	 * @return string|false
+	 * @return callable|false
 	 */
 	final public function canInject($type) {
 		$method = "inject_{$type}";
 		if(method_exists($this, $method)) {
-			return $method;
+			return [$this,$method];
 		}
 		return false;
 	}

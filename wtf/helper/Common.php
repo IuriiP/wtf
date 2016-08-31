@@ -33,7 +33,7 @@ abstract class Common {
 	 * @param boolean $ucfirst
 	 * @return string
 	 */
-	static public function camelCase($string, $ucfirst = true) {
+	public static function camelCase($string, $ucfirst = true) {
 		$str = preg_replace_callback('~_([a-z])~i', function($matches) {
 			return ucfirst($matches[1]);
 		}, $string);
@@ -46,7 +46,7 @@ abstract class Common {
 	 * @param string $string
 	 * @return string
 	 */
-	static public function snakeCase($string) {
+	public static function snakeCase($string) {
 		$str = preg_replace_callback('~[A-Z]~', function($matches) {
 			return '_' . strtolower($matches[0]);
 		}, lcfirst($string));
@@ -59,9 +59,11 @@ abstract class Common {
 	 * @param string $string
 	 * @return string
 	 */
-	static public function plural($string) {
-		return preg_replace_callback('~[a-z]$~', function($matches) {
+	public static function plural($string) {
+		return preg_replace_callback('~es$|[a-z]$~', function($matches) {
 			switch($matches[0]) {
+				case 'es': return 'es';
+				case 'f': return 'ves';
 				case 's': return 'ses';
 				case 'x': return 'xes';
 				case 'y': return 'ies';
@@ -77,7 +79,7 @@ abstract class Common {
 	 * @param string $string
 	 * @return mixed
 	 */
-	static public function parsePhp($string) {
+	public static function parsePhp($string) {
 		$content = null;
 		ob_start();
 		$content = eval(preg_replace(['~\\<\\?php~', '~\\?\\>~'], '', $string));

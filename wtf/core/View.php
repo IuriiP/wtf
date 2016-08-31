@@ -41,11 +41,11 @@ class View {
 		}
 	}
 
-	static public function exists($view) {
+	public static function exists($view) {
 		return self::find($view);
 	}
 
-	static public function find($view) {
+	public static function find($view) {
 		if($origin = self::search($view)) {
 			$cached = realpath(\Wtf\Core\App::path('cache') . DIRECTORY_SEPARATOR . sha1($view));
 			if(!file_exists($cached) || (filemtime($cached) < filemtime($origin['path']))) {

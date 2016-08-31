@@ -150,7 +150,7 @@ class Rule implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory
 	 * @param mixed $closure
 	 * @return array|null
 	 */
-	static public function any($pattern, $closure) {
+	public static function any($pattern, $closure) {
 		return self::produce('', $pattern, $closure);
 	}
 
@@ -166,7 +166,7 @@ class Rule implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory
 	 * @param array $args
 	 * @return array|null
 	 */
-	static public function __callStatic($method, $args) {
+	public static function __callStatic($method, $args) {
 		if(2 === count($args)) {
 			return self::produce($method, $args[0], $args[1]);
 		}

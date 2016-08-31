@@ -14,7 +14,7 @@ namespace Wtf\Interfaces;
  */
 interface Configurable {
 
-	static public function configure($name = null);
+	public static function configure($name = null);
 
 	public function config($path = null);
 }

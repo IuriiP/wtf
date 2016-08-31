@@ -91,7 +91,7 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	 * @param string $name
 	 * @param mixed $def
 	 */
-	final static public function extract($source, $name, $def) {
+	final public static function extract($source, $name, $def) {
 		$src = $source;
 		$parts = explode('.', $name);
 		foreach($parts as $sub) {
@@ -110,7 +110,7 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	 * @param string $name
 	 * @param mixed $def
 	 */
-	final static public function get($name, $def = null) {
+	final public static function get($name, $def = null) {
 		return self::extract($_GET, $name, $def);
 	}
 
@@ -120,7 +120,7 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	 * @param string $name
 	 * @param mixed $def
 	 */
-	final static public function post($name, $def = null) {
+	final public static function post($name, $def = null) {
 		return self::extract($_POST, $name, $def);
 	}
 
@@ -130,7 +130,7 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	 * @param string $name
 	 * @param mixed $def
 	 */
-	final static public function cookie($name, $def = null) {
+	final public static function cookie($name, $def = null) {
 		return self::extract($_COOKIE, $name, $def);
 	}
 
@@ -140,7 +140,7 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	 * @param string $name
 	 * @param mixed $def
 	 */
-	final static public function file($name, $def = null) {
+	final public static function file($name, $def = null) {
 		return self::extract($_FILES, $name, $def);
 	}
 

@@ -26,7 +26,12 @@ trait Pool {
 	 */
 	public static function instance($name = '') {
 		if(!isset(self::$_pool[$name])) {
-			return self::$_pool[$name] = new static($name);
+			$class = new \ReflectionClass(static::class);
+			if($class->implementsInterface(\Wtf\Interfaces\Factory::class)) {
+				return self::$_pool[$name] = static::factory($class->getShortName(), $name);
+			} else {
+				return self::$_pool[$name] = new static($name);
+			}
 		}
 		return self::$_pool[$name];
 	}

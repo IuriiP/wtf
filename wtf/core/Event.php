@@ -20,11 +20,26 @@
 namespace Wtf\Core;
 
 /**
- * Base for the Event
+ * Event with builder.
+ * 
+ * Using:
+ * 
+ * $event = new Event('some/warning');
+ * $event->fire('message', Event::WARNING, ['data'=>'some data']);
+ * 
+ * or
+ * 
+ * Event::_('some/warning')
+ *			->message('message')
+ *			->type(Event::WARNING)
+ *			->data(['data'=>'some data'])
+ *			->fire();
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Event {
+class Event implements \Wtf\Interfaces\Builder {
+
+	use \Wtf\Traits\Builder;
 
 	/**
 	 * Constants
@@ -36,12 +51,6 @@ class Event {
 		WARNING = 4,
 		ERROR = 5,
 		FAIL = 6;
-
-	/**
-	 * Registered subscribers for each named event.
-	 * @var array of \Wtf\Interface\Observer[] 
-	 */
-	static private $_subscribers = [];
 
 	/**
 	 * Event name
@@ -62,86 +71,40 @@ class Event {
 	public $time = 0;
 
 	/**
-	 * Event type
-	 * @var int 
-	 */
-	public $type = 0;
-
-	/**
-	 * Event message
-	 * @var string
-	 */
-	public $message = null;
-
-	/**
-	 * Event specific data
-	 * @var mixed 
-	 */
-	public $data = null;
-
-	/**
-	 * Create event
+	 * Construct named event.
 	 * 
 	 * @param string $name
 	 * @param mixed $source
 	 */
 	public function __construct($name, $source = null) {
 		$this->name = $name;
-		$this->source = $source;
+		$this->source = $source ? : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
 	}
 
 	/**
-	 * Fire event with data
+	 * Build instance of Event.
+	 * 
+	 * @param type $name
+	 * @return \Wtf\Core\Event
+	 */
+	public static function _() {
+		return new Event(func_get_arg(0), debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]);
+	}
+
+	/**
+	 * Fire event
 	 * 
 	 * @param string $message
 	 * @param int $type
 	 * @param mixed $data
 	 */
-	public function fire($message, $type = 0, $data = null) {
+	public function fire($message = '', $type = 0, $data = null) {
 		$this->time = microtime(true);
-		$this->message = $message;
-		$this->type = $type;
-		$this->data = $data;
-		foreach(self::$_subscribers as $pattern => $observers) {
-			if(preg_match($pattern, $name)) {
-				foreach($observers as $regname => $observer) {
-					$observer->notify($this, $regname);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Add observer for event
-	 * 
-	 * @param \Wtf\Interfaces\Observer $observer
-	 * @param string $pattern
-	 */
-	static public function enable(\Wtf\Interfaces\Observer $observer, $pattern = '.*') {
-		$pattern = '/' . str_replace('/', '', $pattern) . '/';
-		$named = $observer->observer($name);
-		if(!isset(self::$_subscribers[$pattern]) || !isset(self::$_subscribers[$pattern][$named])) {
-			self::$_subscribers[$pattern][$named] = $observer;
-		}
-	}
-
-	/**
-	 * Remove observer from event
-	 * 
-	 * @param type $pattern
-	 * @param type $observername
-	 */
-	static public function disable($pattern, $observername = null) {
-		$pattern = '/' . str_replace('/', '', $pattern) . '/';
-		if(!$observername) {
-			unset(self::$_subscribers[$pattern]);
-		} elseif(is_array($observername)) {
-			foreach($observername as $value) {
-				self::disable($pattern, $value);
-			}
-		} elseif(isset(self::$_subscribers[$pattern]) && isset(self::$_subscribers[$pattern][$observername])) {
-			unset(self::$_subscribers[$pattern][$observername]);
-		}
+		$this->_bricks['message'] = $message ? [(string) $message] : ($this->message? : ['']);
+		$this->_bricks['type'] = $type ? [(int) $type] : ($this->type? : [0]);
+		$this->_bricks['data'] = $data ? (array) $data : ($this->data? : []);
+		
+		return EventManager::fire($this);
 	}
 
 }
