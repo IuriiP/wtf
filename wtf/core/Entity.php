@@ -75,7 +75,7 @@ abstract class Entity implements \Wtf\Interfaces\Factory, \IteratorAggregate {
 	 * @return mixed
 	 */
 	final public function content(\Wtf\Interfaces\Content $content = null) {
-		if($content && $content instanceof \Wtf\Interfaces\Content) {
+		if($content) {
 			$this->content = $content;
 		}
 		return $this->content;

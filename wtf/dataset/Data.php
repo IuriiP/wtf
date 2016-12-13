@@ -86,19 +86,21 @@ class Data implements \Wtf\Interfaces\AsArray {
 			return $val;
 		}, $array);
 	}
-	
+
 	public function definedAs($list) {
 		return !!array_intersect_key($this->_array, array_flip($list));
 	}
 
-	public static function linkTo($model,$links=[]) {
+	public static function linkTo($model, $links = []) {
 		return Relation::hasOne($model, $links);
 	}
-	
-	public static function hasOne($model,$links=[]) {
+
+	public static function hasOne($model, $links = []) {
 		return Relation::hasOne($model, $links);
 	}
-	public static function hasMany($model,$links=[]) {
+
+	public static function hasMany($model, $links = []) {
 		return Relation::hasMany($model, $links);
 	}
+
 }

@@ -260,21 +260,6 @@ class Html extends \Wtf\Core\Entity implements \Wtf\Interfaces\Content
     }
 
     /**
-     * Append debug information to the HTTP header
-     * 
-     * @param \Wtf\Core\Entities\HttpDebug $content
-     * @param int $position
-     * @return boolean
-     */
-    protected function inject_http_debug(Wtf\Core\Entities\HttpDebug $content, $position)
-    {
-        foreach ($content as $value) {
-            header('X-Debug-String: ' . $value, false);
-        }
-        return true;
-    }
-
-    /**
      * Append final comment.
      * 
      * @param \Wtf\Core\Entities\HtmlComment $content

@@ -4,13 +4,15 @@
 ### mod_rewrite
 RewriteEngine On
 RewriteBase /public
+# deny hidden files access
 RewriteRule ^\.(.*)$ - [F]
 
 ### force ssl
 #RewriteCond %{HTTPS} off
 #RewriteRule ^(.*)$ https://%{SERVER_NAME}/%$1 [R,L]
 
+### internal redirect to index.php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !index.php$
-RewriteRule ^(.*)$ index.php
+RewriteCond $1 !index.php$
+RewriteRule ^(.*)$ index.php [L]

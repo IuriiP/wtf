@@ -24,10 +24,9 @@ namespace Wtf\Core;
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class EventManager implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Bootstrap {
+class EventManager implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Bootstrap {
 
-	use \Wtf\Traits\Singleton,
-	 \Wtf\Traits\Configurable;
+	use \Wtf\Traits\Singleton;
 
 	/**
 	 *
@@ -46,7 +45,7 @@ class EventManager implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Configu
 
 	public static function bootstrap(App $app) {
 		$self = self::singleton();
-		self::observe($self->configure($cfg? : 'events'));
+		self::observe($app->config('events'));
 
 		$app::contract('events', $self);
 	}

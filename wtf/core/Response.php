@@ -173,7 +173,11 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 		];
 		if((\Wtf\Interfaces\Content::INJECT_HERE === $position) && !$this->hasChild($name)) {
 			if(!$this->content) {
-				$this->content($content);
+				if($content instanceof \Wtf\Interfaces\Content) {
+					$this->content($content);
+				} else {
+					$this->child[] = $asset;
+				}
 			} else {
 				$this->content->inject($asset);
 			}
@@ -264,14 +268,15 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 		foreach($this->_headers as $key => $value) {
 			if(null !== $value) {
 				if(is_array($value)) {
-					foreach($value as $subval) {
-						header("{$key}: $subval", false);
+					foreach($value as $subkey=>$subval) {
+						header("{$key}-{$subkey}: ". str_replace(["\n", "\t", "\r"], '', $subval),false);
 					}
 				} else {
-					header("{$key}: $value", true);
+					header("{$key}: ".str_replace(["\n", "\t", "\r"], '', $subval), true);
 				}
 			}
 		}
+		
 		return ($code >= 200) && ($code < 300);
 	}
 
@@ -282,28 +287,30 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 	 * @return true
 	 */
 	public function send($trash = null) {
-		if(!headers_sent() && $this->_sendHeader($this->_code) && $this->content) {
-			header('Content-type: ' . $this->content->getMime(), true);
-			if($trash) {
-				if($this->content->isType('html')) {
-					$this->approve(Entity::make('html_comment', $trash), '', \Wtf\Interfaces\Content::INJECT_END);
-				} else {
-					$this->approve(Entity::make('http_debug', $trash), '', \Wtf\Interfaces\Content::INJECT_HERE);
-				}
-			}
+		if($trash) {
+			$this->headers(['X-Trash'=>(array)$trash]);
+		}
+
+		if($this->content) {
+			$this->header('Content-Type', $this->content->getMime());
 			if($this->children) {
 				foreach(array_filter($this->children) as $asset) {
 					$this->content->inject($asset);
 				}
 			}
 			if($length = $this->content->getLength()) {
-				header("Content-length: {$length}", true);
+				$this->header('Content-Length', $length);
 			}
+			
+			$this->_sendHeader($this->_code);
 			echo (string) $this->content;
+		} else {
+			$this->_sendHeader($this->_code);
 		}
+
 		return $this->sent = true;
 	}
-	
+
 	/**
 	 * Magic cast to string.
 	 * 

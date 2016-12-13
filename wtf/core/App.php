@@ -102,6 +102,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 				$trash[] = $str;
 			}
 		}
+
 		if($trashbin) {
 			$trashbin($trash);
 		}
@@ -139,8 +140,14 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 		 */
 		$self->response = $self->request->execute($self->server('request_method'));
 
-		echo 'Send!';
+		var_export($self);
 
+		echo $boot;
+
+		var_export($_SERVER);
+		echo 'Done!';
+		
+		
 		if(!$self->response->sent) {
 			$trashbin = $self('trashbin');
 			// clear output
@@ -148,11 +155,6 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 			// send Response
 			$self->response->send($trashbin ? $trashbin() : []);
 		}
-
-		echo $boot;
-
-		var_export($_SERVER);
-		echo 'Done!';
 	}
 
 	/**

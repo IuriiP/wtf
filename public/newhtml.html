@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=0.5">
+        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+                integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+        crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div>
+            <input type="number" 
+                   id="nodeCounter" 
+                   min="3"
+                   value="50" />
+            <button id="generateTree">Generate tree</button>
+            <button id="findCenter1">Find centers (first)</button>
+        </div>
+        <div style="width: 20%; float: left;">
+            <table style="width: 100%; border: solid 1px;">
+                <tr id="headRow">
+                    <th>Node</th>
+                    <th>Parent</th>
+                    <th>Children</th>
+                </tr>
+            </table>
+        </div>
+        <div id="container" style="float: right; width: 79%; border: solid 1px;">
+            <canvas id="canvas" width="600" height="400"></canvas>
+        </div>
+        <div id="result" style="float: right; width: 79%; border: solid 1px;">
+        </div>
+        <script src="/js/tree_1.0.js"></script>
+    </body>
+</html>
