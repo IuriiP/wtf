@@ -17,8 +17,6 @@ trait Configurable {
 
 	static protected $s_config = null;
 
-//	protected $_config = null;
-
 	public static function configure($name = null) {
 		if(!static::$s_config) {
 			if(!$name) {
@@ -27,12 +25,19 @@ trait Configurable {
 			$cfg = \Wtf\Core\Config::singleton();
 			$base = $cfg[$name];
 			static::$s_config = (is_string($base) || $base instanceof \Wtf\Core\Resource) ? new \Wtf\Core\Config($base) : $base;
+			/**
+			 * If is first configured and method 'configured' exists
+			 */
+			if(method_exists(__CLASS__, 'configured')) {
+				static::configured(static::$s_config);
+			}
 		}
 		return static::$s_config;
 	}
 
 	public function config($path = null) {
-		if($config = self::configure()) {
+		$config = self::configure();
+		if($config) {
 			return $path ? $config[$path] : null;
 		}
 		return null;

@@ -24,24 +24,16 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Compiler implements \Wtf\Interfaces\Factory {
+abstract class Compiler implements \Wtf\Interfaces\Factory, \Wtf\Interfaces\Configurable {
 
-	use \Wtf\Traits\Factory;
+	use \Wtf\Traits\Factory,
+	 \Wtf\Traits\Configurable;
 
 	/**
+	 * Compile source content.
 	 * 
-	 * 
-	 * @param string $compiler
-	 * @param Resource $source
+	 * @param string $content
 	 * @return string Compiled content
 	 */
-	final public static function compile($compiler, $source) {
-		$resource = Resource::produce($source);
-		if($compiler && ($engine = self::factory(['', $compiler]))) {
-			return $engine->process($resource->getContent());
-		}
-		return $resource->getContent();
-	}
-
-	abstract function process($content);
+	abstract function compile($content);
 }

@@ -25,7 +25,7 @@ use Wtf\Core\Rule;
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 return [
-	Rule::group('/install', 'Private\\Install::run'),
-	Rule::group('/config', 'Private\\Config::run'),
-//  Rule::group('/{application}','Private\\{application}::run'),
+	Rule::any('/install', 'Privates\\Install::run'),
+	Rule::any('/config', 'Privates\\Config::run'),
+	Rule::group('/{application}','Privates\\{application}::run'),
 ];

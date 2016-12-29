@@ -33,6 +33,8 @@ class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 		if(\PHP_SESSION_ACTIVE !== session_status()) {
 			session_start();
 		}
+		
+		$this->mirror($_SESSION);
 	}
 
 //    public function __destruct() {

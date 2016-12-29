@@ -26,38 +26,55 @@ use Wtf\Core\Compiler;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class View {
+class View implements \Wtf\Interfaces\Creator, \Wtf\Interfaces\Configurable {
 
-	static private $_caches = [];
+	use \Wtf\Traits\Creator,
+		\Wtf\Traits\Configurable;
 
 	/**
-	 * @param string $source
+	 *
+	 * @var string
 	 */
-	public function __construct($source) {
-		if($cached = self::find($source)) {
-			parent::__construct($this->resolve($cached, $vars));
-		} else {
-			parent::__construct(null);
-		}
+	private $_cached = null;
+
+	/**
+	 * @param string $view
+	 */
+	public function __construct($view) {
+		$this->_cached = self::find($view);
 	}
 
-	public static function exists($view) {
-		return self::find($view);
+	/**
+	 * Get content
+	 * 
+	 * @return string
+	 */
+	public function get() {
+		return $this->_cached;
 	}
 
-	public static function find($view) {
-		if($origin = self::search($view)) {
-			$cached = realpath(\Wtf\Core\App::path('cache') . DIRECTORY_SEPARATOR . sha1($view));
-			if(!file_exists($cached) || (filemtime($cached) < filemtime($origin['path']))) {
-				file_put_contents($cached, Compiler::compile($origin['compiler'], $origin['path']));
-			}
-			return $cached;
+	/**
+	 * Find cached or compile & caching view
+	 * 
+	 * @param string $view
+	 * @return string
+	 */
+	protected static function find($view) {
+		$origin = self::search($view);
+		if($origin) {
+			return Cache::supply($origin['path'], [Compiler::factory($origin['compiler']),'compile']);
 		}
 		return null;
 	}
 
-	static protected function search($view) {
-		foreach(\Wtf\Core\App::config('views') as $key => $value) {
+	/**
+	 * Search file by configured pathes
+	 * 
+	 * @param string $view
+	 * @return array
+	 */
+	protected static function search($view) {
+		foreach(self::configure() as $key => $value) {
 			$filename = sprintf($key, $view);
 			if(file_exists($filename)) {
 				return [
@@ -69,11 +86,15 @@ class View {
 		return null;
 	}
 
-	protected function resolve($fname, $vars) {
-		ob_start();
-		extract($vars);
-		include $fname;
-		return ob_get_clean();
+	/**
+	 * Render the compiled view on context
+	 * 
+	 * @param array Named variables content
+	 * @param object Object context
+	 * @return string
+	 */
+	public function render() {
+		return \Wtf\Helper\Common::includePhp($this->_cached, ...func_get_args());
 	}
 
 }

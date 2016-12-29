@@ -141,6 +141,26 @@ abstract class Complex {
 	}
 
 	/**
+	 * Get routed value from array
+	 * 
+	 * @param string $from
+	 * @param string $name
+	 * @param mixed $dflt
+	 */
+	public static function extract($from, $name, $dflt = null) {
+		$src = $from;
+		$parts = preg_split('~[./]~', $name);
+		foreach($parts as $sub) {
+			if(isset($src[$sub])) {
+				$src = $src[$sub];
+			} else {
+				return $dflt;
+			}
+		}
+		return $src;
+	}
+
+	/**
 	 * Get named value from array or default
 	 *
 	 * @param mixed $from Array or Object

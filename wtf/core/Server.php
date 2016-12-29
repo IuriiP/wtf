@@ -31,6 +31,10 @@ class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 
 	private function __construct() {
 		$this->set($_SERVER);
+		// override 'request_method' from 'magic' request field
+		if(isset($_REQUEST['_method'])) {
+			$this['request_method'] = $_REQUEST['_method'];
+		}
 	}
 
 }

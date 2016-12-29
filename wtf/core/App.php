@@ -99,7 +99,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 		$trash = [];
 		while(FALSE !== ($str = ob_get_clean())) {
 			if($str) {
-				$trash[] = $str;
+				array_unshift($trash, $str);
 			}
 		}
 
@@ -140,14 +140,11 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 		 */
 		$self->response = $self->request->execute($self->server('request_method'));
 
-		var_export($self);
+		self::x_debug($_SERVER, 'SERVER');
+		self::x_debug($self, 'App');
+		self::x_echo('Done!');
 
-		echo $boot;
 
-		var_export($_SERVER);
-		echo 'Done!';
-		
-		
 		if(!$self->response->sent) {
 			$trashbin = $self('trashbin');
 			// clear output
@@ -182,6 +179,19 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 	 */
 	public static function getTimerTotal() {
 		return microtime(true) - reset(self::$_timer_stack);
+	}
+
+	public static function x_debug($var, $prefix=null) {
+		ob_start();
+		if($prefix) {
+			echo "{$prefix}:\n";
+		}
+		var_export($var);
+	}
+
+	public static function x_echo() {
+		ob_start();
+		echo sprintf(...func_get_args());
 	}
 
 }

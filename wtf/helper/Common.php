@@ -74,7 +74,7 @@ abstract class Common {
 	}
 
 	/**
-	 * Eval string as PHP
+	 * Eval string as PHP and return result
 	 * 
 	 * @param string $string
 	 * @return mixed
@@ -82,9 +82,24 @@ abstract class Common {
 	public static function parsePhp($string) {
 		$content = null;
 		ob_start();
-		$content = eval(preg_replace(['~\\<\\?php~', '~\\?\\>~'], '', $string));
-		ob_end_clean();
-		return (false === $content) ? [] : $content;
+		$content = eval('?>' . $string);
+		$echo = ob_get_clean();
+		if((false===$content) && preg_match('~Parse error~', $echo)) {
+			throw new \ErrorException('Parse error');
+		}
+		return $content;
+	}
+
+	/**
+	 * Static wrapper for include code from memory
+	 * 
+	 * @param string $string
+	 * @param array $context
+	 * @param mixed $object
+	 * @return string
+	 */
+	public static function includePhp($string, $context = [], $object = null) {
+		return includePhp($string, $context, $object);
 	}
 
 	/**
@@ -93,7 +108,7 @@ abstract class Common {
 	 * @param string $path
 	 * @return string
 	 */
-	static function normalizePath($path) {
+	public static function normalizePath($path) {
 		$path = str_replace(['/', '\\'], '/', $path);
 		$parts = array_filter(explode('/', $path), 'strlen');
 		$absolutes = [];
@@ -116,7 +131,7 @@ abstract class Common {
 	 * @param string $root
 	 * @return string
 	 */
-	static function absolutePath($path, $root = null) {
+	public static function absolutePath($path, $root = null) {
 		$path = str_replace('\\', '/', $path);
 		$base = str_replace('\\', '/', realpath('/'));
 		if('/' === $path{0}) {
@@ -128,4 +143,27 @@ abstract class Common {
 		return self::normalizePath(str_replace('\\', '/', realpath($root)) . '/' . $path);
 	}
 
+}
+
+/**
+ * Include code from memory and return output
+ * 
+ * @param string $string
+ * @param array $context
+ * @param mixed $object
+ * @return string
+ */
+function includePhp($string, $context = [], $object = null) {
+	$closure = \Closure::bind(function($_, $__ = []) {
+			ob_start();
+			extract($__);
+			$result = eval('?>' . $_);
+			$echo = ob_get_clean();
+			if((false===$result) && preg_match('~Parse error~', $echo)) {
+				throw new \ErrorException('Parse error');
+			}
+			return $echo;
+		}, $object, $object);
+
+	return $closure($string, $context);
 }

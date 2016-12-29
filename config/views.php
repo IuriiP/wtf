@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 return [
-    'private/views/blade/%s.php' => 'blade',
-    'private/views/%s.blade.php' => 'blade',
-    'private/views/twig/%s.php' => 'twig',
-    'private/views/%s.twig.php' => 'twig',
-    'private/views/%s.php' => 'php',
+    'views/blade/%s.php' => 'blade',
+    'views/%s.blade.php' => 'blade',
+    'views/twig/%s.php' => 'twig',
+    'views/%s.twig.php' => 'twig',
+    'views/%s.php' => 'php',
 ];

@@ -35,7 +35,7 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 
 	private $_method = null;
 
-	private $_input = null;
+	private $_input = [];
 
 	public function __construct($route, $map = []) {
 		$this->_route = $route? : '/';
@@ -50,13 +50,23 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	 */
 	public function execute($method = 'get', $input = []) {
 		$this->_method = $method;
-		$this->_input = $input;
-		if($this->_map) {
-			foreach($this->_map as $rule) {
-				$ret = $this->_useRule($rule);
-				if(FALSE !== $ret) {
-					return $ret;
+		$this->_input = $_REQUEST;
+
+		if(!in_array($method, ['get', 'post'])) {
+			$exploded = explode('&', file_get_contents('php://input'));
+			foreach($exploded as $pair) {
+				$item = explode('=', $pair);
+				if(count($item) == 2) {
+					$this->_input[urldecode($item[0])] = urldecode($item[1]);
 				}
+			}
+		}
+		$this->_input = array_replace($this->_input, $input);
+
+		if($this->_map) {
+			$ret = Rule::find($this->_map, $this->_route, $this->_method, $this->_input);
+			if($ret) {
+				return $ret;
 			}
 			return Response::error(404, ['route' => $this->_route]);
 		}
@@ -64,74 +74,13 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	}
 
 	/**
-	 * Get value from $this->_input | $_POST | $_GET | $_COOKIE
+	 * Get value from $this->_input
 	 * 
 	 * @param string $name
 	 * @param mixed $def
 	 */
 	final public function input($name, $def = null) {
-		if(isset($this->_input[$name])) {
-			return $this->_input[$name];
-		}
-		if(isset($_POST[$name])) {
-			return $_POST[$name];
-		}
-		if(isset($_GET[$name])) {
-			return $_GET[$name];
-		}
-		if(isset($_COOKIE[$name])) {
-			return $_COOKIE[$name];
-		}
-		return $def;
-	}
-
-	/**
-	 * Get value from array
-	 * 
-	 * @param string $name
-	 * @param mixed $def
-	 */
-	final public static function extract($source, $name, $def) {
-		$src = $source;
-		$parts = explode('.', $name);
-		foreach($parts as $sub) {
-			if(isset($src[$sub])) {
-				$src = $src[$sub];
-			} else {
-				return $def;
-			}
-		}
-		return $src;
-	}
-
-	/**
-	 * Get value from $_GET
-	 * 
-	 * @param string $name
-	 * @param mixed $def
-	 */
-	final public static function get($name, $def = null) {
-		return self::extract($_GET, $name, $def);
-	}
-
-	/**
-	 * Get value from $_POST
-	 * 
-	 * @param string $name
-	 * @param mixed $def
-	 */
-	final public static function post($name, $def = null) {
-		return self::extract($_POST, $name, $def);
-	}
-
-	/**
-	 * Get value from $_COOKIE
-	 * 
-	 * @param string $name
-	 * @param mixed $def
-	 */
-	final public static function cookie($name, $def = null) {
-		return self::extract($_COOKIE, $name, $def);
+		return \Wtf\Helper\Complex::extract($this->_input, $name, $def);
 	}
 
 	/**
@@ -141,99 +90,14 @@ class Request implements \Wtf\Interfaces\Bootstrap {
 	 * @param mixed $def
 	 */
 	final public static function file($name, $def = null) {
-		return self::extract($_FILES, $name, $def);
+		return \Wtf\Helper\Complex::extract($_FILES, $name, $def);
 	}
 
 	/**
-	 * Check to the route matching 
-	 * and try execute the matched closure.
+	 * Implementation of \Wtf\Interfaces\Bootstrap::bootstrap()
 	 * 
-	 * @param string $method
-	 * @param array $input
+	 * @param App $app
 	 */
-	private function _useRule($rule) {
-		if($rule && ($pattern = $rule['pattern'])) {
-			$matches = [];
-			$method = $rule['method'];
-			if((!$method || (FALSE !== stripos($this->_method, $method))) && preg_match("#^{$pattern}$#", $this->_route, $matches)) {
-				$mapper = $rule['mapper'];
-				$closure = $rule['closure'];
-				if(is_string($closure)) {
-					return $this->_callback($closure, array_combine($mapper, $matches));
-				} elseif(is_object($closure)) {
-					return $this->_closure($closure, array_combine($mapper, $matches));
-				} elseif(is_array($closure)) {
-					return $this->_routes($closure, array_combine($mapper, $matches));
-				}
-			}
-		}
-		return FALSE;
-	}
-
-	/**
-	 * Process string
-	 * 
-	 * @param string $callback
-	 * @param array $mapped
-	 * @return \Wtf\Core\Response|FALSE
-	 */
-	private function _callback($callback, $mapped) {
-		$callable = explode('::', preg_replace_callback('/{(\w+)}/', function($match) use($mapped) {
-				return empty($mapped[$match[1]]) ? '' : $mapped[$match[1]];
-			}, $callback));
-		if(count($callable) < 2) {
-			$callable[1] = $this->_method;
-		}
-
-		if($contract = App::get($callable[0])) {
-			$callable[0] = $contract;
-		}
-		$callname = '';
-		if(is_callable($callable, false, $callname)) {
-			try {
-				return call_user_func($callable, $mapped, $this->_method, $this->_input);
-			} catch(Exception $exc) {
-				trigger_error($exc->getMessage() . ' At ' . __CLASS__ . "::execute: calling '{$callname}' on route '$this->_route'");
-			}
-		}
-		return FALSE;
-	}
-
-	/**
-	 * Process lambda-function
-	 * 
-	 * @param \Closure $closure
-	 * @param array $mapped
-	 * @return \Wtf\Core\Response|FALSE
-	 */
-	private function _closure($closure, $mapped) {
-		$callname = null;
-		if(is_callable($closure, false, $callname)) {
-			try {
-				return call_user_func($closure, $mapped, $this->_method, $this->_input);
-			} catch(Exception $exc) {
-				trigger_error($exc->getMessage() . ' At ' . __CLASS__ . "::execute: calling '{$callname}' on route '$this->_route'");
-			}
-		}
-		return FALSE;
-	}
-
-	/**
-	 * Process nested sub-routes.
-	 * Parsed variables from the parent route 
-	 * pass in the overrided $input array.
-	 * 
-	 * @param array $array
-	 * @param array $mapped
-	 * @return \Wtf\Core\Response|FALSE
-	 */
-	private function _routes($array, $mapped) {
-		$request = new Request($mapped['_'], $array);
-		unset($mapped['']);
-		unset($mapped['_']);
-		return $request->execute($this->_method, array_replace_recursive($this->_input, $mapped));
-	}
-
 	public static function bootstrap(\Wtf\Core\App $app) {
 		$app::contract('request', __CLASS__);
 	}

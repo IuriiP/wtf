@@ -59,7 +59,7 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 		if($cfg) {
 			$cfgRoot = Resource::produce($cfg);
 			if($cfgRoot->isContainer()) {
-				$this->set([]);
+				$this->set();
 				foreach($cfgRoot->get(true) as $file) {
 					$res = Resource::produce($cfgRoot, $file);
 					if($res->isContainer() || (false !== array_search($res->getType(), ['php', 'ini', 'env','json', 'xml']))) {
@@ -90,7 +90,8 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 	public function offsetGet($offset) {
 		$offset = strtolower($offset);
 		if($this->_resource) {
-			$this->set(self::_load($this->_resource));
+			$res = self::_load($this->_resource);
+			$this->set($res);
 			$this->_resource = null;
 		}
 		if(isset($this->_collection[$offset])) {

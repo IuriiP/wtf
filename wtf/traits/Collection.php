@@ -210,16 +210,22 @@ trait Collection {
 	/**
 	 * Set the initial collection tree.
 	 * 
-	 * @param \Traversable $array
+	 * @param array $array
 	 * @return \ArrayAccess
 	 */
-	public function set($array) {
-		$this->_collection = [];
-		if(is_array($array) || $array instanceof \Traversable) {
-			foreach($array as $key => $value) {
-				$this->offsetSet($key, $value);
-			}
-		}
+	public function set($array=[]) {
+		$this->_collection = (array)$array;
+		return $this->_collection;
+	}
+
+	/**
+	 * Set the initial collection tree.
+	 * 
+	 * @param array $array
+	 * @return \ArrayAccess
+	 */
+	public function mirror(&$array) {
+		$this->_collection = &$array;
 		return $this->_collection;
 	}
 

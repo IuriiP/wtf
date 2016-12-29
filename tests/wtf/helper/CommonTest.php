@@ -34,33 +34,38 @@ class CommonTest extends \PHPUnit_Framework_TestCase {
 	public function testParsePhp() {
 		$phpret = <<<EOT
 <?php
+	echo 'trash';
 	return 'some text';
-?>
 
 EOT;
 
 		$phpstr = <<<EOT
 <?php
+	echo 'trash';
 	'some text';
-?>
 
 EOT;
 
 		$phparr = <<<EOT
 <?php
+	echo 'trash';
 	return ['some text'];
-?>
 
 EOT;
 
 		$phperr = <<<EOT
 <?php
+	echo 'trash';
 	return ['some text';
 EOT;
 
+		$this->expectOutputString('');
 		$this->assertEquals('some text', Common::parsePhp($phpret));
 		$this->assertEmpty(Common::parsePhp($phpstr));
 		$this->assertEquals(['some text'], Common::parsePhp($phparr));
+
+		$this->expectException(\ErrorException::class);
+		$this->expectExceptionMessage('Parse error');
 		$this->assertEmpty(Common::parsePhp($phperr));
 	}
 
@@ -115,10 +120,49 @@ EOT;
 	public function testAbsolutePath() {
 
 		$this->assertEquals(str_replace('\\', '/', realpath('')) . '/foo', Common::absolutePath('foo'));
-		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'foo', Common::absolutePath('foo','/'));
-		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'foo', Common::absolutePath('/foo','/bar'));
-		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'bar', Common::absolutePath('foo/../bar','/'));
-		$this->assertEquals(str_replace('\\', '/', realpath('.')) . '/foo', Common::absolutePath(realpath('.').'/foo','/'));
+		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'foo', Common::absolutePath('foo', '/'));
+		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'foo', Common::absolutePath('/foo', '/bar'));
+		$this->assertEquals(str_replace('\\', '/', realpath('/')) . 'bar', Common::absolutePath('foo/../bar', '/'));
+		$this->assertEquals(str_replace('\\', '/', realpath('.')) . '/foo', Common::absolutePath(realpath('.') . '/foo', '/'));
+	}
+
+	/**
+	 * @covers Wtf\Helper\Common::includePhp
+	 */
+	public function testIncludePhp() {
+		$phpconst = <<<EOT
+some text here
+EOT;
+		$phpstr = <<<EOT
+<?php
+	echo 'some text';
+
+EOT;
+
+		$phparr = <<<'EOT'
+<?php
+	echo $a;
+	echo $b;
+EOT;
+
+		$phpobj = <<<'EOT'
+class=<?=get_class($this)?>
+EOT;
+
+		$phperr = <<<EOT
+<?php
+	return ['some text';
+EOT;
+
+		$this->expectOutputString('');
+		$this->assertEquals('some text here', Common::includePhp($phpconst));
+		$this->assertEquals('some text', Common::includePhp($phpstr));
+		$this->assertEquals('sometext', Common::includePhp($phparr, ['a' => 'some', 'b' => 'text']));
+		$this->assertEquals('class=stdClass', Common::includePhp($phpobj, ['a' => 'some', 'b' => 'text'], new \stdClass));
+
+		$this->expectException(\ErrorException::class);
+		$this->expectExceptionMessage('Parse error');
+		$this->assertEmpty(Common::includePhp($phperr, ['a' => 'some', 'b' => 'text'], new \stdClass));
 	}
 
 }

@@ -31,7 +31,7 @@ use Wtf\Core\Resource;
  *      'algorithm' => 'md5', // the legal algorithm for `hash`
  * ],
  * 'compilers' => [
- *      'blade' => ['\\Wtf\\Core\\Compilers','compile'], // for `*.blade` files
+ *      'blade' => ['\\Wtf\\Core\\Compilers\\Blade','compile'], // for `*.blade` files
  * ],
  * 
  * Using:
@@ -80,7 +80,7 @@ class Cache implements \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Singleton {
 						->getContent();
 			}
 		}
-		return $known
+		return $target
 				->put($source->getContent())
 				->getContent();
 	}
@@ -112,7 +112,6 @@ class Cache implements \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Singleton {
 	 * 
 	 * @param string|Resource $source
 	 * @param Callback $callback gets the original resource, returns the prepared content
-	 * @param array $args parameters for preparing
 	 * @return string
 	 */
 	public static function supply($source, $callback = null) {
