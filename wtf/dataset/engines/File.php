@@ -26,7 +26,7 @@ namespace Wtf\Dataset\Engines;
  */
 class File extends \Wtf\Dataset\Engine {
 
-	private $_format = 'json';
+	private $_format = null;
 
 	private $_resource = null;
 
@@ -36,18 +36,50 @@ class File extends \Wtf\Dataset\Engine {
 
 	private $_content = [];
 
+	private $_ready = false;
+
 	public function open() {
 		$config = $this->config();
 		$this->_resource = \Wtf\Core\Resource::produce(\Wtf\Helper\Complex::get($config, 'resource'));
 		$this->_format = \Wtf\Helper\Complex::get($config, 'format', $this->_resource->getType());
 		$this->_readonly = \Wtf\Helper\Complex::get($config, 'readonly');
+		$this->_content = $this->_load();
+		$this->_ready = true;
 	}
 
 	public function close() {
 		if($this->_changed) {
 			$this->_store();
 		}
-		$this->_content = null;
+		$this->_ready = false;
+		$this->_content = [];
+	}
+
+	/**
+	 * Internal loading.
+	 * 
+	 * @return array
+	 */
+	private function _load() {
+		$args = \Wtf\Helper\Common::parseArgs($this->_resource->getData());
+		$subset = \Wtf\Helper\Complex::get($args, 'subset');
+		$ret = [];
+		switch($this->_format) {
+			case 'php':
+				// eval PHP file
+				$ret = Common::parsePhp($this->_resource->getContent());
+				break;
+			case 'json':
+				// JSON object as array
+				$ret = json_decode($this->_resource->getContent(), true);
+				break;
+			case 'xml':
+				// XML as array
+				$ret = json_decode(json_encode(simplexml_load_string($this->_resource->getContent())), true);
+				$subset = $subset? : strtolower($this->_resource->getName());
+				break;
+		}
+		return $subset ? \Wtf\Helper\Complex::get($ret, $subset) : $ret;
 	}
 
 	/**
@@ -115,7 +147,7 @@ class File extends \Wtf\Dataset\Engine {
 	}
 
 	public function isReady() {
-		
+		return $this->_ready;
 	}
 
 	public static function getAttributes(\Wtf\Dataset\Data $data) {

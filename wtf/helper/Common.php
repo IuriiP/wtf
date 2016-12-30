@@ -84,7 +84,7 @@ abstract class Common {
 		ob_start();
 		$content = eval('?>' . $string);
 		$echo = ob_get_clean();
-		if((false===$content) && preg_match('~Parse error~', $echo)) {
+		if((false === $content) && preg_match('~Parse error~', $echo)) {
 			throw new \ErrorException('Parse error');
 		}
 		return $content;
@@ -143,6 +143,15 @@ abstract class Common {
 		return self::normalizePath(str_replace('\\', '/', realpath($root)) . '/' . $path);
 	}
 
+	public static function parseArgs($string) {
+		$ret = [];
+		foreach(explode('&', $string) as $chunk) {
+			list($key, $val) = explode("=", $chunk);
+			$ret[urldecode($key)] = urldecode($val);
+		}
+		return $ret;
+	}
+
 }
 
 /**
@@ -159,7 +168,7 @@ function includePhp($string, $context = [], $object = null) {
 			extract($__);
 			$result = eval('?>' . $_);
 			$echo = ob_get_clean();
-			if((false===$result) && preg_match('~Parse error~', $echo)) {
+			if((false === $result) && preg_match('~Parse error~', $echo)) {
 				throw new \ErrorException('Parse error');
 			}
 			return $echo;
