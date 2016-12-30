@@ -35,10 +35,9 @@ interface Crud {
 	/**
 	 * Read data by conditions
 	 * 
-	 * @param Iterator $data
 	 * @param array of Condition $conditions
 	 */
-	public function read($data, $conditions);
+	public function read($conditions);
 
 	/**
 	 * Update data by conditions

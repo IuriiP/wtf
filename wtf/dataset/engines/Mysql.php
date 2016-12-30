@@ -137,7 +137,7 @@ class Mysql extends \Wtf\Dataset\Engine implements \Wtf\Interfaces\Sql, \Wtf\Int
 				echo $exc->getTraceAsString();
 			}
 		}
-		return $this->_mysqli;
+		return (bool) $this->_mysqli;
 	}
 
 	public function close() {

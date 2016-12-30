@@ -38,4 +38,9 @@ return [
 		'user' => 'user',
 		'password' => 'password',
 	],
+	'users' => [
+		'engine' => 'file',
+		'format' => 'json',
+		'resource' => 'storage/users.json',
+	],
 ];

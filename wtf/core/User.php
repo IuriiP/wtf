@@ -22,28 +22,27 @@ namespace Wtf\Core;
 /**
  * User is a basic class for the personality access.
  * 
- * Config for users may be:
- * string - the name of the descentant class for an accessing to users data
- * array|object - the container for the list of users
+ * Config for users must have:
+ * 
+ * 'resource' => resource link for users data
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class User implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Collection, \Wtf\Interfaces\Configurable {
+class User implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Collection {
 
 	use \Wtf\Traits\Pool,
-		\Wtf\Traits\Collection,
-		\Wtf\Traits\Configurable;
+	 \Wtf\Traits\Collection;
 
 	public $id = null;
 
-	public function __construct($id=null) {
+	public function __construct($id = null) {
 		$resource = $this->config('resource');
 		if($resource) {
-			$source = Resource::produce($resource,['id'=>$id]);
+			$source = Resource::produce($resource, ['id' => $id]);
 			$this->set($source->get());
 		}
 	}
-		
+
 	private function _check($cred, \Traversable $list) {
 		foreach($list as $id => $data) {
 			$expect = \Wtf\Helper\Complex::eliminate($data, 'credentials');
