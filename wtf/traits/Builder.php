@@ -20,7 +20,7 @@
 namespace Wtf\Traits;
 
 /**
- * Basic Builder pattern.
+ * Implementation of Wtf\Interfaces\Builder.
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
@@ -30,51 +30,69 @@ trait Builder {
 
 	private $_bricks = [];
 
+	/**
+	 * Chainable setter.
+	 * 
+	 * @param string $name
+	 * @param array $arguments
+	 * @return Wtf\Interface\Builder
+	 */
 	public function __call($name, $arguments) {
-		switch(count($arguments)) {
-			case 0:
-				unset($this->_bricks[$name]);
-				break;
-			case 1:
-				$this->_bricks[$name][] = $arguments[0];
-				break;
-			default:
-				if(!isset($this->_bricks[$name])) {
-					$this->_bricks[$name] = [];
-				}
-				$this->_bricks[$name] = array_merge($this->_bricks[$name], $arguments);
+		if(!isset($this->_bricks[$name])) {
+			$this->_bricks[$name] = [];
 		}
+		$this->_bricks[$name] = array_merge($this->_bricks[$name], $arguments);
+
 		return $this;
 	}
 
 	/**
-	 * Get the brick value by the name.
+	 * Get the brick set by the name.
 	 * 
 	 * @param string $name
-	 * @return mixed
+	 * @return array
 	 */
 	public function __get($name) {
-		return isset($this->_bricks[$name]) ? $this->_bricks[$name] : null;
+		return isset($this->_bricks[$name]) ? $this->_bricks[$name] : [];
 	}
 
+	/**
+	 * Add value to the brick set.
+	 * 
+	 * @param string $name
+	 * @param mixed $value
+	 */
 	public function __set($name, $value) {
 		$this->_bricks[$name][] = $value;
 	}
 
+	/**
+	 * Check if the brick exists.
+	 * 
+	 * @param type $name
+	 * @return type
+	 */
 	public function __isset($name) {
 		return isset($this->_bricks[$name]);
 	}
 
+	/**
+	 * Remove the brick.
+	 * 
+	 * @param type $name
+	 */
 	public function __unset($name) {
 		unset($this->_bricks[$name]);
 	}
 
+	/**
+	 * Filtered getting bricks by names.
+	 * 
+	 * @param type $param
+	 * @return type
+	 */
 	public function __invoke($param = null) {
 		return $param ? array_intersect_key($this->_bricks, array_flip((array) $param)) : $this->_bricks;
-	}
-
-	public function getIterator() {
-		return new \ArrayIterator($this->_bricks);
 	}
 
 }

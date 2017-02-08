@@ -9,7 +9,7 @@
 namespace Wtf\Traits;
 
 /**
- * Pool of named descendants/
+ * Implementation of Pool
  *
  * @author IuriiP
  */
@@ -28,10 +28,9 @@ trait Pool {
 		if(!isset(self::$_pool[$name])) {
 			$class = new \ReflectionClass(static::class);
 			if($class->implementsInterface(\Wtf\Interfaces\Factory::class)) {
-				return self::$_pool[$name] = static::factory($class->getShortName(), $name);
-			} else {
-				return self::$_pool[$name] = new static($name);
+				return self::$_pool[$name] = static::factory($class->getName(), [$name]);
 			}
+			return self::$_pool[$name] = new static($name);
 		}
 		return self::$_pool[$name];
 	}

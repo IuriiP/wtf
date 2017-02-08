@@ -23,11 +23,11 @@ namespace Wtf\Core;
  * Virtual Universal Resource Factory
  * 
  * Use URI notation:
- * [`protocol`://][`access`@][`path`][?`data`]
+ * [`scheme`:`scheme`:`scheme`://][`access`@][`path`][?`data`]
  * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory, \Wtf\Interfaces\Factory {
+abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory, \Wtf\Interfaces\Factory, \Wtf\Interfaces\Resource {
 
 	use \Wtf\Traits\AdaptiveFactory,
 	 \Wtf\Traits\Factory;
@@ -47,54 +47,22 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 	protected $_data = null;
 
 	/**
-	 * Clone Resource descendant
-	 * from Resource
-	 * 
-	 * @param Resource $obj
-	 */
-	final protected function guess_object(Resource $obj) {
-		return $this->guess_object_string_array($obj, '', []);
-	}
-
-	/**
-	 * Create Resource descendant
-	 * from the child of Resource
-	 * 
-	 * @param Resource $obj
-	 * @param string $string
-	 */
-	final protected function guess_object_string(Resource $obj, $string) {
-		return $this->guess_object_string_array($obj, $string, []);
-	}
-
-	/**
 	 * Create Resource descendant
 	 * from the child of Resource 
 	 * with adding options
 	 * 
-	 * @param Resource $obj
-	 * @param array $opts
-	 */
-	final protected function guess_object_array(Resource $obj, array $opts) {
-		return $this->guess_object_string_array($obj, '', $opts);
-	}
-
-	/**
-	 * Create Resource descendant
-	 * from the child of Resource 
-	 * with adding options
-	 * 
-	 * @param Resource $obj
+	 * @param \Wtf\Interfaces\Resource $obj
 	 * @param string $string
 	 * @param array $opts
+	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_object_string_array(Resource $obj, $string, array $opts) {
+	final protected function guess_object_string_array(Resource $obj, $string = '', array $opts = []) {
 		$parts = [];
 		if(preg_match('~^([^?]*)(\?(.*))?$~', $string, $parts)) {
 			$branch = $parts[1];
 			$data = (count($parts) > 2) ? $parts[3] : '';
 			if(!strlen($branch)) {
-				return static::factory($obj, [$obj->getPath(), $obj->getOptions(), $data])->options($opts);
+				return static::factory($obj, [$obj->getPath(), $data, $obj->getOptions()])->options($opts);
 			} elseif($child = $obj->child($branch)) {
 				return $child->data($data)->options($opts);
 			}
@@ -103,17 +71,50 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 	}
 
 	/**
-	 * Create Resource descendant 
-	 * from init URL string
 	 * 
+	 * @param \Wtf\Interface\Resource $obj
+	 * @param array $opts
 	 * @param string $string
+	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_string($string) {
-		$parsed = self::_parseURL($string);
-		if($parsed) {
-			return static::factory($parsed['scheme'], [$parsed['path'], $parsed['options'], $parsed['data']]);
-		}
-		return null;
+	final protected function guess_object_array_string(Resource $obj, array $opts = [], $string = '') {
+		return $this->guess_object_string_array($obj, $string, $opts);
+	}
+
+	/**
+	 * Clone Resource descendant
+	 * from Resource
+	 * 
+	 * @param \Wtf\Interface\Resource $obj
+	 * @return \Wtf\Interface\Resource | null
+	 */
+	final protected function guess_object(Resource $obj) {
+		return $this->guess_object_string_array($obj);
+	}
+
+	/**
+	 * Create Resource descendant
+	 * from the child of Resource
+	 * 
+	 * @param \Wtf\Interface\Resource $obj
+	 * @param string $string
+	 * @return \Wtf\Interface\Resource | null
+	 */
+	final protected function guess_object_string(Resource $obj, $string) {
+		return $this->guess_object_string_array($obj, $string);
+	}
+
+	/**
+	 * Create Resource descendant
+	 * from the child of Resource 
+	 * with adding options
+	 * 
+	 * @param \Wtf\Interface\Resource $obj
+	 * @param array $opts
+	 * @return \Wtf\Interface\Resource | null
+	 */
+	final protected function guess_object_array(Resource $obj, array $opts) {
+		return $this->guess_object_string_array($obj, '', $opts);
 	}
 
 	/**
@@ -121,24 +122,46 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 	 * from init URL string
 	 * with options array
 	 * 
-	 * @param array $args
+	 * @param string $string
+	 * @param array $opts
+	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_string_array($string, array $opts) {
-		if($obj = $this->guess_string($string)) {
-			return $obj->options($opts);
+	final protected function guess_string_array($string, array $opts = []) {
+		$parsed = self::_parseURL($string);
+		if($parsed) {
+			$schemes = $parsed['scheme'];
+			$path = $parsed['path'];
+			$options = array_merge($opts, $parsed['options']);
+			$data = $parsed['data'];
+			$obj = static::factory(['', array_pop($schemes)], [$path, $data, $options]);
+			while($schemes) {
+				$obj = static::factory(['', array_pop($schemes)], [$obj, $data, $options]);
+			}
+			return $obj;
 		}
 		return null;
 	}
 
 	/**
-	 * Create the object from URL
+	 * Create Resource descendant 
+	 * from init URL string
+	 * 
+	 * @param string $string
+	 * @return \Wtf\Interface\Resource | null
+	 */
+	final protected function guess_string($string) {
+		return $this->guess_string_array($string, []);
+	}
+
+	/**
+	 * Parse URL to components.
 	 * 
 	 * @param string $url
 	 * @return array
 	 */
 	final static private function _parseURL($url) {
 		$parts = [];
-		if(preg_match('~^(([\\w]+)://)?((.+)@)?([/\\\\]?([^?]*))(\\?(.*))?$~i', $url, $parts)) {
+		if(preg_match('~^(([\\w]+:)*//)?((.+)@)?([/\\\\]?([^?]*))(\\?(.*))?$~i', $url, $parts)) {
 			/* @var array */
 			$opt = [];
 			$access = explode(':', $parts[4], 2);
@@ -150,7 +173,7 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 			}
 
 			return [
-				'scheme' => ['', $parts[2] ? : 'file'],
+				'scheme' => $parts[2] ? array_filter(explode($parts[2], ':')) : ['file'],
 				'path' => $parts[6]? : '/',
 				'options' => $opt,
 				'data' => count($parts) > 7 ? $parts[8] : ''
@@ -158,7 +181,7 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 		}
 
 		return [
-			'scheme' => ['', 'none'],
+			'scheme' => ['none'],
 			'path' => '',
 			'options' => [],
 			'data' => ''
@@ -178,7 +201,7 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 	 * Alias for child
 	 * 
 	 * @param string $name
-	 * @return \Wtf\Core\Resource descendant
+	 * @return \Wtf\Interface\Resource
 	 */
 	final public function getChild($name) {
 		return $this->child($name);
@@ -187,7 +210,7 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 	/**
 	 * Alias for container
 	 * 
-	 * @return \Wtf\Core\Resource
+	 * @return \Wtf\Interface\Resource
 	 */
 	final public function getContainer() {
 		return $this->container();
@@ -256,18 +279,11 @@ class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFac
 	 * Chainable set data
 	 * 
 	 * @param type $data
-	 * @return \Wtf\Core\Resource
+	 * @return \Wtf\Interface\Resource
 	 */
 	final public function data($data = '') {
 		$this->_data = $data;
 		return $this;
-	}
-
-	/**
-	 * Pseudo constructor
-	 */
-	private function __construct() {
-		
 	}
 
 	public static function bootstrap(App $app) {

@@ -20,21 +20,61 @@
 namespace Wtf\Core;
 
 /**
- * Description of Server
+ * Server provides the readonly access to $_SERVER data.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
+class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \Wtf\Interfaces\Getter, \ArrayAccess {
 
-	use \Wtf\Traits\Singleton,
-	 \Wtf\Traits\Collection;
+	use \Wtf\Traits\Singleton;
 
+	private $_server = [];
+	
+	/**
+	 * Gets copy of current $_SERVER
+	 * and override 'request_method' with 
+	 * magic '_method' field from request.
+	 */
 	private function __construct() {
-		$this->set($_SERVER);
+		$this->_server = array_change_key_case($_SERVER);
 		// override 'request_method' from 'magic' request field
 		if(isset($_REQUEST['_method'])) {
-			$this['request_method'] = $_REQUEST['_method'];
+			$this->_server['request_method'] = $_REQUEST['_method'];
 		}
+	}
+
+	/**
+	 * 
+	 * @param type $name
+	 * @return type
+	 */
+	public function __get($name) {
+		return $this->offsetGet($name);
+	}
+
+	public function __isset($name) {
+		return $this->offsetExists($name);
+	}
+
+	public function offsetExists($offset) {
+		return isset($this->_server[strtolower($offset)]);
+	}
+
+	public function offsetGet($offset) {
+		$name = strtolower($offset);
+		return isset($this->_server[$name]) ? $this->_server[$name] : null;
+	}
+
+	public function offsetSet($offset, $value) {
+		// readonly
+	}
+
+	public function offsetUnset($offset) {
+		// readonly
+	}
+
+	public function __invoke($offset) {
+		return $this->offsetGet($offset);
 	}
 
 }

@@ -20,6 +20,7 @@
 namespace Wtf\Interfaces;
 
 /**
+ * Singleton pattern.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */

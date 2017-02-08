@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
+ * Copyright (C) 2017 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Wtf\Core;
+namespace Wtf\Traits;
 
 /**
- * Generic Collection implementation
+ * Implementation of Named
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Collection implements \Wtf\Interfaces\Collection {
+trait Named {
 
-	use \Wtf\Traits\Collection;
+	private $_name = null;
+
+	/**
+	 * Set/get self name.
+	 * 
+	 * @param string|null $string
+	 * @return string
+	 */
+	function name($string = null) {
+		if($string) {
+			$this->_name = (string) $string;
+		} elseif(!$this->_name) {
+			$this->_name = spl_object_hash($this);
+		}
+		return $this->_name;
+	}
+
 }

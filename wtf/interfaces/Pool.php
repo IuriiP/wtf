@@ -9,6 +9,7 @@
 namespace Wtf\Interfaces;
 
 /**
+ * Pool of named instances.
  *
  * @author IuriiP
  */

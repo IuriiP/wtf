@@ -38,7 +38,7 @@ class Auth implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Configurable {
 		$fp = $session['fingerprint'];
 		if($fp) {
 			if($server['remote_addr'] . $server['http_user_agent'] === $fp) {
-				$this->user = unserialize($session['user']);
+				$this->user = $session['user'];
 			} else {
 				$session['fingerprint'] = '';
 			}
@@ -52,14 +52,14 @@ class Auth implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Configurable {
 	public function user() {
 		return $this->user;
 	}
-	
+
 	public function login($cred) {
 		$session = Session::singleton();
 		$server = Server::singleton();
 
 		$this->user = new User($cred);
 
-		$session['user'] = serialize($this->user);
+		$session['user'] = $this->user;
 		$session['fingerprint'] = $server['remote_addr'] . $server['http_user_agent'];
 
 		return $this;
@@ -68,7 +68,7 @@ class Auth implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Configurable {
 	public function logout() {
 		$this->user = null;
 
-		$session['user'] = serialize($this->user);
+		$session['user'] = $this->user;
 		$session['fingerprint'] = '';
 
 		return $this;
@@ -79,4 +79,5 @@ class Auth implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Configurable {
 
 		return $this;
 	}
+
 }

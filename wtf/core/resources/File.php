@@ -20,7 +20,7 @@
 namespace Wtf\Core\Resources;
 
 /**
- * Description of File
+ * File is a basic wrapper to the filesystem.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
@@ -34,7 +34,7 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 	 * @param string $path path to file
 	 * @param array $options file options
 	 */
-	public function __construct($path, $options = []) {
+	public function __construct($path, $data=null, $options = []) {
 		// $data ignored!
 		$this->_origin = \Wtf\Helper\Common::absolutePath($path);
 		$this->_opt = $options;
@@ -59,12 +59,12 @@ class File extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 	}
 
 	/**
-	 * Get scheme = `file://`
+	 * Get scheme = `file`
 	 * 
 	 * @return string
 	 */
 	public function getScheme() {
-		return 'file://';
+		return 'file';
 	}
 
 	/**

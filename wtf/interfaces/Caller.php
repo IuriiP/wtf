@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
+ * Copyright (C) 2017 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,11 @@
 namespace Wtf\Interfaces;
 
 /**
- * Basic interface for the chainable builder.
+ * Magic calling.
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-interface Builder extends Creator, Caller, Getter, Setter, Invokable {
+interface Caller {
 
+	public function __call($name, $arguments);
 }

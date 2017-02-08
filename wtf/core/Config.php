@@ -30,10 +30,10 @@ use Wtf\Core\Resource,
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
+class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Tree {
 
 	use \Wtf\Traits\Singleton,
-	 \Wtf\Traits\Collection;
+	 \Wtf\Traits\Tree;
 
 	private $_resource = null;
 
@@ -44,7 +44,8 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 	 */
 	public function __construct($cfg = null) {
 		if(!$cfg) {
-			$cfg = Server::config();
+			// get path to config from .env
+			$cfg = Server::singleton()->config;
 		}
 		$this->load($cfg);
 	}
@@ -65,7 +66,7 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 					if($res->isContainer() || (false !== array_search($res->getType(), ['php', 'ini', 'env','json', 'xml']))) {
 						$name=$res->getName();
 						if($name) {
-							$this->offsetSet($res->getName(), new Config($res));
+							$this->offsetSet($name, new Config($res));
 						} else {
 							$local = self::_load($res);
 							foreach($local as $key=>$val) {
@@ -94,8 +95,8 @@ class Config implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
 			$this->set($res);
 			$this->_resource = null;
 		}
-		if(isset($this->_collection[$offset])) {
-			return $this->_collection[$offset];
+		if(isset($this[$offset])) {
+			return $this[$offset];
 		}
 		return null;
 	}

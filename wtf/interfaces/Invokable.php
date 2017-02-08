@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
+ * Copyright (C) 2017 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Wtf\Core;
+namespace Wtf\Interfaces;
 
 /**
- * Generic Tree implementation.
+ * Can be invoked.
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Tree implements \Wtf\Interfaces\Tree {
+interface Invokable {
 
-	use \Wtf\Traits\Tree;
+	public function __invoke();
 }

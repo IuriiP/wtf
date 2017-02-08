@@ -20,11 +20,11 @@
 namespace Wtf\Traits;
 
 /**
- * The adaptive Builder.
+ * Implementation of Wtf\Interfaces\AdaptiveFactory.
  * 
- * Descendants must defines the static methods `guess[_type0[_type1[_type2[...]]]]`
- * for building itself by the arguments types accordingly.
- * Types are defined by the function `gettype()`
+ * Base class must defines the static methods `guess[_type0[_type1[_type2[...]]]]`
+ * for make itself by the arguments types accordingly.
+ * Types are defined by the function `gettype()`.
  * 
  * EG:
  * guess_string

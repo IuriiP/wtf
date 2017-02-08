@@ -26,10 +26,9 @@ namespace Wtf\Dataset;
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Model implements \Wtf\Interfaces\Pool, \Wtf\Interfaces\Configurable {
+class Model implements \Wtf\Interfaces\Configurable {
 
-	use \Wtf\Traits\Pool,
-	 \Wtf\Traits\Configurable;
+	use \Wtf\Traits\Configurable;
 
 	public $id = null;
 

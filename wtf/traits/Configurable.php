@@ -9,7 +9,7 @@
 namespace Wtf\Traits;
 
 /**
- * Description of Configurable
+ * Implementation of Wtf\Interfaces\Configurable
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
@@ -24,11 +24,11 @@ trait Configurable {
 			}
 			$cfg = \Wtf\Core\Config::singleton();
 			$base = $cfg[$name];
-			static::$s_config = (is_string($base) || $base instanceof \Wtf\Core\Resource) ? new \Wtf\Core\Config($base) : $base;
+			static::$s_config = (is_string($base) || $base instanceof \Wtf\Interfaces\Resource) ? new \Wtf\Core\Config($base) : $base;
 			/**
 			 * If is first configured and method 'configured' exists
 			 */
-			if(method_exists(__CLASS__, 'configured')) {
+			if(method_exists(static::class, 'configured')) {
 				static::configured(static::$s_config);
 			}
 		}

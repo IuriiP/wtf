@@ -24,37 +24,18 @@ use Wtf\Helper\Common;
 /**
  * Main Application Class
  * 
- * @interface Collection
+ * @interface Tree
  * @interface Singleton
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
+class App implements \Wtf\Interfaces\Contractor, \Wtf\Interfaces\Singleton {
 
-	use \Wtf\Traits\Collection,
+	use \Wtf\Traits\Contractor,
 	 \Wtf\Traits\Singleton;
 
 // Use for profiling purposes
 	static private $_timer_stack = [];
-
-	/**
-	 * Register the contract for
-	 * the Class or
-	 * the created singletone object.
-	 * 
-	 * Return the callable for the instance bootstrap method.
-	 * 
-	 * @param type $name
-	 * @param type $instance
-	 * @return type
-	 */
-	public static function contract($name, $instance) {
-		$self = self::singleton();
-		if(!$self->offsetExists($name)) {
-			$self->offsetSet($name, $instance);
-		}
-		return $self[$name];
-	}
 
 	/**
 	 * Perform 'bootstrap' method if exists.
@@ -146,7 +127,7 @@ class App implements \Wtf\Interfaces\Collection, \Wtf\Interfaces\Singleton {
 
 
 		if(!$self->response->sent) {
-			$trashbin = $self('trashbin');
+			$trashbin = $self->trashbin;
 			// clear output
 			$self->_clear($trashbin);
 			// send Response

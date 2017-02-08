@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
+ * Copyright (C) 2017 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Wtf\Interfaces;
+namespace Wtf\Traits;
 
 /**
- * Basic interface for the chainable builder.
- *
+ * Implementation of \Wtf\Interfaces\Caller
+ * Indirect invoke of member.
+ * 
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-interface Builder extends Creator, Caller, Getter, Setter, Invokable {
+trait Caller {
+
+	public function __call($name, $arguments) {
+		if($this instanceof \ArrayAccess) {
+			$obj = $this[$name];
+		} elseif($this instanceof \Wtf\Interfaces\Getter) {
+			$obj = $this->$name;
+		} else {
+			throw new \ErrorException('Unknown method ' . __CLASS__ . "::{$name} called");
+		}
+		return $obj(...$arguments);
+	}
 
 }

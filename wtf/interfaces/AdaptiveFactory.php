@@ -20,10 +20,15 @@
 namespace Wtf\Interfaces;
 
 /**
- *
+ * Produce the object of some class
+ * dependent of the arguments list.
+ * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 interface AdaptiveFactory {
 
+	/**
+	 * @return Object
+	 */
 	public static function produce();
 }

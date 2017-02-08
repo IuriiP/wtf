@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
+ * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,181 +20,313 @@
 namespace Wtf\Traits;
 
 /**
- * Trait for Tree.
+ * Tree functionality for Wtf\Interfaces\Tree
+ * 
+ * Supports access:
+ * - Iterator
+ * - $tree[$key] : \ArrayAccess
+ * - $tree($key) : __invoke
+ * - $tree->$key : __get, __set
+ * - $tree->$key() : __call
  *
- * @author IuriiP <hardwork.mouse@gmail.com>
+ * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 trait Tree {
 
-	/**
-	 *
-	 * @var array
-	 */
-	protected $_leaves = [];
+	protected $_tree = [];
 
 	/**
-	 *
-	 * @var array
-	 */
-	protected $_branches = [];
-
-	/**
-	 * Check if tree is empty.
+	 * Parse the complex offset by '/'.
 	 * 
-	 * @param type $param
-	 * @return type
+	 * @param string $offset
+	 * @return array|null
 	 */
-	final public function isEmpty() {
-		return !$this->_leaves && !$this->_branches;
-	}
-
-	/**
-	 * Add the leaf to the path.
-	 * 
-	 * @param mixed $object
-	 * @param string|array $path
-	 */
-	final public function add($object, $path = '') {
-		$pathes = is_string($path) ? explode('/', $path) : (array) $path;
-		$seek = array_shift($pathes);
-
-		if($seek) {
-			if(is_object($object) ? !isset($this->_leaves[spl_object_hash($object)]) : in_array($object, $this->_leaves)) {
-				if(!isset($this->_branches[$seek])) {
-					$this->_branches[$seek] = new static;
-				}
-				$this->_branches[$seek]->add($object, $pathes);
-			}
-		} else {
-			$this->all(function($leaf) use ($object) {
-				return $leaf !== $object;
-			});
-			if(is_object($object)) {
-				$this->_leaves[spl_object_hash($object)] = $object;
-			} elseif(!in_array($object, $this->_leaves)) {
-				$this->_leaves[] = $object;
-			}
+	protected static function _parseComplex($offset) {
+		if(is_string($offset) && (FALSE !== strpos($offset, '/'))) {
+			return explode('/', $offset);
 		}
-
-		return $this;
+		return null;
 	}
 
 	/**
-	 * Remove the object/(s) from the path.
+	 * Check if the path exists.
 	 * 
-	 * @param string|array $path
-	 * @param mixed $object
+	 * @param \ArrayAccess $tree
+	 * @param array $param
+	 * @return bool
 	 */
-	final public function remove($path, $object = null) {
-		$pathes = is_string($path) ? explode('/', $path) : (array) $path;
-		$seek = array_shift($pathes);
-
-		if($seek) {
-			if($this->_branches && isset($this->_branches[$seek])) {
-				$this->_branches[$seek]->remove($pathes, $object);
-				if($this->_branches[$seek]->isEmpty()) {
-					unset($this->_branches[$seek]);
-				}
+	protected static function _complexCheck($tree, $param) {
+		$offset = strtolower(array_shift($param));
+		if(isset($tree[$offset])) {
+			if($param) {
+				return self::_complexCheck($tree[$offset], $param);
 			}
-		} elseif(!is_null($object)) {
-			$this->all(function($leaf) use($object) {
-				return $leaf !== $object;
-			});
-		} else {
-			// cut this branch (reset)
-			$this->_leaves = [];
-			$this->_branches = [];
+			return true;
 		}
-
-		return $this;
+		return false;
 	}
 
 	/**
-	 * Get all leaves on the path.
+	 * Get a value from the path.
 	 * 
-	 * @param string|array $path
+	 * @param \ArrayAccess $tree
+	 * @param array $param
+	 * @return mixed
+	 */
+	protected static function _complexGet($tree, $param) {
+		$offset = strtolower(array_shift($param));
+		if(isset($tree[$offset])) {
+			return $param ? self::_complexGet($tree[$offset], $param) : $tree[$offset];
+		}
+		return null;
+	}
+
+	/**
+	 * Set the value by the path.
+	 * 
+	 * @param \ArrayAccess $tree
+	 * @param array $param
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	protected static function _complexSet(&$tree, $param, $value) {
+		$offset = strtolower(array_shift($param));
+		if($param) {
+			if(!isset($tree[$offset])) {
+				$tree[$offset] = [];
+			}
+			return self::_complexSet($tree[$offset], $param, $value);
+		}
+		return $tree[$offset] = $value;
+	}
+
+	/**
+	 * Unset by the path.
+	 * 
+	 * @param \ArrayAccess $tree
+	 * @param array $param
+	 */
+	protected static function _complexUnset(&$tree, $param) {
+		$offset = strtolower(array_shift($param));
+		if($param) {
+			if(isset($tree[$offset])) {
+				self::_complexUnset($tree[$offset], $param);
+			}
+			return;
+		}
+		unset($tree[$offset]);
+	}
+
+	/**
+	 * Check if the offset exists.
+	 * 
+	 * @param string $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset) {
+		$complex = self::_parseComplex($offset);
+		if($complex) {
+			return self::_complexCheck($this->_tree, $complex);
+		}
+		return isset($this->_tree[strtolower($offset)]);
+	}
+
+	/**
+	 * Get a value by the offset.
+	 * 
+	 * @param string $offset
+	 * @return mixed
+	 */
+	public function offsetGet($offset) {
+		$complex = self::_parseComplex($offset);
+		if($complex) {
+			return self::_complexGet($this->_tree, $complex);
+		}
+		return self::_complexGet($this->_tree, [$offset]);
+	}
+
+	/**
+	 * Set the value by the offset.
+	 * 
+	 * @param string $offset
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function offsetSet($offset, $value) {
+		$complex = self::_parseComplex($offset);
+		if($complex) {
+			return self::_complexSet($this->_tree, $complex, $value);
+		}
+		return $this->_tree[strtolower($offset)] = $value;
+	}
+
+	/**
+	 * Unset by the offset.
+	 * 
+	 * @param string $offset
+	 */
+	public function offsetUnset($offset) {
+		$complex = self::_parseComplex($offset);
+		if($complex) {
+			self::_complexUnset($this->_tree, $complex);
+		} else {
+			unset($this->_tree[strtolower($offset)]);
+		}
+	}
+
+	/**
+	 * Get the tree iterator.
+	 * 
+	 * @return \ArrayIterator
+	 */
+	public function getIterator() {
+		return new \ArrayIterator($this->_tree);
+	}
+
+	/**
+	 * Get and unset by the offset. Returns default if not exists.
+	 * 
+	 * @param string $offset
+	 * @param mixed $def
+	 * @return mixed
+	 */
+	public function eliminate($offset, $def = null) {
+		$elem = $this->get($offset, $def);
+		$this->offsetUnset($offset);
+		return $elem;
+	}
+
+	/**
+	 * Get a value by the offset. Returns default if not exists.
+	 * 
+	 * @param string $offset
+	 * @param mixed $def
+	 * @return mixed
+	 */
+	public function get($offset, $def = null) {
+		return $this->offsetExists($offset) ? $this->offsetGet($offset) : $def;
+	}
+
+	/**
+	 * Set the initial tree.
+	 * 
+	 * @param array $array
+	 * @return \ArrayAccess
+	 */
+	public function set($array = []) {
+		$this->_tree = (array) $array;
+		return $this->_tree;
+	}
+
+	/**
+	 * Magic getter.
+	 * 
+	 * @param string $offset
+	 * @return mixed
+	 */
+	public function __get($offset) {
+		return $this->offsetExists($offset) ? $this->offsetGet($offset) : null;
+	}
+
+	/**
+	 * Magic setter.
+	 * 
+	 * @param string $offset
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function __set($offset, $value) {
+		return $this->offsetSet($offset, $value);
+	}
+
+	/**
+	 * Hook for expanding a complex parameter.
+	 * 
+	 * @param array $args
 	 * @return array
 	 */
-	final public function leaves($path) {
-		$pathes = is_string($path) ? explode('/', $path) : (array) $path;
-		$seek = array_shift($pathes);
-
-		if($seek) {
-			return isset($this->_branches[$seek]) ? $this->_branches[$seek]->leaves($pathes) : [];
+	static private function _expandArgs(array $args) {
+		$reargs = [];
+		foreach($args as $value) {
+			if(false !== strpos($value, '/')) {
+				$parts = explode('/', $value);
+				$reargs = array_merge($reargs, $parts);
+			} else {
+				$reargs[] = $value;
+			}
 		}
-
-		return $this->_leaves;
+		return $reargs;
 	}
 
 	/**
-	 * Get all branches on the path.
+	 * Magic invoking.
 	 * 
-	 * @param string|array $path
-	 * @return array
-	 */
-	final public function branches($path) {
-		$pathes = is_string($path) ? explode('/', $path) : (array) $path;
-		$seek = array_shift($pathes);
-
-		if($seek) {
-			return isset($this->_branches[$seek]) ? $this->_branches[$seek]->branches($pathes) : [];
-		}
-
-		return $this->_branches;
-	}
-
-	/**
-	 * Perform the callback on each leaf until on the path.
+	 * $tree = new Tree();
+	 * var_dump($tree('long/path',$part,'long/tail'));
 	 * 
-	 * @param Callable $callback function($leaf) returns FALSE for remove this leaf.
-	 * @param string|array $path
-	 * @return $this
+	 * @return mixed
 	 */
-	final public function each($callback, $path = '') {
-		$pathes = is_string($path) ? explode('/', $path) : (array) $path;
-		$seek = array_shift($pathes);
-
-		// process leaves
-		foreach($this->_leaves as $key => $leaf) {
-			if(!$callback($leaf)) {
-				unset($this->_leaves[$key]);
-			}
+	public function __invoke() {
+		$args = self::_expandArgs(func_get_args());
+		if(count($args)) {
+			$offset = array_shift($args);
+			return $this->__call($offset, $args);
 		}
-
-		// process branch
-		if($seek && isset($this->_branches[$seek])) {
-			$branch = $this->_branches[$seek]->each($callback, $pathes);
-			if($branch->isEmpty()) {
-				unset($this->_branches[$seek]);
-			}
-		}
-
 		return $this;
 	}
 
 	/**
-	 * Perform the callback on each leaf on the tree.
+	 * Magic calling.
 	 * 
-	 * @param Callable $callback function($leaf) returns FALSE for remove this leaf.
-	 * @return $this
+	 * $tree = new Tree();
+	 * var_dump($tree->long('path',$part,'long/tail'));
+	 * 
+	 * @param string $offset
+	 * @param array $args
+	 * @return mixed
 	 */
-	final public function all($callback) {
-		// process leaves
-		foreach($this->_leaves as $key => $leaf) {
-			if(!$callback($leaf)) {
-				unset($this->_leaves[$key]);
+	public function __call($offset, $args = []) {
+		if(($elem = $this->__get($offset)) && count($args)) {
+			$args = self::_expandArgs($args);
+			if(is_object($elem)) {
+				$obj = new \ReflectionObject($elem);
+				if($obj->hasMethod('__invoke')) {
+					$ref = $obj->getMethod('__invoke');
+					return $ref->invokeArgs($elem, $args);
+				}
+			} elseif(is_callable($elem)) {
+				return call_user_func_array($elem, $args);
+			} elseif(is_array($elem) || ($elem instanceof \ArrayAccess)) {
+				return self::_complexGet($elem, $args);
 			}
+			return null;
 		}
+		return $elem;
+	}
 
-		// process branches
-		foreach($this->_branches as $seek => $branch) {
-			$branch->all($callback);
-			if($branch->isEmpty()) {
-				unset($this->_branches[$seek]);
-			}
+	/**
+	 * Magic static for singletons.
+	 * 
+	 * @param string $offset
+	 * @param array $args
+	 * @return mixed
+	 * @throws Exception If the called class isn't singleton.
+	 */
+	public static function __callStatic($offset, $args = []) {
+		$class = static::class;
+
+		if(!is_subclass_of($class, 'Wtf\\Interfaces\\Singleton')) {
+			throw new \ErrorException("{$class}::Tree: static calling accepted by Singleton only.");
 		}
+		return call_user_func_array([static::singleton(), $offset], $args);
+	}
 
-		return $this;
+	public function __isset($name) {
+		return $this->offsetExists($offset);
+	}
+
+	public function __unset($name) {
+		$this->offsetUnset($offset);
 	}
 
 }

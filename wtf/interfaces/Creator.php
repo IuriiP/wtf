@@ -20,6 +20,7 @@
 namespace Wtf\Interfaces;
 
 /**
+ * Shortcut to creating an instance.
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */

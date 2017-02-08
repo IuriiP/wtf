@@ -20,7 +20,7 @@
 namespace Wtf\Traits;
 
 /**
- * ArrayAccess is implementation of \ArrayAccess & \IteratorAggregate.
+ * Implementation of \ArrayAccess & \IteratorAggregate.
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */

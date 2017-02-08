@@ -20,10 +20,15 @@
 namespace Wtf\Interfaces;
 
 /**
+ * Make some actions on the start.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 interface Bootstrap {
 
+	/**
+	 * @param \Wtf\Core\App $app
+	 * @return mixed Itself
+	 */
 	public static function bootstrap(\Wtf\Core\App $app);
 }

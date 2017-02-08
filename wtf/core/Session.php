@@ -20,25 +20,98 @@
 namespace Wtf\Core;
 
 /**
- * Description of Session
+ * Session expands access to $_SESSION.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Collection {
+class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \ArrayAccess {
 
-	use \Wtf\Traits\Collection,
-	 \Wtf\Traits\Singleton;
+	use \Wtf\Traits\Singleton;
 
+	/**
+	 * Session starts if inactive.
+	 */
 	private function __construct() {
 		if(\PHP_SESSION_ACTIVE !== session_status()) {
 			session_start();
 		}
-		
-		$this->mirror($_SESSION);
 	}
 
-//    public function __destruct() {
-//        session_commit();
-//    }
-//    
+	/**
+	 * Write & close session.
+	 */
+	public function __destruct() {
+		session_commit();
+	}
+
+	/**
+	 * Check if record exists.
+	 * 
+	 * @param string $offset
+	 * @return bool
+	 */
+	public function offsetExists($offset) {
+		return isset($_SESSION[strtolower($offset)]);
+	}
+
+	/**
+	 * Get current value.
+	 * Unset if it is temporary.
+	 * 
+	 * @param string $offset
+	 * @return mixed
+	 */
+	public function offsetGet($offset) {
+		$name = strtolower($offset);
+
+		if(isset($_SESSION[$name])) {
+			// decode session value
+			$record = $_SESSION[$name];
+			if(is_scalar($record)) {
+				return $record;
+			}
+
+			if(isset($record['once'])) {
+				unset($_SESSION[$name]);
+			}
+
+			return unserialize($record['value']);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Set permanent value.
+	 * 
+	 * @param string $offset
+	 * @param mixed $value
+	 */
+	public function offsetSet($offset, $value) {
+		$_SESSION[strtolower($offset)] = is_scalar($value) ? $value : ['value' => serialize($value)];
+	}
+
+	/**
+	 * Unset record.
+	 * 
+	 * @param string $offset
+	 */
+	public function offsetUnset($offset) {
+		unset($_SESSION[strtolower($offset)]);
+	}
+
+	/**
+	 * Set temporary value.
+	 * 
+	 * @param string $offset
+	 * @param mixed $value
+	 */
+	public function flush($offset, $value) {
+		$_SESSION[strtolower($offset)] = ['once' => true, 'value' => serialize($value)];
+	}
+
+	public function __invoke($offset) {
+		return $this->offsetGet($offset);
+	}
+
 }

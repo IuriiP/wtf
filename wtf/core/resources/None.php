@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
  *
@@ -15,132 +16,132 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Wtf\Core\Resources;
 
 /**
- * Description of File
+ * None is fake unstructured resource.
+ * It is equal to dev/null
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 
-    private $_origin = null;
+	public function __construct() {
+	}
 
-    /**
-     */
-    public function __construct() {
-        $this->_origin = '';
-    }
+	/**
+	 * Check if already exists.
+	 * 
+	 * @return bool
+	 */
+	public function exists() {
+		return false;
+	}
 
-    /**
-     * Check if already exists.
-     * 
-     * @return bool
-     */
-    public function exists() {
-        return false;
-    }
-    
-    /**
-     * @return FALSE
-     */
-    public function isContainer() {
-        return FALSE;
-    }
+	/**
+	 * @return FALSE
+	 */
+	public function isContainer() {
+		return FALSE;
+	}
 
-    /**
-     * @return null
-     */
-    public function getScheme() {
-        return null;
-    }
+	/**
+	 * @return null
+	 */
+	public function getScheme() {
+		return 'none';
+	}
 
-    /**
-     * @return null
-     */
-    public function child() {
-        return null;
-    }
+	/**
+	 * @return null
+	 */
+	public function child() {
+		return null;
+	}
 
-    /**
-     * @return null
-     */
-    public function container() {
-        return null;
-    }
+	/**
+	 * @return null
+	 */
+	public function container() {
+		return null;
+	}
 
-    /**
-     * @return int
-     */
-    public function getTime() {
-        return time();
-    }
+	/**
+	 * @return int
+	 */
+	public function getTime() {
+		return time();
+	}
 
-    /**
-     * @return string
-     */
-    public function getPath() {
-        return '';
-    }
+	/**
+	 * @return string
+	 */
+	public function getPath() {
+		return '';
+	}
 
-    /**
-     * @return string
-     */
-    public function getName() {
-        return '';
-    }
+	/**
+	 * @return string
+	 */
+	public function getName() {
+		return '';
+	}
 
-    /**
-     * @return string
-     */
-    public function getType() {
-            return '';
-    }
+	/**
+	 * @return string
+	 */
+	public function getType() {
+		return '';
+	}
 
-    /**
-     * @return string
-     */
-    public function getMime() {
-        return '';
-    }
+	/**
+	 * @return string
+	 */
+	public function getMime() {
+		return '';
+	}
 
-    public function getLength() {
-        
-    }
+	/**
+	 * @return int
+	 */
+	public function getLength() {
+		return 0;
+	}
 
-    /**
-     * @return []
-     */
-    public function get() {
-        return [];
-    }
+	/**
+	 * @return []
+	 */
+	public function get() {
+		return [];
+	}
 
-    /**
-     * @return null
-     */
-    public function getContent() {
-        return null;
-    }
+	/**
+	 * @return null
+	 */
+	public function getContent() {
+		return null;
+	}
 
-    /**
-     * @return null
-     */
-    public function append() {
-        return null;
-    }
+	/**
+	 * @return null
+	 */
+	public function append() {
+		return null;
+	}
 
-    /**
-     * @return null
-     */
-    public function put() {
-        return null;
-    }
+	/**
+	 * @return null
+	 */
+	public function put() {
+		return null;
+	}
 
-    /**
-     * @return null
-     */
-    public function remove() {
-        return null;
-    }
+	/**
+	 * @return null
+	 */
+	public function remove() {
+		return null;
+	}
 
 }

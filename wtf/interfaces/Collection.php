@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2016 Iurii Prudius <hardwork.mouse@gmail.com>
+ * Copyright (C) 2016 IuriiP <hardwork.mouse@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,11 @@
 namespace Wtf\Interfaces;
 
 /**
+ * Collection of objects.
  *
- * @author Iurii Prudius <hardwork.mouse@gmail.com>
+ * @author IuriiP <hardwork.mouse@gmail.com>
  */
-interface Collection extends \ArrayAccess, \IteratorAggregate {
+interface Collection extends \Iterator, \Countable {
 
-	public function __get($offset);
-
-	public function __set($offset, $value);
-
-	public function __invoke();
-
-	public function __call($offset, $args = []);
+	public function add($object, $name = null);
 }

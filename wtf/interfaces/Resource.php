@@ -20,6 +20,7 @@
 namespace Wtf\Interfaces;
 
 /**
+ * Universal resource.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */

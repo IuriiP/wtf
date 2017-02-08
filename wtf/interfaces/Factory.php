@@ -20,7 +20,9 @@
 namespace Wtf\Interfaces;
 
 /**
- *
+ * Factory for produce a object of the specified class
+ * in specified namespace
+ * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
 interface Factory {
@@ -28,4 +30,6 @@ interface Factory {
 	public static function factory($param);
 
 	public static function make();
+
+	public static function __callStatic($name, $params);
 }

@@ -24,7 +24,7 @@ namespace Wtf\Core;
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Trashbin implements \Wtf\Interfaces\Singleton {
+class Trashbin implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable {
 
 	//put your code here
 	use \Wtf\Traits\Singleton;

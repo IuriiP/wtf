@@ -20,7 +20,7 @@
 namespace Wtf\Traits;
 
 /**
- * Description of Creator
+ * Implementation of Wtf\Interfaces\Creator
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */

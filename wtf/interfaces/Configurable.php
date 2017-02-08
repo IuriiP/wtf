@@ -9,6 +9,7 @@
 namespace Wtf\Interfaces;
 
 /**
+ * It's for objects which have a config.
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */

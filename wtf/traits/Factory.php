@@ -22,8 +22,6 @@ namespace Wtf\Traits;
 use Wtf\Helper\Common;
 
 /**
- * Factory for produce a object of the specified class
- * in specified namespace
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
@@ -32,7 +30,7 @@ trait Factory {
 	/**
 	 * Object Factory
 	 * 
-	 * @param mixed $named string: full class name, array: [namespace,name], object: prototype
+	 * @param mixed $named string: full class name, array: [configspace,name], object: prototype
 	 * @param array $args args list
 	 * @return mixed|null
 	 */
@@ -40,11 +38,11 @@ trait Factory {
 		if(is_object($named)) {
 			$class = get_class($named);
 		} elseif(is_string($named)) {
-			$class = \Wtf\Core\App::singleton()->get($named)? : $named;
+			$class = \Wtf\Core\App::contract($named)? : $named;
 		} elseif(is_array($named)) {
 			$ns = '';
-			if($named[0] && ($context = \Wtf\Core\Config::singleton()->get(Common::snakeCase(Common::plural($named[0]))))) {
-				$ns = $context($named[1], 'class')? : '';
+			if($named[0] && ($context = \Wtf\Core\App::config(Common::snakeCase(Common::plural($named[0]))))) {
+				$ns = $context[$named[1].'/class']? : '';
 			}
 			$class = $ns? : Common::plural(get_called_class()) . '\\' . Common::camelCase($named[1]);
 		} else {
