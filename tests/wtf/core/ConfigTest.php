@@ -10,16 +10,22 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @var Config
 	 */
-	protected $object;
+	protected static $object;
 
-	private $fixture;
+	private static $fixture;
 
+	public static function setUpBeforeClass() {
+		self::$fixture = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config';
+		self::$object = Config::singleton(self::$fixture);
+		
+		var_export(self::$fixture);
+		var_export(self::$object);
+	}
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-		$this->fixture = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'config';
 	}
 
 	/**
@@ -34,137 +40,269 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	 * @covers Wtf\Core\Config::singleton
 	 */
 	public function testSingleton() {
-		$this->object = Config::singleton($this->fixture);
+		$this->assertSame(self::$object, Config::singleton());
 
-		$this->assertSame($this->object, Config::singleton());
+		return self::$object;
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::__construct
-	 */
-	public function test__construct() {
-		$this->object = new Config();
-
-		$this->assertNotSame($this->object, Config::singleton());
-		$this->assertEmpty((array) $this->object->getIterator());
-
-		return $this->object;
-	}
-
-	/**
-	 * @covers Wtf\Core\Config::load
-	 * @depends test__construct
-	 */
-	public function testLoad($object) {
-		$this->assertNull($object['php']);
-
-		$object->load($this->fixture);
-
-		$this->assertNull($object['nothing']);
-		$this->assertNull($object['css']);
-		$this->assertInstanceOf(Config::class, $object['ini']);
-		$this->assertInstanceOf(Config::class, $object['json']);
-		$this->assertInstanceOf(Config::class, $object['php']);
-		$this->assertInstanceOf(Config::class, $object['xml']);
-
-		return $object;
-	}
-
-	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
 	 * @covers Wtf\Core\Config::offsetGet
-	 * @depends testLoad
 	 */
-	public function testOffsetGet($object) {
-		$dir = $object['dir'];
-		var_export($dir);
-		$this->assertInstanceOf(Config::class, $dir);
-		$this->assertInternalType('string', $dir['some']);
-		$this->assertInstanceOf(Config::class, $dir['php']);
-
-		$php = $dir['php'];
-		$this->assertInstanceOf(Config::class, $php);
-
-		$this->assertAttributeEmpty('_collection', $php);
-		$string = $php['string'];
-		$this->assertAttributeNotEmpty('_collection', $php);
-
-		return $object;
+	public function testArrayNotExists($object) {
+		$this->assertFalse(isset($object['nothing']));
+		$this->assertNull($object['nothing']);
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::_load
-	 * @depends testOffsetGet
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
 	 */
-	public function test_php($object) {
+	public function testArrayInitial($object) {
+		$this->assertTrue(isset($object['ENV']));
+		$this->assertEquals('FIXTURE',$object['ENV']);
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 */
+	public function testArrayUnknown($object) {
+		$this->assertTrue(isset($object['css']));
+		$css = $object['css'];
+		$this->assertInstanceOf(Config::class, $css);
+		$this->assertFalse(isset($css['some']));
+		$this->assertNull($css['some']);
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetGet
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Parse error
+	 */
+	public function testArrayPhpBad($object) {
+		$this->assertTrue(isset($object['php_bad']));
+		$bad = $object['php_bad'];
+		$this->assertInstanceOf(Config::class, $bad);
+		$broken = $object['php_bad/data'];
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 */
+	public function testArrayPhp($object) {
+		$this->assertTrue(isset($object['php']));
 		$php = $object['php'];
-
-		$this->assertEquals('ONE', $php['string']);
-		$this->assertInstanceOf('stdClass', $php['object']);
-		$this->assertInternalType('array', $php['array']);
-		$this->assertEquals($_SERVER['SCRIPT_FILENAME'], $php['indirect']);
-		$this->assertNull($php['nothing']);
-
-		return $object;
+		$this->assertInstanceOf(Config::class, $php);
+		$this->assertFalse(isset($php['some']));
+		$this->assertTrue(isset($php['string']));
+		$this->assertEquals('ONE',$object['php']['string']);
+		$this->assertTrue(isset($object['php/string']));
+		$this->assertEquals('ONE',$object['php/string']);
+		$this->assertTrue($object['php/array/bool']);
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::_load
-	 * @depends testOffsetGet
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Parse error
 	 */
-	public function test_phpError($object) {
-		$php = $object['broken'];
-
-		$this->assertNull($php['nothing']);
-
-		return $object;
+	public function testArrayIniBad($object) {
+		$this->assertTrue(isset($object['ini_bad']));
+		$bad = $object['ini_bad'];
+		$this->assertInstanceOf(Config::class, $bad);
+		$broken = $object['ini_bad/data'];
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::_load
-	 * @depends testOffsetGet
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
 	 */
-	public function test_ini($object) {
+	public function testArrayIni($object) {
+		$this->assertTrue(isset($object['ini']));
 		$ini = $object['ini'];
-
-		$this->assertEquals('string', $ini['string']);
-		$this->assertEquals('string with spaces', $ini['spaced']);
-		$this->assertEquals(1, $ini['bool']);
-		$this->assertEquals(999, $ini['number']);
-		$this->assertEquals(['key' => 'value', 'otherkey' => 'othervalue'], $ini['section']);
-		$this->assertNull($ini['nothing']);
-
-		return $object;
+		$this->assertInstanceOf(Config::class, $ini);
+		$this->assertFalse(isset($ini['some']));
+		$this->assertTrue(isset($ini['string']));
+		$this->assertEquals('string',$object['ini']['string']);
+		$this->assertEquals('string',$object['ini/string']);
+		$this->assertEquals('value',$object['ini/section/key']);
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::_load
-	 * @depends testOffsetGet
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Parse error
 	 */
-	public function test_json($object) {
+	public function testArrayJsonBad($object) {
+		$this->assertTrue(isset($object['json_bad']));
+		$bad = $object['json_bad'];
+		$this->assertInstanceOf(Config::class, $bad);
+		$broken = $object['json_bad/data'];
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 */
+	public function testArrayJson($object) {
+		$this->assertTrue(isset($object['json']));
 		$json = $object['json'];
-
-		$this->assertEquals('json', $json['format']);
-		$this->assertEquals('IuriiP <hardwork.mouse@gmail.com>', $json['name']);
-		$this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8, 9, 0], $json['array']);
-		$this->assertNull($json['nothing']);
-
-		return $object;
+		$this->assertInstanceOf(Config::class, $json);
+		$this->assertFalse(isset($json['some']));
+		$this->assertTrue(isset($json['string']));
+		$this->assertEquals('string',$object['json']['string']);
+		$this->assertEquals('string',$object['json/string']);
+		$this->assertEquals('value',$object['json/section/key']);
+//
+//		$this->assertInstanceOf(Config::class, $object['xml']);
+//		$this->assertInstanceOf(Config::class, $object['dir']);
+//		$object['css'] = [];
 	}
 
 	/**
-	 * @covers Wtf\Core\Config::_load
-	 * @depends testOffsetGet
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Parse error
 	 */
-	public function test_xml($object) {
-		$xml = $object['xml'];
-		$xml['load'];
-
-		$this->assertEquals('some text', $xml['text']);
-		$this->assertEquals(['first' => "ONE", 'second' => "TWO"], $xml['complex']);
-		$this->assertEquals(["duplicated 0", "duplicated 1", "duplicated 2", "duplicated 3", "duplicated 4"], $xml['dup']);
-		$this->assertNull($xml['nothing']);
-
-		return $object;
+	public function testArrayXmlBad($object) {
+		$this->assertTrue(isset($object['xml_bad']));
+		$bad = $object['xml_bad'];
+		$this->assertInstanceOf(Config::class, $bad);
+		$broken = $bad['data'];
 	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 */
+	public function testArrayXml($object) {
+		$this->assertTrue(isset($object['xml']));
+		$xml = $object['xml'];
+		$this->assertInstanceOf(Config::class, $xml);
+		$this->assertFalse(isset($xml['notfound']));
+		$this->assertTrue(isset($xml['text']));
+		$this->assertInternalType('array',$object['xml/dup']);
+		$this->assertEquals('ONE',$object['xml/complex/first']);
+//
+//		$this->assertInstanceOf(Config::class, $object['dir']);
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetExists
+	 * @covers Wtf\Core\Config::offsetGet
+	 */
+	public function testArrayDir($object) {
+		$this->assertTrue(isset($object['dir']));
+		$dir = $object['dir'];
+		$this->assertInstanceOf(Config::class, $dir);
+
+		// overriding!
+		$this->assertInstanceOf(\stdClass::class, $dir['php/object']);
+		$this->assertInternalType('array', $dir['php/array']);
+		$this->assertEquals('Overrided string',$dir['php/string']);
+		$this->assertEquals(getenv('OS'),$dir['os']);
+		$this->assertEquals($_SERVER['SCRIPT_FILENAME'],$dir['php/indirect']);
+	}
+
+	
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::offsetUnset
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage readonly
+	 */
+	public function testUnset($object) {
+		unset($object['xml']);
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::__isset
+	 * @covers Wtf\Core\Config::__get
+	 * @covers Wtf\Core\Config::__unset
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage readonly
+	 */
+	public function testGetter($object) {
+		$this->assertFalse(isset($object->nothing));
+		$this->assertTrue(isset($object->env));
+		$this->assertTrue(isset($object->ini));
+		$this->assertInstanceOf(Config::class, $object->ini);
+		$this->assertInstanceOf(Config::class, $object->json);
+		$this->assertInstanceOf(Config::class, $object->php);
+		$this->assertInstanceOf(Config::class, $object->xml);
+		$this->assertInstanceOf(Config::class, $object->dir);
+		unset($object->css);
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::__set
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage readonly
+	 */
+	public function testSet($object) {
+		$object->css = [];
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::__call
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage not available
+	 */
+	public function testCaller($object) {
+		$this->assertEquals('FIXTURE',$object->env());
+		$object->foo();
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::__call
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Wrong arguments
+	 */
+	public function testCallerError($object) {
+		$object->env('foo');
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::__invoke
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage not available
+	 */
+	public function testInvoker($object) {
+		$this->assertEquals('FIXTURE',$object('env'));
+		$object('foo');
+	}
+
+	/**
+	 * @depends testSingleton
+	 * @covers Wtf\Core\Config::__invoke
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage not available
+	 */
+	public function testInvokerError($object) {
+		$object('env', 'foo');
+	}
+
 
 }

@@ -165,4 +165,17 @@ EOT;
 		$this->assertEmpty(Common::includePhp($phperr, ['a' => 'some', 'b' => 'text'], new \stdClass));
 	}
 
+	/**
+	 * @covers Wtf\Helper\Common::normalizePath
+	 */
+	public function testReturnBytes() {
+
+		$this->assertEquals(1024, Common::returnBytes('1K'));
+		$this->assertEquals(2 * 1024 * 1024, Common::returnBytes('2M'));
+		$this->assertEquals(5.5 * 1024 * 1024, Common::returnBytes('5.5M'));
+		$this->assertEquals(42, Common::returnBytes('42l'));
+		$this->assertEquals(0, Common::returnBytes('some42'));
+		$this->assertEquals(4.222 * 1024 * 1024 * 1024, Common::returnBytes('4.222G'));
+	}
+
 }

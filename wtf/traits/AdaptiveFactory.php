@@ -48,13 +48,13 @@ trait AdaptiveFactory {
 			$types[] = gettype($arg);
 		}
 
-		$self = new static();
-		$ref = new \ReflectionClass($self);
+		$ref = new \ReflectionClass(static::class);
 
 		while($types) {
 			$method = implode('_', $types);
 			if($ref->hasMethod($method)) {
-				return $self->$method(...$args);
+				$refMethod = $ref->getMethod($method);
+				return $refMethod->invokeArgs(null, $args);
 			}
 			array_pop($types);
 		}
@@ -67,7 +67,7 @@ trait AdaptiveFactory {
 	 * 
 	 * @return bool
 	 */
-	protected function guess() {
+	final static function guess() {
 		return new static();
 	}
 

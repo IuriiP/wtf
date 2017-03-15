@@ -31,8 +31,8 @@ class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \
 	/**
 	 * Session starts if inactive.
 	 */
-	private function __construct() {
-		if(\PHP_SESSION_ACTIVE !== session_status()) {
+	private function __construct($id = null) {
+		if((\PHP_SESSION_ACTIVE !== session_status()) && !headers_sent()) {
 			session_start();
 		}
 	}
@@ -41,7 +41,7 @@ class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \
 	 * Write & close session.
 	 */
 	public function __destruct() {
-		session_commit();
+//		session_commit();
 	}
 
 	/**
@@ -97,7 +97,8 @@ class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \
 	 * @param string $offset
 	 */
 	public function offsetUnset($offset) {
-		unset($_SESSION[strtolower($offset)]);
+		if(isset($_SESSION[strtolower($offset)]))
+			unset($_SESSION[strtolower($offset)]);
 	}
 
 	/**
@@ -110,8 +111,29 @@ class Session implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \
 		$_SESSION[strtolower($offset)] = ['once' => true, 'value' => serialize($value)];
 	}
 
-	public function __invoke($offset) {
-		return $this->offsetGet($offset);
+	/**
+	 * Getting:
+	 * w/o arguments - $this object,
+	 * one argument - the value,
+	 * more arguments - subset of $_SESSION.
+	 * 
+	 * @return \Wtf\Core\Session | mixed | array
+	 */
+	public function __invoke() {
+		switch(func_num_args()) {
+			case 0:
+				return $this;
+			case 1:
+				return $this->offsetGet(func_get_arg(0));
+		}
+
+		$ret = [];
+		foreach(func_get_args() as $name) {
+			if($this->offsetExists($name)) {
+				$ret[$name] = $this->offsetGet($name);
+			}
+		}
+		return $ret;
 	}
 
 }

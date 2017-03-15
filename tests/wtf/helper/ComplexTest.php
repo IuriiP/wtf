@@ -30,7 +30,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::except
-	 * @todo   Implement testExcept().
 	 */
 	public function testExcept() {
 		// test on wrong types
@@ -47,7 +46,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::only
-	 * @todo   Implement testOnly().
 	 */
 	public function testOnly() {
 		// test on wrong types
@@ -64,7 +62,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::obj2arr
-	 * @todo   Implement testObj2arr().
 	 */
 	public function testObj2arr() {
 		$obj = new \stdClass;
@@ -80,7 +77,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::arr2obj
-	 * @todo   Implement testArr2obj().
 	 */
 	public function testArr2obj() {
 		$obj = new \stdClass;
@@ -95,7 +91,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::arr2ini
-	 * @todo   Implement testArr2ini().
 	 */
 	public function testArr2ini() {
 		$arr = [];
@@ -134,7 +129,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::ini2arr
-	 * @todo   Implement testIni2arr().
 	 */
 	public function testIni2arr() {
 		$arr = [];
@@ -173,7 +167,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::get
-	 * @todo   Implement testGet().
 	 */
 	public function testGet() {
 		$arr = [];
@@ -193,7 +186,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::eliminate
-	 * @todo   Implement testEliminate().
 	 */
 	public function testEliminate() {
 		$arr = [];
@@ -215,7 +207,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Helper\Complex::arr2attr
-	 * @todo   Implement testArr2attr().
 	 */
 	public function testArr2attr() {
 		$arr = [];
@@ -223,51 +214,88 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 		$arr['bool'] = false;
 		$arr['empty'] = null;
 		$arr['string'] = 'some text';
-		
+
 		$expect = [
 			'number="2016"',
 			'bool="off"',
 			'empty',
 			'string="some text"',
 		];
-		
+
 		$this->assertEquals($expect, Complex::arr2attr($arr));
-		
+
 		$expect = [
 			'number="2016"',
 			'string="some text"',
 		];
-		
-		$this->assertEquals($expect, Complex::arr2attr($arr,['number','string']));
+
+		$this->assertEquals($expect, Complex::arr2attr($arr, ['number', 'string']));
 	}
 
 	/**
 	 * @covers Wtf\Helper\Complex::attr2arr
-	 * @todo   Implement testAttr2arr().
 	 */
 	public function testAttr2arr() {
 		$xml = <<<EOT
 <?xml version='1.0' standalone='yes'?>
 <root><node first="one" second="two" /></root>
 EOT;
-		
+
 		$doc = new \DOMDocument();
 		$doc->loadXML($xml);
-		
+
 		$expect = [
-			'first'=>'one',
-			'second'=>'two',
+			'first' => 'one',
+			'second' => 'two',
 		];
-		
+
 		$this->assertEquals([], Complex::attr2arr($doc->documentElement));
 		$this->assertEquals($expect, Complex::attr2arr($doc->documentElement->firstChild));
-		
+
 		$sxe = new \SimpleXMLElement($xml);
 		$this->assertEquals([], Complex::attr2arr($sxe));
 		$this->assertEquals($expect, Complex::attr2arr($sxe->node));
-		
+
 		$this->assertNull(Complex::attr2arr(null));
 		$this->assertNull(Complex::attr2arr(new \stdClass()));
+	}
+
+	public function testXmlEncode() {
+		$array = [
+			'node' => [
+				[
+					'first' => 'one',
+					'second' => 'two',
+				],
+				[
+					'third' => 'three',
+					'repeat' => [
+						1, 2, 3, 4,
+					],
+				],
+			],
+		];
+		$xml = <<<EOT
+<?xml version='1.0' standalone='yes'?>
+<root>
+<node>
+	<first>one</first>
+	<second>two</second>
+</node>
+<node>
+	<third>three</third>
+	<repeat>1</repeat>
+	<repeat>2</repeat>
+	<repeat>3</repeat>
+	<repeat>4</repeat>
+</node>
+</root>
+EOT;
+
+		$sxe = new \SimpleXMLElement($xml);
+		$encoded = Complex::xmlEncode($array);
+		echo $encoded->asXML();
+		$this->assertEqualXMLStructure(dom_import_simplexml($sxe), dom_import_simplexml($encoded));
 	}
 
 }

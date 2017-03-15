@@ -141,6 +141,34 @@ abstract class Complex {
 	}
 
 	/**
+	 * Convert array to XML
+	 * 
+	 * @param array $array
+	 * @param \SimpleXMLElement $node
+	 * @return type
+	 */
+	public static function xmlEncode($array, $parent = null, $upkey = 'node') {
+		if(!isset($parent)) {
+			$parent = new \SimpleXMLElement('<?xml version="1.0" standalone="yes"?><root></root>');
+		}
+		foreach($array as $key => $value) {
+			if(is_numeric($key)) {
+				if(is_array($value)) {
+					self::xmlEncode($value, $parent, $upkey);
+				} else {
+					$parent->addChild($upkey, $value);
+				}
+			} elseif(is_array($value)) {
+				self::xmlEncode($value, $parent, $key);
+			} else {
+				$subnode = $parent->addChild($upkey);
+				$subnode->addChild($key, $value);
+			}
+		}
+		return $parent;
+	}
+
+	/**
 	 * Get routed value from array
 	 * 
 	 * @param string $from

@@ -20,7 +20,7 @@ trait Configurable {
 	public static function configure($name = null) {
 		if(!static::$s_config) {
 			if(!$name) {
-				$name = \Wtf\Helper\Common::snakeCase((new \ReflectionClass(get_called_class()))->getShortName());
+				$name = \Wtf\Helper\Common::snakeCase((new \ReflectionClass(static::class))->getShortName());
 			}
 			$cfg = \Wtf\Core\Config::singleton();
 			$base = $cfg[$name];

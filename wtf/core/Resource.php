@@ -27,7 +27,7 @@ namespace Wtf\Core;
  * 
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\AdaptiveFactory, \Wtf\Interfaces\Factory, \Wtf\Interfaces\Resource {
+abstract class Resource implements \Wtf\Interfaces\AdaptiveFactory, \Wtf\Interfaces\Factory, \Wtf\Interfaces\Resource {
 
 	use \Wtf\Traits\AdaptiveFactory,
 	 \Wtf\Traits\Factory;
@@ -56,13 +56,13 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 * @param array $opts
 	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_object_string_array(Resource $obj, $string = '', array $opts = []) {
+	final static function guess_object_string_array(Resource $obj, $string = '', array $opts = []) {
 		$parts = [];
 		if(preg_match('~^([^?]*)(\?(.*))?$~', $string, $parts)) {
 			$branch = $parts[1];
 			$data = (count($parts) > 2) ? $parts[3] : '';
 			if(!strlen($branch)) {
-				return static::factory($obj, [$obj->getPath(), $data, $obj->getOptions()])->options($opts);
+				return self::factory($obj, [$obj->getPath(), $data, $obj->getOptions()])->options($opts);
 			} elseif($child = $obj->child($branch)) {
 				return $child->data($data)->options($opts);
 			}
@@ -77,8 +77,8 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 * @param string $string
 	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_object_array_string(Resource $obj, array $opts = [], $string = '') {
-		return $this->guess_object_string_array($obj, $string, $opts);
+	final static function guess_object_array_string(Resource $obj, array $opts = [], $string = '') {
+		return self::guess_object_string_array($obj, $string, $opts);
 	}
 
 	/**
@@ -88,8 +88,8 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 * @param \Wtf\Interface\Resource $obj
 	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_object(Resource $obj) {
-		return $this->guess_object_string_array($obj);
+	final static function guess_object(Resource $obj) {
+		return self::guess_object_string_array($obj);
 	}
 
 	/**
@@ -100,8 +100,8 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 * @param string $string
 	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_object_string(Resource $obj, $string) {
-		return $this->guess_object_string_array($obj, $string);
+	final static function guess_object_string(Resource $obj, $string) {
+		return self::guess_object_string_array($obj, $string);
 	}
 
 	/**
@@ -113,8 +113,8 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 * @param array $opts
 	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_object_array(Resource $obj, array $opts) {
-		return $this->guess_object_string_array($obj, '', $opts);
+	final static function guess_object_array(Resource $obj, array $opts) {
+		return self::guess_object_string_array($obj, '', $opts);
 	}
 
 	/**
@@ -126,16 +126,16 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 * @param array $opts
 	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_string_array($string, array $opts = []) {
+	final static function guess_string_array($string, array $opts = []) {
 		$parsed = self::_parseURL($string);
 		if($parsed) {
 			$schemes = $parsed['scheme'];
 			$path = $parsed['path'];
 			$options = array_merge($opts, $parsed['options']);
 			$data = $parsed['data'];
-			$obj = static::factory(['', array_pop($schemes)], [$path, $data, $options]);
+			$obj = self::factory(['', array_pop($schemes)], [$path, $data, $options]);
 			while($schemes) {
-				$obj = static::factory(['', array_pop($schemes)], [$obj, $data, $options]);
+				$obj = self::factory(['', array_pop($schemes)], [$obj, $data, $options]);
 			}
 			return $obj;
 		}
@@ -149,8 +149,8 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 * @param string $string
 	 * @return \Wtf\Interface\Resource | null
 	 */
-	final protected function guess_string($string) {
-		return $this->guess_string_array($string, []);
+	final static function guess_string($string) {
+		return self::guess_string_array($string, []);
 	}
 
 	/**
@@ -161,22 +161,41 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	 */
 	final static private function _parseURL($url) {
 		$parts = [];
-		if(preg_match('~^(([\\w]+:)*//)?((.+)@)?([/\\\\]?([^?]*))(\\?(.*))?$~i', $url, $parts)) {
-			/* @var array */
+		if(preg_match('~^'	// anchor
+			. '(?:'	 // non-capturing schemes group
+				. '(?<schemes>[a-z_:]+)' // 1 schemes list
+				. '://'	// anchor
+			. ')?' // optionally
+			. '(?:'	// non-capturing credentials group
+				. '(?<username>[^:]+)'	// 2 username
+				. '(?:'	// non-capturing password group
+					. '\:'	// anchor
+					. '(?<password>.+)'	// 3 password
+				. ')?'	// optionally
+			. '@'	//anchor
+			. ')?'	// optionally
+			. '(?<path>[^&>?<*;\'`"]+)' // 4 path
+			. '(?:'	// non-capturing data part
+			. '\?'	// anchor
+			.	 '(?<data>[^?]*)'	// 5 data
+			. ')?' // optionally
+			. '(?<error>.*)' // trash
+			. '$~i',
+			$url, $parts) && !$parts['error']) {
+
 			$opt = [];
-			$access = explode(':', $parts[4], 2);
-			if(!empty($access[0])) {
-				$opt['user'] = $access[0];
+			if(!empty($parts['username'])) {
+				$opt['username'] = $parts['username'];
 			}
-			if(!empty($access[1])) {
-				$opt['password'] = $access[1];
+			if(!empty($parts['password'])) {
+				$opt['password'] = $parts['password'];
 			}
 
 			return [
-				'scheme' => $parts[2] ? array_filter(explode($parts[2], ':')) : ['file'],
-				'path' => $parts[6]? : '/',
+				'scheme' => $parts['schemes'] ? array_filter(explode(':', $parts['schemes'])) : ['file'],
+				'path' => $parts['path'],
 				'options' => $opt,
-				'data' => count($parts) > 7 ? $parts[8] : ''
+				'data' => $parts['data'],
 			];
 		}
 
@@ -284,10 +303,6 @@ abstract class Resource implements \Wtf\Interfaces\Bootstrap, \Wtf\Interfaces\Ad
 	final public function data($data = '') {
 		$this->_data = $data;
 		return $this;
-	}
-
-	public static function bootstrap(App $app) {
-		$app::contract('resource', __CLASS__);
 	}
 
 }

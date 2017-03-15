@@ -24,7 +24,7 @@ use Wtf\Helper\Common;
 /**
  * Main Application Class
  * 
- * @interface Tree
+ * @interface Contractor
  * @interface Singleton
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
@@ -36,40 +36,6 @@ class App implements \Wtf\Interfaces\Contractor, \Wtf\Interfaces\Singleton {
 
 // Use for profiling purposes
 	static private $_timer_stack = [];
-
-	/**
-	 * Perform 'bootstrap' method if exists.
-	 * 
-	 * @param \ReflectionClass $ref
-	 * @return mixed
-	 */
-	static private function _performBoot(\ReflectionClass $ref) {
-		if($ref->implementsInterface('\\Wtf\\Interfaces\\Bootstrap')) {
-			return $ref->getMethod('bootstrap')->invoke(null, self::singleton());
-		}
-		return null;
-	}
-
-	/**
-	 * Conditional bootstrapping
-	 * 
-	 * @param array $bootstrap
-	 */
-	static private function _makeBooting($bootstrap) {
-		foreach($bootstrap as $key => $value) {
-			if(is_numeric($key)) {
-				// just perform 'bootstrap' method
-				self::_performBoot(new \ReflectionClass($value));
-			} elseif(is_object($value)) {
-				// register bootstraped|object as contract
-				self::contract($key, self::_performBoot(new \ReflectionClass($value))? : $value);
-			} elseif(is_string($value)) {
-				// register bootstraped|instance as contract
-				$ref = new \ReflectionClass($value);
-				self::contract($key, self::_performBoot($ref)? : $ref->newInstance());
-			}
-		}
-	}
 
 	/**
 	 * Clear output buffers into trashbin and turn off buffering
@@ -104,29 +70,46 @@ class App implements \Wtf\Interfaces\Contractor, \Wtf\Interfaces\Singleton {
 		$self = self::singleton();
 
 		/**
-		 * Bootstraping
+		 * Contracts
 		 */
-		$boot = getenv('BOOTSTRAP');
-		if($boot) {
-			self::_makeBooting(Common::parsePhp(Resource::produce($boot)->getContent()));
+		if(defined('BOOTSTRAP')) {
+			self::$_contracts = Common::parsePhp(Resource::produce(BOOTSTRAP)->getContent());
 		}
 
-		/**
-		 * @var \Wtf\Core\Request make default request from $_SERVER
-		 */
-		$self->request = new Request($self->server('request_uri'));
+		// get path only from uri
+		$uri = $self->server('request_uri');
+		list($path, $q) = explode('?', $uri . '?', 2);
 
-		/**
-		 * @var \Wtf\Core\Response execute request (recursive) and get response
-		 */
-		$self->response = $self->request->execute($self->server('request_method'));
+		// incapsulate request 
+		$request = new Request();
+		$request
+			->format(pathinfo($path, PATHINFO_EXTENSION))
+			->method($self->server('request_method'))
+			->input(new Input($request->method))
+			->accept($self->server('http_accept'))
+			->language($self->server('http_accept_language'))
+			->charset($self->server('http_accept_charset'))
+			->encoding($self->server('http_accept_encoding'));
+		$response = null;
 
-		self::x_debug($_SERVER, 'SERVER');
-		self::x_debug($self, 'App');
-		self::x_echo('Done!');
+		try {
+			// find rule
+			$rule = Rule::find($self->config('routes'), $path, $request->method);
+			if($rule) {
+				$response = $rule->execute($request);
+			} else {
+				$response = Response::error(404, ['path' => $path, 'method' => $request->method]);
+			}
+		} catch(Exception $e) {
+			$response = Response::error(405, ['path' => $path, 'method' => $request->method]);
+		}
 
 
-		if(!$self->response->sent) {
+//		self::x_debug($_SERVER, 'SERVER');
+//		self::x_debug($self, 'App');
+//		self::x_echo('Done!');
+
+		if(!$response->sent) {
 			$trashbin = $self->trashbin;
 			// clear output
 			$self->_clear($trashbin);
@@ -162,7 +145,7 @@ class App implements \Wtf\Interfaces\Contractor, \Wtf\Interfaces\Singleton {
 		return microtime(true) - reset(self::$_timer_stack);
 	}
 
-	public static function x_debug($var, $prefix=null) {
+	public static function x_debug($var, $prefix = null) {
 		ob_start();
 		if($prefix) {
 			echo "{$prefix}:\n";

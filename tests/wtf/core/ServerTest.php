@@ -17,7 +17,6 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
-		$this->object = Server::singleton();
 	}
 
 	/**
@@ -29,9 +28,66 @@ class ServerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers Wtf\Core\Server::get
+	 * @covers Wtf\Core\Server::singleton
 	 */
-	public function testContainer() {
-		$this->assertEquals($_SERVER['SCRIPT_FILENAME'],$this->object->get('Script_FileName'));
+	public function testSingleton() {
+		$this->assertInstanceOf(Server::class, Server::singleton());
 	}
+
+	/**
+	 * @covers Wtf\Core\Server::__call
+	 */
+	public function testCaller() {
+		$object = Server::singleton();
+		$this->assertEquals($_SERVER['SCRIPT_FILENAME'], $object->Script_FileName());
+	}
+
+	/**
+	 * @covers Wtf\Core\Server::__invoke
+	 */
+	public function testInvocable() {
+		$object = Server::singleton();
+		$this->assertEquals($_SERVER['SCRIPT_FILENAME'], $object('Script_FileName'));
+	}
+
+	/**
+	 * @covers Wtf\Core\Server::offsetExists
+	 * @covers Wtf\Core\Server::offsetGet
+	 * @covers Wtf\Core\Server::offsetSet
+	 * @expectedException Wtf\Exceptions\ReadOnlyException
+	 * @expectedExceptionMessage Object 'Wtf\Core\Server' is readonly
+	 */
+	public function testArray() {
+		$object = Server::singleton();
+		$this->assertFalse(isset($object['Foo_Bar_Baz']));
+		$this->assertTrue(isset($object['Script_FileName']));
+		$this->assertEquals($_SERVER['SCRIPT_FILENAME'], $object['Script_FileName']);
+		$object['root'] = '/system/root';
+	}
+
+	/**
+	 * @covers Wtf\Core\Server::offsetUnset
+	 * @expectedException Wtf\Exceptions\ReadOnlyException
+	 * @expectedExceptionMessage Object 'Wtf\Core\Server' is readonly
+	 */
+	public function testArrayUnset() {
+		$object = Server::singleton();
+		unset($object['root']);
+	}
+
+	/**
+	 * @covers Wtf\Core\Server::__get
+	 * @covers Wtf\Core\Server::__isset
+	 * @covers Wtf\Core\Server::__unset
+	 * @expectedException Wtf\Exceptions\ReadOnlyException
+	 * @expectedExceptionMessage Object 'Wtf\Core\Server' is readonly
+	 */
+	public function testGetter() {
+		$object = Server::singleton();
+		$this->assertFalse(isset($object->Foo_Bar_Baz));
+		$this->assertTrue(isset($object->Script_FileName));
+		$this->assertEquals($_SERVER['SCRIPT_FILENAME'], $object->Script_FileName);
+		unset($object->Script_FileName);
+	}
+
 }

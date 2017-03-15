@@ -1,5 +1,9 @@
 {
     "name": "IuriiP <hardwork.mouse@gmail.com>",
     "format": "json",
-    "array": [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+    "array": [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+    "string": "string",
+    "section": {
+        "key": "value"
+    }
 }

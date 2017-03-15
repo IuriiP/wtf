@@ -27,27 +27,35 @@ namespace Wtf\Traits;
 trait Invokable {
 
 	public function __invoke() {
-		$args = func_get_args();
+		$arguments = func_get_args();
 
-		if($args) {
-			$target = array_shift($args);
-
-			if($this instanceof \Wtf\Interfaces\Caller) {
-				return $this->$target(...$args);
-			} elseif($this instanceof \ArrayAccess) {
-				$obj = $this[$target];
-			} elseif($this instanceof \Wtf\Interfaces\Getter) {
-				$obj = $this->$target;
+		$obj = $this;
+		while($arguments) {
+			$target = array_shift($arguments);
+			if(is_array($obj)) {
+				if(isset($obj[$target])) {
+					$obj = $obj[$target];
+					continue;
+				}
+			} elseif(is_object($obj)) {
+				if(isset($obj->$target)) {
+					$obj = $obj->$target;
+					continue;
+				} elseif($obj instanceof \ArrayAccess && isset($obj[$target])) {
+					$obj = $obj[$target];
+					continue;
+				} elseif(is_callable([$obj,$target])) {
+					return call_user_func_array([$obj,$target],$arguments);
+				} elseif(($obj !== $this) && is_callable($obj)) {
+					// prevent deadloop
+					$obj = $obj($target, ...$arguments);
+					continue;
+				}
 			}
-
-			if($obj) {
-				return $obj(...$args);
-			}
-
-			throw new \ErrorException('Unknown member ' . __CLASS__ . "::{$target} on invoke");
+			throw new \Wtf\Exceptions\MethodException(__CLASS__ . "::{$target}");
 		}
 
-		return $this;
+		return $obj;
 	}
 
 }

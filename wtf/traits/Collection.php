@@ -34,6 +34,7 @@ trait Collection {
 
 	public function add($object) {
 		$this->_collection[] = $object;
+		return $this;
 	}
 
 	public function current() {
@@ -45,11 +46,12 @@ trait Collection {
 	}
 
 	public function next() {
-		next($this->_collection);
+		return next($this->_collection);
 	}
 
 	public function rewind() {
-		rewind($this->_collection);
+		reset($this->_collection);
+		return true;
 	}
 
 	public function valid() {

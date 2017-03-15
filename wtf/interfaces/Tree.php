@@ -24,6 +24,6 @@ namespace Wtf\Interfaces;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-interface Tree extends \ArrayAccess, \IteratorAggregate, Getter, Setter {
+interface Tree extends \ArrayAccess, \IteratorAggregate, Caller, Invokable, Getter, Setter {
 
 }

@@ -4,7 +4,7 @@
  * .php config
  */
 return [
-	'string' => 'ONE',
+	'string' => 'Overrided string',
 	'object' => new \stdClass(),
 	'array' => [
 		'bool' => true,

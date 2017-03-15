@@ -51,11 +51,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
 		$app->contract('singleton', \Wtf\Core\App::singleton());
 		
 		$object = FactoryMock::factory('name');
-		$this->assertInstanceOf('\\Wtf\\Traits\\ClassMock', $object);
+		$this->assertInstanceOf(\Wtf\Traits\ClassMock::class, $object);
 		$object = FactoryMock::factory('object');
-		$this->assertInstanceOf('\\Wtf\\Traits\\ClassMock', $object);
+		$this->assertInstanceOf(\Wtf\Traits\ClassMock::class, $object);
 		$object = FactoryMock::factory('singleton');
-		$this->assertInstanceOf('\\Wtf\\Core\\App', $object);
+		$this->assertInstanceOf(\Wtf\Core\App::class, $object);
 	}
 
 	/**
@@ -63,7 +63,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testFactoryClassname() {
 		$object = FactoryMock::factory(ClassMock::class);
-		$this->assertInstanceOf('\\Wtf\\Traits\\ClassMock', $object);
+		$this->assertInstanceOf(\Wtf\Traits\ClassMock::class, $object);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testFactoryObject() {
 		$object = FactoryMock::factory(new ClassMock);
-		$this->assertInstanceOf('\\Wtf\\Traits\\ClassMock', $object);
+		$this->assertInstanceOf(\Wtf\Traits\ClassMock::class, $object);
 	}
 
 }

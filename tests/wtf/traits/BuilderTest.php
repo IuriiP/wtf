@@ -21,6 +21,10 @@ class BuilderTest extends \PHPUnit_Framework_TestCase {
 
 	protected $object;
 
+	protected function assertArrayValues($expected, $actual) {
+		$this->assertEmpty(array_merge(array_diff($expected, $actual), array_diff($actual, $expected)));
+	}
+
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
@@ -56,14 +60,55 @@ class BuilderTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertSame($mock, $mock->data(999));
 		$this->assertEquals([999], $mock->data);
+		$this->assertSame($mock, $mock->data(555, 999, 900));
+		$this->assertArrayValues([999, 555, 900], $mock->data);
 		$this->assertSame($mock, $mock->data(333));
-		$this->assertEquals([999,333], $mock->data);
+		$this->assertEquals([999, 555, 900, 333], $mock->data);
 
 		$this->assertSame($mock, $mock->data());
-		$this->assertNull($mock->data);
+		$this->assertNotNull($mock->data);
 
-		$this->assertSame($mock, $mock->data(1, true, 'string'));
-		$this->assertEquals([1, true, 'string'], $mock->data);
+		$this->assertSame($mock, $mock->data(555, true, 'string'));
+		$this->assertArrayValues([999, 555, 900, 333, true, 'string'], $mock->data);
+	}
+
+	/**
+	 * @covers Wtf\Traits\Builder::__set
+	 * @covers Wtf\Traits\Builder::__isset
+	 * @covers Wtf\Traits\Builder::__unset
+	 */
+	public function testSet_Unset() {
+		$mock = BuilderMock::_();
+
+		$this->assertFalse(isset($mock->data));
+		$mock->data = 999;
+		$this->assertTrue(isset($mock->data));
+		$this->assertEquals([999], $mock->data);
+		$mock->data = 333;
+		$this->assertEquals([999, 333], $mock->data);
+
+		unset($mock->data);
+		$this->assertFalse(isset($mock->data));
+		$this->assertEquals([], $mock->data);
+	}
+
+	/**
+	 * @covers Wtf\Traits\Builder::__invoke
+	 */
+	public function testInvoke() {
+		$mock = BuilderMock::_();
+
+		$mock->data = 999;
+		$mock->data = 666;
+		$mock->data = 999;
+		$this->assertArrayValues([999, 666], $mock->data);
+		$mock->tata = 777;
+		$mock->tata = 888;
+		$mock->tata = 999;
+		$this->assertArrayValues([777, 888, 999], $mock->tata);
+
+		$this->assertEquals(['data' => [999, 666]], $mock('data'));
+		$this->assertEquals(['data' => [999, 666], 'tata' => [777, 888, 999]], $mock());
 	}
 
 }

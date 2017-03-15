@@ -26,7 +26,9 @@ namespace Wtf\Traits;
  */
 trait Contractor {
 
-	private static $_contracts = [];
+	use Caller;
+	
+	protected static $_contracts = [];
 
 	/**
 	 * Set/get the named contract.
@@ -38,28 +40,10 @@ trait Contractor {
 	public static function contract($name, $instance = null) {
 		$name = strtolower($name);
 		if($instance) {
-			static::$_contracts[$name] = $instance;
+			self::$_contracts[$name] = $instance;
 		}
 
-		return isset(static::$_contracts[$name]) ? static::$_contracts[$name] : null;
-	}
-
-	/**
-	 * Invoke contract.
-	 * 
-	 * @param string $name
-	 * @param array $arguments
-	 * @return mixed
-	 * @throws ErrorException on unknown contract
-	 */
-	public function __call($name, $arguments) {
-		$contract = static::contract($name);
-
-		if($contract) {
-			return $contract(...$arguments);
-		}
-
-		throw new ErrorException("Unknown contract '{$name}'");
+		return isset(self::$_contracts[$name]) ? self::$_contracts[$name] : null;
 	}
 
 	/**
@@ -68,7 +52,7 @@ trait Contractor {
 	 * @param string $name
 	 */
 	public function __get($name) {
-		return static::contract($name);
+		return self::contract($name);
 	}
 
 	/**
@@ -77,26 +61,28 @@ trait Contractor {
 	 * @param string $name
 	 */
 	public function __isset($name) {
-		return !!static::contract($name);
+		return !!self::contract($name);
 	}
 
 	/**
-	 * Set contract.
+	 * Disable setting contract.
 	 * 
 	 * @param string $name
 	 * @param mixed $value
 	 */
 	public function __set($name, $value) {
-		static::contract($name, $value);
+//		self::contract($name, $value);
+		throw new \Wtf\Exceptions\ReadOnlyException(__CLASS__);
 	}
 
 	/**
-	 * Remove contract.
+	 * Disable removing contract.
 	 * 
 	 * @param type $name
 	 */
 	public function __unset($name) {
-		unset(static::$_contracts[strtolower($name)]);
+//		unset(self::$_contracts[strtolower($name)]);
+		throw new \Wtf\Exceptions\ReadOnlyException(__CLASS__);
 	}
 
 }

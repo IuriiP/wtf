@@ -35,7 +35,7 @@ class Cookie implements \Wtf\Interfaces\Singleton, \ArrayAccess {
 	}
 
 	private function _filterOffset($offset) {
-		return str_replace([' ','.','/'], ['_'], $offset);
+		return preg_replace('/[=,; \t\r\n\013\014]+/', '_', $offset);
 	}
 	
 	public function offsetExists($offset) {
@@ -62,8 +62,7 @@ class Cookie implements \Wtf\Interfaces\Singleton, \ArrayAccess {
 				\Wtf\Helper\Complex::get($value, 'httponly', false)
 				);
 		} else {
-			setcookie($name, (string) $value);
-			$this->_array[$name] = (string) $value;
+			throw new \Wtf\Exceptions\ArgumentsException(__CLASS__.'::offsetSet()');
 		}
 	}
 

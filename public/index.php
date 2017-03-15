@@ -26,23 +26,21 @@ session_start();
 $loader = require_once('../vendor/autoload.php');
 
 /**
- * Use vlucas/dotenv to set environment
+ * Use iuriip/dotini to set initial constants
  */
-$dotenv = new \Dotenv\Dotenv(dirname(__DIR__));
+$dotini = new \Dotini\Dotini(true);
 /**
- * Load environment
+ * Initialize from '../'
  */
-//$dotenv->load();
-/**
- * Or overload environment
- */
-$dotenv->overload();
+$dotini->load(dirname(__DIR__));
 
 /**
- * Create shortcut to main application!
+ * Create shortcut to main application
+ * to avoid using the string
+ * use Wtf\Core\App;
  */
 class App extends \Wtf\Core\App {
-	// short alias
+	// shortcut
 }
 
 /**

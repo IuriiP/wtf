@@ -26,5 +26,5 @@ namespace Wtf\Interfaces;
  */
 interface Collection extends \Iterator, \Countable {
 
-	public function add($object, $name = null);
+	public function add($object);
 }

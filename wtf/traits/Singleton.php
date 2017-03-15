@@ -55,7 +55,7 @@ trait Singleton {
 	 * @throws \ErrorException
 	 */
 	private function __clone() {
-		throw new \ErrorException(__CLASS__ . '::Singleton: cloning is not allowed', E_ERROR);
+		throw new \ErrorException(__CLASS__ . ':: is Singleton: cloning is not allowed', E_ERROR);
 	}
 
 	/**
@@ -63,8 +63,8 @@ trait Singleton {
 	 * 
 	 * @throws \ErrorException
 	 */
-	private function __wakeup() {
-		throw new \ErrorException(__CLASS__ . '::Singleton: unserializing is not allowed', E_ERROR);
-	}
-
+//	private function __wakeup() {
+//		throw new \ErrorException(__CLASS__ . ':: is Singleton: unserializing is not allowed', E_ERROR);
+//	}
+//
 }

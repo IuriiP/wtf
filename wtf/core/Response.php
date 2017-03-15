@@ -24,7 +24,9 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
+abstract class Response implements \Wtf\Interfaces\Factory {
+
+	use \Wtf\Traits\Factory;
 
 	/**
 	 * @var array HTTP/1.1 response codes
@@ -102,27 +104,18 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 	 */
 	private $_headers = [];
 
-	/**
-	 * @var int response code
-	 */
 	private $_code = 200;
 
 	public $sent = false;
 
-	/**
-	 * Contracted name.
-	 */
-	public static function bootstrap(App $app) {
-		$app::contract('response', __CLASS__);
-	}
-
+	abstract public function __construct();
 	/**
 	 * Set headers array.
 	 * 
 	 * @param array $array
 	 * @return \Wtf\Core\Response Chainable
 	 */
-	public function headers($array = null) {
+	public final function headers($array = null) {
 		if(!headers_sent()) {
 			if(is_null($array)) {
 				$this->_headers = [];
@@ -140,7 +133,7 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 	 * @param mixed $value
 	 * @return \Wtf\Core\Response Chainable
 	 */
-	public function header($name, $value = null) {
+	public final function header($name, $value = null) {
 		if(!headers_sent()) {
 			$this->_headers[$name] = $value;
 		}
@@ -153,93 +146,8 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 	 * @param int $code
 	 * @return \Wtf\Core\Response Chainable
 	 */
-	public function code($code) {
+	public final function code($code) {
 		$this->_code = $code;
-		return $this;
-	}
-
-	/**
-	 * Define the required dependency.
-	 * 
-	 * @param mixed $content
-	 * @param string $name 
-	 * @param int $position
-	 * @return \Wtf\Core\Response Chainable
-	 */
-	public function approve($content, $name = null, $position = 0) {
-		$asset = [
-			'position' => $position,
-			'content' => $content,
-		];
-		if((\Wtf\Interfaces\Content::INJECT_HERE === $position) && !$this->hasChild($name)) {
-			if(!$this->content) {
-				if($content instanceof \Wtf\Interfaces\Content) {
-					$this->content($content);
-				} else {
-					$this->child[] = $asset;
-				}
-			} else {
-				$this->content->inject($asset);
-			}
-			if($name) {
-				$this->child[$name] = null;
-			}
-		} elseif($name) {
-			$this->child[$name] = $asset;
-		} else {
-			$this->child[] = $asset;
-		}
-		return $this;
-	}
-
-	/**
-	 * Magic setter for any type injection.
-	 * 
-	 * EG: Code below
-	 * ~~~
-	 * $response->html()
-	 *     ->style('.hidden {display:none;}')
-	 *     ->script('$("#some").addClass("hidden");');
-	 * ~~~
-	 * will inject <style> and <script> tags into html.
-	 * 
-	 * @param string $offset
-	 * @param array $args
-	 * @return \Wtf\Core\Response Chainable
-	 */
-	public function __call($offset, $args = []) {
-		if((count($args) < 1) || (null === $args[0])) {
-			$this->approve(Entity::make($offset, null));
-		} elseif(!$this->content) {
-			$content = Entity::factory($offset, $args);
-			if($content && ($content instanceof \Wtf\Interfaces\Content)) {
-				$this->content($content);
-			} else {
-				throw new Exception(__CLASS__ . "::{$offset}: can't be content");
-			}
-		} elseif($this->content->canInject($offset)) {
-			switch(count($args)) {
-				case 2: $this->approve(Entity::make($offset, $args[1]), $args[0]);
-					break;
-				case 1: $this->approve(Entity::make($offset, $args[0]));
-					break;
-				default: $this->approve(Entity::make($offset, $args[1]), $args[0], $args[2]);
-					break;
-			}
-		} else {
-			throw new Exception(__CLASS__ . "::{$offset}: injecting not allowed to " . $this->content->getType());
-		}
-		return $this;
-	}
-
-	/**
-	 * Clear content.
-	 * 
-	 * @return \Wtf\Core\Response Chainable
-	 */
-	public function clear() {
-		$this->content = null;
-		$this->children = [];
 		return $this;
 	}
 
@@ -250,11 +158,28 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 	 * @param type $code
 	 * @return \Wtf\Core\Response Chainable
 	 */
-	public function redirect($url, $code) {
-		$this->clear()->header('Location', $url)->code($code? : 301);
-		$this->sent = $this->send();
+	public final function redirect($url, $code=301) {
+		$this
+			->headers()
+			->clear()
+			->header('Location', $url)
+			->code($code)
+			->send();
 		return $this;
 	}
+
+	/**
+	 * Clear content.
+	 * 
+	 * @return \Wtf\Core\Response Chainable
+	 */
+	abstract public function clear();
+
+	/**
+	 * Send unsent specific headers 
+	 * and sends or returns body.
+	 */
+	abstract public function __toString();
 
 	/**
 	 * Send prepared headers.
@@ -286,38 +211,24 @@ class Response extends \Wtf\Core\Entity implements \Wtf\Interfaces\Bootstrap {
 	 * @param array $trash Some trash information for including in debug purposes
 	 * @return true
 	 */
-	public function send($trash = null) {
+	public final function send($trash = null) {
 		if($trash) {
 			$this->headers(['X-Trash'=>(array)$trash]);
 		}
 
-		if($this->content) {
-			$this->header('Content-Type', $this->content->getMime());
-			if($this->children) {
-				foreach(array_filter($this->children) as $asset) {
-					$this->content->inject($asset);
-				}
-			}
-			if($length = $this->content->getLength()) {
-				$this->header('Content-Length', $length);
-			}
-			
-			$this->_sendHeader($this->_code);
-			echo (string) $this->content;
-		} else {
-			$this->_sendHeader($this->_code);
+		$this->_sendHeader($this->_code);
+
+		$out = (string) $this;
+
+		// turn off output buffering
+		while(FALSE !== ob_end_clean()) {
+		}
+
+		if($out) {
+			echo $out;
 		}
 
 		return $this->sent = true;
-	}
-
-	/**
-	 * Magic cast to string.
-	 * 
-	 * @return type
-	 */
-	public function __toString() {
-		return (string) $this->content;
 	}
 
 }

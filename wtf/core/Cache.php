@@ -102,7 +102,7 @@ class Cache implements \Wtf\Interfaces\Configurable, \Wtf\Interfaces\Singleton {
 				return $known->getContent();
 			}
 			// make/rebuild cache
-			return $this->_compile($known, $resource, $callback ? : Config::singleton()->get('compilers')[$resource->getType()]);
+			return $this->_compile($known, $resource, $callback ? : Config::compilers($resource->getType()));
 		}
 		return $resource->getContent();
 	}

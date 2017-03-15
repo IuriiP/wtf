@@ -19,87 +19,139 @@
 
 namespace Wtf\Core;
 
-use Wtf\Core\App,
-	Wtf\Core\Response;
+use Wtf\Core\Response;
 
 /**
- * Description of Request
+ * Request incapsulate request information.
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Request implements \Wtf\Interfaces\Bootstrap {
+class Request {
 
-	private $_route = null;
-
-	private $_map = null;
-
+	/**
+	 * Request method
+	 * @var string
+	 */
 	private $_method = null;
 
-	private $_input = [];
+	/**
+	 * Output format
+	 * @var string
+	 */
+	private $_format = null;
 
-	public function __construct($route, $map = []) {
-		$this->_route = $route? : '/';
-		$this->_map = $map? : App::config('routes');
+	/**
+	 * Input data
+	 * @var \Wtf\Core\Input
+	 */
+	private $_input = null;
+
+	private $_accept = [];
+
+	/**
+	 * Set method
+	 * 
+	 * @param string $method
+	 * @return \Wtf\Core\Request
+	 */
+	public function method($method) {
+		$this->_method = strtolower($method);
+		return $this;
 	}
 
 	/**
-	 * Process routes from list
+	 * Set format
 	 * 
-	 * @param string $method
-	 * @param array $input
+	 * @param string $format
+	 * @return \Wtf\Core\Request
 	 */
-	public function execute($method = 'get', $input = []) {
-		$this->_method = $method;
-		$this->_input = $_REQUEST;
+	public function format($format) {
+		$this->_format = $format;
+		return $this;
+	}
 
-		if(!in_array($method, ['get', 'post'])) {
-			$exploded = explode('&', file_get_contents('php://input'));
-			foreach($exploded as $pair) {
-				$item = explode('=', $pair);
-				if(count($item) == 2) {
-					$this->_input[urldecode($item[0])] = urldecode($item[1]);
+	/**
+	 * Set input
+	 * 
+	 * @param \Wtf\Core\Input $input
+	 * @return \Wtf\Core\Request
+	 */
+	public function input($input) {
+		$this->_input = $input;
+		return $this;
+	}
+
+	/**
+	 * Magic setting for acceptable
+	 * 
+	 * @param string $name
+	 * @param string[] $arguments
+	 * @return \Wtf\Core\Request
+	 */
+	public function __call($name, $arguments) {
+		$this->_accept[$name] = $this->_priority($list);
+		return $this;
+	}
+
+	/**
+	 * Magic getter for readonly
+	 * 
+	 * @param string $name
+	 * @return string
+	 */
+	public function __get($name) {
+		switch($name) {
+			case 'method':
+				return $this->_method;
+			case 'format':
+				return $this->_format;
+			case 'input':
+				return $this->_input;
+			default:
+				return reset($this->_accept[$name]);
+		}
+		
+	}
+
+	/**
+	 * Select preferable option from acceptable
+	 * 
+	 * @param string $name
+	 * @param string[] $options
+	 * @return string
+	 */
+	public function select($name,$options) {
+		if(isset($this->_accept[$name])) {
+			$list = $this->_accept[$name];
+			foreach($list as $key=>$val) {
+				$pattern = str_replace('*', '.*', $key);
+				$matches = preg_grep($pattern, $options);
+				if($matches) {
+					return reset($matches);
 				}
 			}
 		}
-		$this->_input = array_replace($this->_input, $input);
+		return null;
+	}
 
-		if($this->_map) {
-			$ret = Rule::find($this->_map, $this->_route, $this->_method, $this->_input);
-			if($ret) {
-				return $ret;
+	/**
+	 * Parse list of values, weighted with the quality value syntax
+	 * 
+	 * @param array|string $list
+	 * @return array
+	 */
+	private function _priority($list) {
+		$ret = [];
+		foreach((array) $list as $string) {
+			if(preg_match_all('~(.+)(?:;q=([\\d.]+))?(?:,|$)~', $string, $matches, PREG_SET_ORDER)) {
+				foreach($matches as $record) {
+					$ret[$record[1]] = $record[2] ? : '1.0';
+				}
 			}
-			return Response::error(404, ['route' => $this->_route]);
 		}
-		return Response::error(500, ['route' => $this->_route]);
-	}
+		asort($ret);
 
-	/**
-	 * Get value from $this->_input
-	 * 
-	 * @param string $name
-	 * @param mixed $def
-	 */
-	final public function input($name, $def = null) {
-		return \Wtf\Helper\Complex::extract($this->_input, $name, $def);
-	}
-
-	/**
-	 * Get value from $_FILES
-	 * 
-	 * @param string $name
-	 * @param mixed $def
-	 */
-	final public static function file($name, $def = null) {
-		return \Wtf\Helper\Complex::extract($_FILES, $name, $def);
-	}
-
-	/**
-	 * Implementation of \Wtf\Interfaces\Bootstrap::bootstrap()
-	 * 
-	 * @param App $app
-	 */
-	public static function bootstrap(\Wtf\Core\App $app) {
-		$app::contract('request', __CLASS__);
+		return $ret;
 	}
 
 }

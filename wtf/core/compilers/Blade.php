@@ -98,7 +98,7 @@ class Blade extends \Wtf\Core\Compiler {
 	 * @param string $content
 	 * @return string
 	 */
-	public static function compile($content) {
+	public function compile($content) {
 		$content = preg_replace_callback(array_keys(self::$_commands), self::$_commands, $content);
 		return preg_replace(array_keys(self::$_templates), self::$_templates, $content);
 	}

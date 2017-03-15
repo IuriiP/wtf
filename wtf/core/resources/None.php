@@ -56,7 +56,7 @@ class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 	/**
 	 * @return null
 	 */
-	public function child() {
+	public function child($name) {
 		return null;
 	}
 
@@ -70,7 +70,7 @@ class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 	/**
 	 * @return int
 	 */
-	public function getTime() {
+	public function getTime($type = NULL) {
 		return time();
 	}
 
@@ -112,7 +112,7 @@ class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 	/**
 	 * @return []
 	 */
-	public function get() {
+	public function get($keep = false) {
 		return [];
 	}
 
@@ -126,14 +126,14 @@ class None extends \Wtf\Core\Resource implements \Wtf\Interfaces\Writable {
 	/**
 	 * @return null
 	 */
-	public function append() {
+	public function append($data) {
 		return null;
 	}
 
 	/**
 	 * @return null
 	 */
-	public function put() {
+	public function put($data) {
 		return null;
 	}
 

@@ -99,9 +99,9 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testCompiler() {
 		$cached = Cache::supply(self::$data . 'compile.tpl');
-		
+
 		$name = hash(Cache::singleton()->config('algorithm') ? : 'md4', Resource::produce(self::$data . 'compile.tpl')->getPath() . '?');
-		
+
 		$this->assertFileExists(self::$fixture . "/cached/$name");
 		$this->assertFileEquals(self::$data . 'compiled', self::$fixture . "/cached/$name");
 	}

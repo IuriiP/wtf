@@ -2,12 +2,12 @@
 
 namespace Wtf\Traits;
 
-class ConfigurableMock {
+class ConfigurableMock implements \Wtf\Interfaces\Configurable {
 
 	use Configurable;
 }
 
-class ConfigurableNamedMock {
+class ConfigurableNamedMock implements \Wtf\Interfaces\Configurable {
 
 	use Configurable;
 }
@@ -45,9 +45,10 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testConfigureNamed() {
 		$object = new ConfigurableNamedMock();
+		$this->assertInstanceOf(ConfigurableNamedMock::class, $object);
 		$php = $object::configure('php');
 
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $php);
+		$this->assertInstanceOf(\Wtf\Core\Config::class, $php);
 		$this->assertEquals('ONE', $php['string']);
 	}
 
@@ -58,7 +59,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase {
 		$object = new ConfigurableMock();
 		$def = $object::configure();
 
-		$this->assertInstanceOf('\\Wtf\\Core\\Config', $def);
+		$this->assertInstanceOf(\Wtf\Core\Config::class, $def);
 		$this->assertEquals('IuriiP <hardwork.mouse@gmail.com>', $def['name']);
 	}
 

@@ -19,9 +19,16 @@
 
 namespace Wtf\Traits;
 
-use Wtf\Helper\Common;
+use Wtf\Helper\Common,
+	Wtf\Core\App;
 
 /**
+ * Implementation of \Wtf\Traits\Factory
+ * @uses \Wtf\Helper\Common::plural()
+ * @uses \Wtf\Helper\Common::camelCase()
+ * @uses \Wtf\Helper\Common::snakeCase()
+ * @uses \Wtf\Core\App::contract()
+ * Uses \Wtf\Core\App::config as contract
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
@@ -38,10 +45,10 @@ trait Factory {
 		if(is_object($named)) {
 			$class = get_class($named);
 		} elseif(is_string($named)) {
-			$class = \Wtf\Core\App::contract($named)? : $named;
+			$class = App::contract($named)? : $named;
 		} elseif(is_array($named)) {
 			$ns = '';
-			if($named[0] && ($context = \Wtf\Core\App::config(Common::snakeCase(Common::plural($named[0]))))) {
+			if($named[0] && ($context = App::config(Common::snakeCase(Common::plural($named[0]))))) {
 				$ns = $context[$named[1].'/class']? : '';
 			}
 			$class = $ns? : Common::plural(get_called_class()) . '\\' . Common::camelCase($named[1]);

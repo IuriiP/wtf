@@ -24,9 +24,13 @@ namespace Wtf\Core;
  *
  * @author Iurii Prudius <hardwork.mouse@gmail.com>
  */
-class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \Wtf\Interfaces\Getter, \ArrayAccess {
+class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \Wtf\Interfaces\Caller, \Wtf\Interfaces\GetterOnly, \Wtf\Interfaces\ArrayAccessRead {
 
-	use \Wtf\Traits\Singleton;
+	use \Wtf\Traits\Singleton, 
+		\Wtf\Traits\GetterOnly,
+		\Wtf\Traits\ArrayAccessRead,
+		\Wtf\Traits\Caller,
+		\Wtf\Traits\Invokable;
 
 	private $_server = [];
 	
@@ -63,18 +67,6 @@ class Server implements \Wtf\Interfaces\Singleton, \Wtf\Interfaces\Invokable, \W
 	public function offsetGet($offset) {
 		$name = strtolower($offset);
 		return isset($this->_server[$name]) ? $this->_server[$name] : null;
-	}
-
-	public function offsetSet($offset, $value) {
-		// readonly
-	}
-
-	public function offsetUnset($offset) {
-		// readonly
-	}
-
-	public function __invoke($offset) {
-		return $this->offsetGet($offset);
 	}
 
 }

@@ -315,10 +315,10 @@ trait Tree {
 	public static function __callStatic($offset, $args = []) {
 		$class = static::class;
 
-		if(!is_subclass_of($class, 'Wtf\\Interfaces\\Singleton')) {
-			throw new \ErrorException("{$class}::Tree: static calling accepted by Singleton only.");
+		if(is_subclass_of($class, \Wtf\Interfaces\Singleton::class)) {
+			return call_user_func_array([static::singleton(), $offset], $args);
 		}
-		return call_user_func_array([static::singleton(), $offset], $args);
+		throw new \Wtf\Exceptions\SingletonException($class);
 	}
 
 	public function __isset($name) {

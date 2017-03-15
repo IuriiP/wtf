@@ -22,20 +22,41 @@ namespace Wtf\Traits;
 /**
  * Implementation of \Wtf\Interfaces\Caller
  * Indirect invoke of member.
+ * @uses \Wtf\Interfaces\Singleton
  * 
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
 trait Caller {
 
 	public function __call($name, $arguments) {
-		if($this instanceof \ArrayAccess) {
-			$obj = $this[$name];
-		} elseif($this instanceof \Wtf\Interfaces\Getter) {
+		if(isset($this->$name)) {
 			$obj = $this->$name;
+		} elseif($this instanceof \ArrayAccess && isset($this[$name])) {
+			$obj = $this[$name];
 		} else {
-			throw new \ErrorException('Unknown method ' . __CLASS__ . "::{$name} called");
+			throw new \Wtf\Exceptions\MethodException(__CLASS__."::{$name}");
 		}
-		return $obj(...$arguments);
+
+		if($arguments) {
+			if(is_object($obj)) {
+				if(is_callable($obj)) {
+					return $obj(...$arguments);
+				} else {
+					$method = array_shift($arguments);
+					return call_user_func_array([$obj, $method], $arguments);
+				}
+			}
+			throw new \Wtf\Exceptions\ArgumentsException(__CLASS__."::{$name}");
+		}
+		return $obj;
+	}
+
+	public static function __callStatic($name, $arguments) {
+		$ref = new \ReflectionClass(static::class);
+		if($ref->implementsInterface(\Wtf\Interfaces\Singleton::class)) {
+			return static::singleton()->__call($name, $arguments);
+		}
+		throw new \Wtf\Exceptions\SingletonException(__CLASS__);
 	}
 
 }

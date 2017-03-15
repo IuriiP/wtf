@@ -10,6 +10,7 @@ namespace Wtf\Traits;
 
 /**
  * Implementation of Pool
+ * @uses \Wtf\Interfaces\Factory
  *
  * @author IuriiP
  */
@@ -28,7 +29,7 @@ trait Pool {
 		if(!isset(self::$_pool[$name])) {
 			$class = new \ReflectionClass(static::class);
 			if($class->implementsInterface(\Wtf\Interfaces\Factory::class)) {
-				return self::$_pool[$name] = static::factory($class->getName(), [$name]);
+				return self::$_pool[$name] = static::factory(['',$name]);
 			}
 			return self::$_pool[$name] = new static($name);
 		}

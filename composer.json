@@ -15,5 +15,8 @@
         "psr-4": {
             "Wtf\\": "wtf/"
         }
+    },
+    "require-dev": {
+        "iuriip/dotini": "* v1.0"
     }
 }

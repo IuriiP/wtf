@@ -41,9 +41,20 @@ trait Builder {
 		if(!isset($this->_bricks[$name])) {
 			$this->_bricks[$name] = [];
 		}
-		$this->_bricks[$name] = array_merge($this->_bricks[$name], $arguments);
+		$this->_bricks[$name] = array_unique(array_merge($this->_bricks[$name], $arguments));
 
 		return $this;
+	}
+
+	/**
+	 * Make instance and call setter.
+	 * 
+	 * @param type $name
+	 * @param type $arguments
+	 */
+	public static function __callStatic($name, $arguments) {
+		$obj = static::_();
+		return $obj->$name(...$arguments);
 	}
 
 	/**
@@ -63,7 +74,12 @@ trait Builder {
 	 * @param mixed $value
 	 */
 	public function __set($name, $value) {
-		$this->_bricks[$name][] = $value;
+		if(!isset($this->_bricks[$name])) {
+			$this->_bricks[$name] = [];
+		}
+		if(!in_array($value, $this->_bricks[$name])) {
+			$this->_bricks[$name][] = $value;
+		}
 	}
 
 	/**
@@ -88,10 +104,10 @@ trait Builder {
 	/**
 	 * Filtered getting bricks by names.
 	 * 
-	 * @param type $param
 	 * @return type
 	 */
-	public function __invoke($param = null) {
+	public function __invoke() {
+		$param = func_get_args();
 		return $param ? array_intersect_key($this->_bricks, array_flip((array) $param)) : $this->_bricks;
 	}
 

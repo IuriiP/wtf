@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 <root>
-    <text>some text</text>
+    <text id="text">some text</text>
     <dup id="name">duplicated 0</dup>
     <complex>
         <first>ONE</first>

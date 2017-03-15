@@ -152,6 +152,27 @@ abstract class Common {
 		return $ret;
 	}
 
+	public static function returnBytes($size_str) {
+		switch(substr($size_str, -1)) {
+			case 'M': case 'm': return (doubleval($size_str) * 1048576);
+			case 'K': case 'k': return (doubleval($size_str) * 1024);
+			case 'G': case 'g': return (doubleval($size_str) * 1073741824);
+			default: return doubleval($size_str);
+		}
+	}
+
+	public static function vnsprintf($format, $arguments) {
+		$names = preg_match_all('/%\((.*?)\)/', $format, $matches, PREG_SET_ORDER);
+
+		$values = array();
+		foreach($matches as $match) {
+			$values[] = $args[$match[1]];
+		}
+
+		$format = preg_replace('/%\((.*?)\)/', '%', $format);
+		return vsprintf($format, $values);
+	}
+
 }
 
 /**

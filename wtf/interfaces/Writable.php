@@ -25,9 +25,9 @@ namespace Wtf\Interfaces;
  */
 interface Writable {
 
-	public function put();
+	public function put($data);
 
-	public function append();
+	public function append($data);
 
 	public function remove();
 }
