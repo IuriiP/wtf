@@ -104,11 +104,11 @@ abstract class Response implements \Wtf\Interfaces\Factory {
 	 */
 	private $_headers = [];
 
-	private $_code = 200;
+	protected $_code = 200;
 
 	public $sent = false;
 
-	abstract public function __construct();
+//	abstract public function __construct();
 	/**
 	 * Set headers array.
 	 * 
@@ -133,7 +133,7 @@ abstract class Response implements \Wtf\Interfaces\Factory {
 	 * @param mixed $value
 	 * @return \Wtf\Core\Response Chainable
 	 */
-	public final function header($name, $value = null) {
+	public function header($name, $value = null) {
 		if(!headers_sent()) {
 			$this->_headers[$name] = $value;
 		}
@@ -144,7 +144,7 @@ abstract class Response implements \Wtf\Interfaces\Factory {
 	 * Set response code.
 	 * 
 	 * @param int $code
-	 * @return \Wtf\Core\Response Chainable
+	 * @return \Wtf\Core\Response
 	 */
 	public final function code($code) {
 		$this->_code = $code;
@@ -152,13 +152,13 @@ abstract class Response implements \Wtf\Interfaces\Factory {
 	}
 
 	/**
-	 * Immediately redirect.
+	 * Helper: Immediately redirect.
 	 * 
-	 * @param type $url
-	 * @param type $code
+	 * @param string $url
+	 * @param int $code
 	 * @return \Wtf\Core\Response Chainable
 	 */
-	public final function redirect($url, $code=301) {
+	public final function redirect($url, $code = 301) {
 		$this
 			->headers()
 			->clear()
@@ -193,16 +193,14 @@ abstract class Response implements \Wtf\Interfaces\Factory {
 		foreach($this->_headers as $key => $value) {
 			if(null !== $value) {
 				if(is_array($value)) {
-					foreach($value as $subkey=>$subval) {
-						header("{$key}-{$subkey}: ". str_replace(["\n", "\t", "\r"], '', $subval),false);
+					foreach($value as $subkey => $subval) {
+						header("{$key}-{$subkey}: " . str_replace(["\n", "\t", "\r"], '', $subval), false);
 					}
 				} else {
-					header("{$key}: ".str_replace(["\n", "\t", "\r"], '', $subval), true);
+					header("{$key}: " . str_replace(["\n", "\t", "\r"], '', $subval), true);
 				}
 			}
 		}
-		
-		return ($code >= 200) && ($code < 300);
 	}
 
 	/**
@@ -213,15 +211,15 @@ abstract class Response implements \Wtf\Interfaces\Factory {
 	 */
 	public final function send($trash = null) {
 		if($trash) {
-			$this->headers(['X-Trash'=>(array)$trash]);
+			$this->headers(['X-Trash' => (array) $trash]);
 		}
 
 		$this->_sendHeader($this->_code);
-
 		$out = (string) $this;
 
 		// turn off output buffering
 		while(FALSE !== ob_end_clean()) {
+			
 		}
 
 		if($out) {

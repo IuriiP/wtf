@@ -170,7 +170,6 @@ class RuleTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @depends testFind
 	 * @covers Wtf\Core\Rule::find
-	 * @covers Wtf\Core\Rule::
 	 */
 	public function testFind1($fixture) {
 		$params = [

@@ -166,7 +166,7 @@ abstract class Common {
 
 		$values = array();
 		foreach($matches as $match) {
-			$values[] = $args[$match[1]];
+			$values[] = $arguments[$match[1]];
 		}
 
 		$format = preg_replace('/%\((.*?)\)/', '%', $format);

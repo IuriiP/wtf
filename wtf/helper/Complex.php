@@ -143,29 +143,56 @@ abstract class Complex {
 	/**
 	 * Convert array to XML
 	 * 
-	 * @param array $array
-	 * @param \SimpleXMLElement $node
-	 * @return type
+	 * @param array $data
+	 * @param \SimpleXMLElement $root
+	 * @param \SimpleXMLElement $parent
+	 * @return \SimpleXMLElement
 	 */
-	public static function xmlEncode($array, $parent = null, $upkey = 'node') {
-		if(!isset($parent)) {
-			$parent = new \SimpleXMLElement('<?xml version="1.0" standalone="yes"?><root></root>');
+	public static function arr2xml($data, $root = null, $parent = null) {
+		if(null === $root) {
+			$root = new \SimpleXMLElement('<?xml version="1.0" standalone="yes"?><xml></xml>');
 		}
-		foreach($array as $key => $value) {
-			if(is_numeric($key)) {
-				if(is_array($value)) {
-					self::xmlEncode($value, $parent, $upkey);
+
+		if(is_array($data)) {
+			$serial = null;
+			foreach($data as $k => $v) {
+				if(is_numeric($k)) {
+					if($parent) {
+						$serial = self::arr2xml($v, $serial ? $parent->addChild($root->getName()) : $root, $parent);
+					} else {
+						self::arr2xml($v, $root->addChild('node'), $root);
+					}
+				} elseif('@' === $k{0}) {
+					$root->addAttribute(substr($k, 1), $v);
 				} else {
-					$parent->addChild($upkey, $value);
+					self::arr2xml($v, $root->addChild($k), $root);
 				}
-			} elseif(is_array($value)) {
-				self::xmlEncode($value, $parent, $key);
+			}
+		} elseif(!empty($data)) {
+			$root[0] = htmlentities($data, ENT_DISALLOWED || ENT_XML1);
+		}
+		return $root;
+	}
+
+	public static function xml2arr($xml) {
+		$arr = (array)$xml;
+		var_export($arr);
+
+		$out = [];
+		foreach($arr as $k => $v) {
+			if('@attributes' === $k) {
+				foreach($v as $attr => $set) {
+					$out["@{$attr}"] = $set;
+				}
+			} elseif(!is_scalar($v)) {
+				$out[$k] = self::xml2arr($v);
+			} elseif(is_string($v) && is_numeric($v)) {
+				$out[$k] = false === strpos($v, '.') ? intval($v) : doubleval($v);
 			} else {
-				$subnode = $parent->addChild($upkey);
-				$subnode->addChild($key, $value);
+				$out[$k] = $v;
 			}
 		}
-		return $parent;
+		return $out;
 	}
 
 	/**

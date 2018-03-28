@@ -26,7 +26,7 @@ namespace Wtf\Core\Responses;
  */
 class Json extends \Wtf\Core\Response {
 
-	private $_data = [];
+	protected $_data = [];
 
 	public function __construct($data) {
 		$this->_data = $data;
@@ -35,8 +35,10 @@ class Json extends \Wtf\Core\Response {
 	public function __toString() {
 		$text = json_encode($this->_data);
 		$this
-				->header('Content-Type', 'application/json')
-				->header('Content-Length', strlen($text));
+			->headers([
+				'Content-Type' => 'application/json',
+				'Content-Length' => strlen($text),
+		]);
 		return $text;
 	}
 

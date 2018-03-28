@@ -17,6 +17,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 	 * This method is called before a test is executed.
 	 */
 	protected function setUp() {
+		
 	}
 
 	/**
@@ -29,68 +30,57 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers Wtf\Core\Response::headers
-	 * @todo   Implement testHeaders().
+	 * @covers Wtf\Core\Response::header
+	 * @runInSeparateProcess
 	 */
 	public function testHeaders() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
+		$stub = $this->getMockForAbstractClass(Response::class);
 
-	/**
-	 * @covers Wtf\Core\Response::header
-	 * @todo   Implement testHeader().
-	 */
-	public function testHeader() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$this->assertSame($stub, $stub->headers(['Foo' => 'foo', 'Bar' => [1, 2]]));
+		$this->assertAttributeEquals(['Foo' => 'foo', 'Bar' => [1, 2]], '_headers', $stub);
+		$this->assertSame($stub, $stub->headers());
+		$this->assertAttributeEquals([], '_headers', $stub);
+		$this->assertSame($stub, $stub->headers(['Foo' => 'foo']));
+		$this->assertAttributeEquals(['Foo' => 'foo'], '_headers', $stub);
+		$this->assertSame($stub, $stub->headers(['Foo' => 'boo']));
+		$this->assertAttributeEquals(['Foo' => 'boo'], '_headers', $stub);
+		$this->assertSame($stub, $stub->header('Bar', 'bar'));
+		$this->assertAttributeEquals(['Foo' => 'boo', 'Bar' => 'bar'], '_headers', $stub);
 	}
 
 	/**
 	 * @covers Wtf\Core\Response::code
-	 * @todo   Implement testCode().
 	 */
 	public function testCode() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$stub = $this->getMockForAbstractClass(Response::class);
+
+		$this->assertSame($stub, $stub->code(222));
+		$this->assertAttributeEquals(222, '_code', $stub);
 	}
 
 	/**
 	 * @covers Wtf\Core\Response::clear
-	 * @todo   Implement testClear().
 	 */
 	public function testClear() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$stub = $this->getMockForAbstractClass(Response::class);
+		$stub->method('clear')
+			->willReturn('OK');
+
+		$this->assertEquals('OK', $stub->clear());
 	}
 
 	/**
 	 * @covers Wtf\Core\Response::redirect
-	 * @todo   Implement testRedirect().
 	 */
 	public function testRedirect() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		
 	}
 
 	/**
 	 * @covers Wtf\Core\Response::send
-	 * @todo   Implement testSend().
 	 */
 	public function testSend() {
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		
 	}
 
 	/**

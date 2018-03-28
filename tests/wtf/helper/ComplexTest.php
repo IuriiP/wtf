@@ -262,22 +262,21 @@ EOT;
 
 	public function testXmlEncode() {
 		$array = [
-			'node' => [
-				[
-					'first' => 'one',
-					'second' => 'two',
-				],
-				[
-					'third' => 'three',
-					'repeat' => [
-						1, 2, 3, 4,
-					],
+			'@attr' => 'some',
+			[
+				'first' => 'one',
+				'second' => 'two',
+			],
+			[
+				'third' => 'three',
+				'repeat' => [
+					1, ['@att' => 'att', 2], 3, 4,
 				],
 			],
 		];
 		$xml = <<<EOT
 <?xml version='1.0' standalone='yes'?>
-<root>
+<xml attr="some">
 <node>
 	<first>one</first>
 	<second>two</second>
@@ -285,17 +284,54 @@ EOT;
 <node>
 	<third>three</third>
 	<repeat>1</repeat>
-	<repeat>2</repeat>
+	<repeat att="att">2</repeat>
 	<repeat>3</repeat>
 	<repeat>4</repeat>
 </node>
-</root>
+</xml>
 EOT;
 
 		$sxe = new \SimpleXMLElement($xml);
-		$encoded = Complex::xmlEncode($array);
-		echo $encoded->asXML();
+		$encoded = Complex::arr2xml($array);
 		$this->assertEqualXMLStructure(dom_import_simplexml($sxe), dom_import_simplexml($encoded));
+	}
+
+	public function testXmlDecode() {
+		$array = [
+			'@attr' => 'some',
+			'node' => [[
+				'first' => 'one',
+				'second' => 'two',
+				],
+				[
+					'third' => 'three',
+					'repeat' => [
+						1, 2.3, 3, 4,
+					],
+				],
+			]
+		];
+		$xml = <<<EOT
+<?xml version='1.0' standalone='yes'?>
+<xml attr="some">
+<node>
+	<first>one</first>
+	<second>two</second>
+</node>
+<node>
+	<third>three</third>
+	<repeat>1</repeat>
+	<repeat>2.3</repeat>
+	<repeat>3</repeat>
+	<repeat>4</repeat>
+</node>
+</xml>
+EOT;
+
+		$sxe = new \SimpleXMLElement($xml);
+		echo $sxe->asXML();
+		$decoded = Complex::xml2arr($sxe);
+		$this->assertEquals($array, $decoded);
 	}
 
 }

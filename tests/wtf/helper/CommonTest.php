@@ -166,7 +166,7 @@ EOT;
 	}
 
 	/**
-	 * @covers Wtf\Helper\Common::normalizePath
+	 * @covers Wtf\Helper\Common::returnBytes
 	 */
 	public function testReturnBytes() {
 
@@ -176,6 +176,14 @@ EOT;
 		$this->assertEquals(42, Common::returnBytes('42l'));
 		$this->assertEquals(0, Common::returnBytes('some42'));
 		$this->assertEquals(4.222 * 1024 * 1024 * 1024, Common::returnBytes('4.222G'));
+	}
+
+	/**
+	 * @covers Wtf\Helper\Common::vnsprintf
+	 */
+	public function testVnsprintf() {
+
+		$this->assertEquals('data test = 0042', Common::vnsprintf('data %(foo)s = %(bar)04d', ['foo' => 'test', 'bar' => 42]));
 	}
 
 }

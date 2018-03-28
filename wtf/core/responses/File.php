@@ -39,9 +39,10 @@ class File extends \Wtf\Core\Response {
 
 	public function __toString() {
 		if($this->_resource->exists() && !$this->_resource->isContainer()) {
-			$this
-				->header('Content-Type', $this->_resource->getMime())
-				->header('Content-Length', $this->_resource->getLength());
+			$this->headers([
+				'Content-Type' => $this->_resource->getMime(),
+				'Content-Length' => $this->_resource->getLength()
+			]);
 			return $this->_resource->getContent();
 		}
 		return null;

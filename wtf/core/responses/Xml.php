@@ -24,26 +24,20 @@ namespace Wtf\Core\Responses;
  *
  * @author IuriiP <hardwork.mouse@gmail.com>
  */
-class Xml extends \Wtf\Core\Response {
-
-	private $_data = [];
-
-	public function __construct($data) {
-		$this->_data = $data;
-	}
+class Xml extends Json {
 
 	public function __toString() {
-		$text = \Wtf\Helper\Complex::xml_encode($this->_data)
+		$text = \Wtf\Helper\Complex::arr2xml($this->_data)
 			->asXML();
-		$this
-			->header('Content-Type', 'text/xml')
-			->header('Content-Length', strlen($text));
+		$this->headers([
+			'Content-Type' => 'text/xml',
+			'Content-Length' => strlen($text),
+		]);
 		return $text;
 	}
 
-	public function clear() {
-		$this->_data = [];
-		return $this;
+	public function xml($data) {
+		$this->_data = array_merge_recursive($this->_data, $data);
 	}
 
 }
